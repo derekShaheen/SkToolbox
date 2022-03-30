@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70CF1763-3BA1-477C-A53F-F74447764D9C}</ProjectGuid>
+    <ProjectGuid>{4124FADB-8531-4922-BE3F-526020E5406A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SkToolbox</RootNamespace>
@@ -41,36 +41,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\SkCommand.cs" />
-    <Compile Include="Commands\StandardCommands.cs" />
-    <Compile Include="Loaders\SkBepInExLoader.cs" />
-    <Compile Include="Loaders\SkLoader.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SkCommandProcessor.cs" />
-    <Compile Include="SkConsole.cs" />
-    <Compile Include="SkMenu.cs" />
-    <Compile Include="SkMenuController.cs" />
-    <Compile Include="SkMenuItem.cs" />
-    <Compile Include="SkModuleController.cs" />
-    <Compile Include="SkModules\IModule.cs" />
-    <Compile Include="SkModules\ModConsoleOpt.cs" />
-    <Compile Include="SkModules\ModGeneric.cs" />
-    <Compile Include="SkModules\ModTestMenu.cs" />
-    <Compile Include="SkModules\SkBaseModule.cs" />
-    <Compile Include="Utility\SkUtilities.cs" />
-    <Compile Include="Utility\SkVersionChecker.cs" />
+    <Compile Include="SkToolbox\Commands\SkCommand.cs" />
+    <Compile Include="SkToolbox\Commands\StandardCommands.cs" />
+    <Compile Include="SkToolbox\Loaders\SkBepInExLoader.cs" />
+    <Compile Include="SkToolbox\Loaders\SkLoader.cs" />
+    <Compile Include="SkToolbox\SkCommandProcessor.cs" />
+    <Compile Include="SkToolbox\SkConsole.cs" />
+    <Compile Include="SkToolbox\SkMenu.cs" />
+    <Compile Include="SkToolbox\SkMenuController.cs" />
+    <Compile Include="SkToolbox\SkMenuItem.cs" />
+    <Compile Include="SkToolbox\SkModuleController.cs" />
+    <Compile Include="SkToolbox\SkModules\IModule.cs" />
+    <Compile Include="SkToolbox\SkModules\ModConsoleOpt.cs" />
+    <Compile Include="SkToolbox\SkModules\ModGeneric.cs" />
+    <Compile Include="SkToolbox\SkModules\ModTestMenu.cs" />
+    <Compile Include="SkToolbox\SkModules\SkBaseModule.cs" />
+    <Compile Include="SkToolbox\Utility\SkUtilities.cs" />
+    <Compile Include="SkToolbox\Utility\SkVersionChecker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="obj\Debug\SkToolbox.csproj.CoreCompileInputs.cache" />
-    <None Include="obj\Debug\SkToolbox.csprojAssemblyReference.cache" />
-    <None Include="SkConsoleNew.cs.bak" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="obj\Debug\TempPE\" />
+    <None Include="SkToolbox\SkConsoleNew.cs.bak" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
