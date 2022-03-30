@@ -35,9 +35,9 @@ namespace SkToolbox
 
         #endregion
 
-        private SkModules.ModConsoleOpt moduleConsole;
-        private SkModules.ModGeneric moduleGeneric;
-        private SkModules.ModTestMenu moduleTestMenu;
+        //private SkModules.ModConsoleOpt moduleConsole;
+        //private SkModules.ModGeneric moduleGeneric;
+        //private SkModules.ModTestMenu moduleTestMenu;
         private List<SkModules.SkBaseModule> _menuOptions = new List<SkModules.SkBaseModule>();
 
         //
@@ -233,16 +233,16 @@ namespace SkToolbox
 
             //RegisterModules();
             //Create a game object for each module
-            moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
-            moduleGeneric = gameObject.AddComponent<SkModules.ModGeneric>();
-            moduleTestMenu = gameObject.AddComponent<SkModules.ModTestMenu>();
+            //moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
+            //moduleGeneric = gameObject.AddComponent<SkModules.ModGeneric>();
+            //moduleTestMenu = gameObject.AddComponent<SkModules.ModTestMenu>();
 
             // Add modules to the menu list
             // This is the order the menu items will be shown as well.
-            menuOptions.Add(moduleTestMenu);
-            menuOptions.Add(moduleConsole);
+            //menuOptions.Add(moduleTestMenu);
+            //menuOptions.Add(moduleConsole);
 
-            menuOptions.Add(moduleGeneric);
+            //menuOptions.Add(moduleGeneric);
         }
 
         public static T ParseEnum<T>(string value)
