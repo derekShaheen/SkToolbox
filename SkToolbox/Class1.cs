@@ -8,5 +8,6 @@ namespace SkToolbox
 {
     public class Class1
     {
+
     }
 }
