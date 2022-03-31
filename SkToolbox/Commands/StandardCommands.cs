@@ -35,7 +35,7 @@ namespace SkToolbox.Commands
                                 hintList += "[" + hint + "] ";
                             }
                         }
-                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + hintList + " - " + foundCmd.Description });
+                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + hintList + "- " + foundCmd.Description });
                     }
                     else
                     {
@@ -57,7 +57,7 @@ namespace SkToolbox.Commands
                                 hintList += "[" + hint + "] ";
                             }
                         }
-                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + hintList + " - " + cmd.Description });
+                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + " " + hintList + "- " + cmd.Description });
                     }
                 }
             }

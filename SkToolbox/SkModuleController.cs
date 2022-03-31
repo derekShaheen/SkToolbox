@@ -276,7 +276,7 @@ namespace SkToolbox
 
             pmodule.CallerEntry = new SkMenuItem((pmodule?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
                                                             pmodule.CallerEntry.ItemText : pmodule.ModuleName, // or will have a menu text applied to it.
-                                                            () => menuController.RequestSubMenu(pmodule.FlushMenu())); //
+                                                            () => menuController.RequestSubMenu(pmodule.FlushMenu())); // We also want to make sure the proper menu controller reference is set
             menuOptions.Add(pmodule);
 
             menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));

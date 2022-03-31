@@ -5,7 +5,7 @@ namespace SkToolbox.Utility
 {
     internal static class SkVersionChecker
     {
-        private static readonly string VersionURL = "https://pastebin.com/raw/ubRAdqxz";
+        private static readonly string VersionURL = "";
         internal static Version currentVersion = new Version("1.0.0.0");
         internal static Version latestVersion = new Version("0.0.0.0");
         public static bool VersionCurrent()
