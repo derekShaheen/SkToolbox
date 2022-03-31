@@ -19,6 +19,7 @@ namespace SkToolbox.Commands
 
         public override void Execute(string[] args)
         {
+            String hintList = String.Empty;
             if (args.Length > 0) // Search for specific commands
             {
                 List<SkCommand> foundCmdList = SkCommandProcessor.Instance.CommandList.FindAll(cmd => cmd.Command.StartsWith(args[0].Trim(), StringComparison.InvariantCultureIgnoreCase));
@@ -26,14 +27,15 @@ namespace SkToolbox.Commands
                 {
                     if (foundCmd != null && foundCmd.Enabled && !foundCmd.VisibilityFlag.HasFlag(SkCommandEnum.VisiblityFlag.FullHidden))
                     {
-                        if (foundCmd.Description[0].Equals('['))
+                        hintList = String.Empty;
+                        if (foundCmd.Hints != null && foundCmd.Hints.Length > 0)
                         {
-                            Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + foundCmd.Description });
+                            foreach (string hint in foundCmd.Hints)
+                            {
+                                hintList += "[" + hint + "] ";
+                            }
                         }
-                        else
-                        {
-                            Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " - " + foundCmd.Description });
-                        }
+                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + hintList + " - " + foundCmd.Description });
                     }
                     else
                     {
@@ -47,14 +49,15 @@ namespace SkToolbox.Commands
                 {
                     if (cmd != null && cmd.Enabled && !cmd.VisibilityFlag.HasFlag(SkCommandEnum.VisiblityFlag.Hidden) && !cmd.VisibilityFlag.HasFlag(SkCommandEnum.VisiblityFlag.FullHidden))
                     {
-                        if (cmd.Description[0].Equals('['))
+                        hintList = String.Empty;
+                        if (cmd.Hints != null && cmd.Hints.Length > 0)
                         {
-                            Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + " " + cmd.Description });
+                            foreach (string hint in cmd.Hints)
+                            {
+                                hintList += "[" + hint + "] ";
+                            }
                         }
-                        else
-                        {
-                            Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + " - " + cmd.Description });
-                        }
+                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + hintList + " - " + cmd.Description });
                     }
                 }
             }
@@ -63,7 +66,7 @@ namespace SkToolbox.Commands
 
     public class CmdStdCls : SkCommand
     {
-        public override string Command => "helpcls";
+        public override string Command => "cls";
 
         public override string Description => "Clear the console.";
 
