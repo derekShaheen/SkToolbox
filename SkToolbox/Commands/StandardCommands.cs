@@ -9,11 +9,13 @@ namespace SkToolbox.Commands
     {
         public override string Command => "help";
 
-        public override string Description => "[Command] - Show all commands or optionally search for commands.";
+        public override string Description => "Show all commands or optionally search for commands.";
 
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
 
         public override bool Enabled => true;
+
+        public override string[] Hints => new string[] { "Command" };
 
         public override void Execute(string[] args)
         {
@@ -69,6 +71,8 @@ namespace SkToolbox.Commands
 
         public override bool Enabled => true;
 
+        public override string[] Hints => null;
+
         public override void Execute(string[] args)
         {
             SkConsole console;
@@ -92,6 +96,8 @@ namespace SkToolbox.Commands
 
         public override bool Enabled => true;
 
+        public override string[] Hints => null;
+
         public override void Execute(string[] args)
         {
             Utility.SkUtilities.Logz(new string[] { "QUIT" }, new string[] { "Exiting the game now..." }, LogType.Error);
@@ -109,6 +115,8 @@ namespace SkToolbox.Commands
 
         public override bool Enabled => false;
 
+        public override string[] Hints => null;
+
         public override void Execute(string[] args)
         {
             SkToolbox.SkCommandProcessor.Instance.DiscoverCommands();
@@ -124,6 +132,8 @@ namespace SkToolbox.Commands
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Hidden;
 
         public override bool Enabled => true;
+
+        public override string[] Hints => null;
 
         public override void Execute(string[] args)
         {
@@ -141,6 +151,8 @@ namespace SkToolbox.Commands
 
         public override bool Enabled => true;
 
+        public override string[] Hints => null;
+
         public override void Execute(string[] args)
         {
             Loaders.SkLoader.SelfDestruct();
@@ -151,11 +163,13 @@ namespace SkToolbox.Commands
     {
         public override string Command => "csetfontsize";
 
-        public override string Description => "[Size] - Set the size of the console font. No parameter provided will report current size.";
+        public override string Description => "Set the size of the console font. No parameter provided will report current size.";
 
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Hidden;
 
         public override bool Enabled => true;
+
+        public override string[] Hints => new string[] { "Font Size" };
 
         public override void Execute(string[] args)
         {
@@ -181,7 +195,8 @@ namespace SkToolbox.Commands
                     console.logFontSize = newValue;
                     return;
                 }
-            } else
+            }
+            else
             {
                 Utility.SkUtilities.Logz(new string[] { "CONSETFONTSIZE", "ERR" }, new string[] { "ConSetFontSize only accepts one parameter." });
             }
@@ -192,28 +207,31 @@ namespace SkToolbox.Commands
     {
         public override string Command => "timescale";
 
-        public override string Description => "[Value] - Set a new timescale. Use no parameter to check current timescale.";
+        public override string Description => "Set a new timescale. Use no parameter to check current timescale.";
 
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
 
         public override bool Enabled => true;
 
+        public override string[] Hints => new string[] { "Value" };
+
         public override void Execute(string[] args)
         {
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
                 Utility.SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Current timescale: " + Time.timeScale.ToString() });
                 return;
             }
 
-            if(args.Length == 1)
+            if (args.Length == 1)
             {
-                if(float.TryParse(args[0], out float newValue))
+                if (float.TryParse(args[0], out float newValue))
                 {
                     Utility.SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Set timescale: " + Time.timeScale.ToString() + " → " + newValue });
                     Time.timeScale = newValue;
                 }
-            } else
+            }
+            else
             {
                 Utility.SkUtilities.Logz(new string[] { "TIMESCALE", "ERR" }, new string[] { "timescale [Value] - Timescale only accepts one parameter." });
             }
@@ -224,20 +242,22 @@ namespace SkToolbox.Commands
     {
         public override string Command => "objectvar";
 
-        public override string Description => "[Gameobject Name] [Component Name] [Field Name] [Value] - Get/Set the value of a variable attached to a gameobject." +
-                                                                                                        "\nNo component name parameter will report all components attached to this object." +
-                                                                                                        "\nNo field name parameter provided will report all fields for this object/component." +
-                                                                                                        "\nNo value parameter provided will report current value of that field.";
+        public override string Description => "Get/Set the value of a variable attached to a gameobject." +
+                                                "\nNo component name parameter will report all components attached to this object." +
+                                                "\nNo field name parameter provided will report all fields for this object/component." +
+                                                "\nNo value parameter provided will report current value of that field.";
 
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
 
         public override bool Enabled => true;
 
+        public override string[] Hints => new string[] { "Gameobject Name", "Component Name", "Field Name", "Value" };
+
         public override void Execute(string[] args)
         {
             if (args.Length > 0)
             {
-                if(GameObject.Find(args[0]) == null)
+                if (GameObject.Find(args[0]) == null)
                 {
                     Utility.SkUtilities.Logz(new string[] { "OBJECTVAR", "ERR" }, new string[] { "Object not found. Check object name, character case matters." });
                     return;
@@ -248,15 +268,18 @@ namespace SkToolbox.Commands
             {
                 Utility.SkUtilities.Logz(new string[] { "OBJECTVAR", "GET" }, new string[] { SkUtilities.GetAllComponentsOnGameobject(args[0]) });
                 return;
-            } else if (args.Length == 2)
+            }
+            else if (args.Length == 2)
             {
                 SkUtilities.Logz(new string[] { "OBJECTVAR", "GET" }, new string[] { SkUtilities.GetAllProperiesOfObject(args[0], args[1]) });
                 return;
-            } else if (args.Length == 3)
+            }
+            else if (args.Length == 3)
             {
-                Utility.SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "Current value: " + SkUtilities.GameobjectGetPrivateField<object>(args[0], args[1], args[2])});
+                Utility.SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "Current value: " + SkUtilities.GameobjectGetPrivateField<object>(args[0], args[1], args[2]) });
                 return;
-            } else if (args.Length == 4)
+            }
+            else if (args.Length == 4)
             {
                 SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "Setting variable " + args[0] + "." + args[1] + "." + args[2] + " " + SkUtilities.GameobjectGetPrivateField<object>(args[0], args[1], args[2]) + " → " + args[3] });
                 SkUtilities.GameobjectSetPrivateField(args[0], args[1], args[2], args[3]);

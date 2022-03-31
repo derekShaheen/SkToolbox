@@ -24,6 +24,11 @@ namespace SkToolbox.Commands
         public abstract string Description { get; }
 
         /// <summary>
+        ///     The help text or description text associated with this command.
+        /// </summary>
+        public abstract string[] Hints { get; }
+
+        /// <summary>
         ///     Should this command be shown when 'help' is typed? How about when 'help cmdname' is typed, specifically searching for this command?
         /// </summary>
         public abstract SkCommandEnum.VisiblityFlag VisibilityFlag { get; }

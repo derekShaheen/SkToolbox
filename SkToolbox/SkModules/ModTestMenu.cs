@@ -13,7 +13,7 @@ namespace SkToolbox.SkModules
     {
         public bool drawLines = false;
         internal Texture2D textureBlue;
-        CMainObject cmo;
+        //CMainObject cmo;
 
         public ModTestMenu() : base()
         {
@@ -26,13 +26,13 @@ namespace SkToolbox.SkModules
 
         public void Start()
         {
-            cmo = FindObjectOfType<CMainObject>();
-            textureBlue = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-            textureBlue.SetPixel(0, 0, Color.white);
-            textureBlue.SetPixel(1, 0, Color.blue);
-            textureBlue.SetPixel(0, 1, Color.blue);
-            textureBlue.SetPixel(1, 1, Color.blue);
-            textureBlue.Apply();
+            //cmo = FindObjectOfType<CMainObject>();
+            //textureBlue = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+            //textureBlue.SetPixel(0, 0, Color.white);
+            //textureBlue.SetPixel(1, 0, Color.blue);
+            //textureBlue.SetPixel(0, 1, Color.blue);
+            //textureBlue.SetPixel(1, 1, Color.blue);
+            //textureBlue.Apply();
 
             BeginMenu();
             base.Ready();

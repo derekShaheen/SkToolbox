@@ -1,4 +1,5 @@
-﻿using SkToolbox.Utility;
+﻿using SkToolbox.Commands;
+using SkToolbox.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -111,13 +112,16 @@ namespace SkToolbox
         private TextEditor editor;
         private string suggestedCommands = string.Empty;
         private string previousInput = string.Empty;
+        private string hints = string.Empty;
+        private SkCommand suggestedCommand = null;
 
         private bool singleFrame = true;
         //private bool mouseOnWindow = false;
 
         public bool NewInput
         {
-            get {
+            get
+            {
                 if (!previousInput.Equals(inputString))
                 {
                     previousInput = inputString;
@@ -191,8 +195,8 @@ namespace SkToolbox
             }
             else
             {
-                if(enableInput)
-                GUI.FocusControl("inputBar");
+                if (enableInput)
+                    GUI.FocusControl("inputBar");
 
             }
 
@@ -234,10 +238,10 @@ namespace SkToolbox
                                 Commands.SkCommand matchCommand = SkCommandProcessor.Instance.CommandList.Where(cmd => cmd.Command.ToLower().StartsWith(inputSplit2.ToLower(), StringComparison.InvariantCultureIgnoreCase)
                                                                                                                     && !cmd.Command.ToLower().Equals(inputSplit2.ToLower())
                                                                                                                     ).First();
-                                
+
                                 if (!string.IsNullOrEmpty(matchCommand.Command))
                                 {
-                                    if(inputSplit.Length > 1)
+                                    if (inputSplit.Length > 1)
                                     {
                                         inputString = string.Empty;
                                         for (int x = 0; x < inputSplit.Length - 1; x++)
@@ -245,7 +249,8 @@ namespace SkToolbox
                                             inputString += inputSplit[x].Trim() + "; ";
                                         }
                                         inputString += matchCommand.Command;
-                                    } else
+                                    }
+                                    else
                                     {
                                         inputString = matchCommand.Command;
                                     }
@@ -298,7 +303,7 @@ namespace SkToolbox
                 unlockCursor();
             }
 
-            if(Event.current.type == EventType.KeyUp
+            if (Event.current.type == EventType.KeyUp
                   && enableInput
                   && (Event.current.keyCode == KeyCode.Tab
                         || Event.current.keyCode == KeyCode.UpArrow
@@ -336,30 +341,37 @@ namespace SkToolbox
                 }
             }
 
-            if(isVisible)
+            if (isVisible)
             {
-                if(!string.IsNullOrEmpty(inputString))
+                if (!string.IsNullOrEmpty(inputString))
                 {
-                    if(!NewInput)// Calculate suggestions
+                    if (!NewInput)// Calculate suggestions
                     {
                         suggestedCommands = string.Empty;
                         string[] commandsInInput = editor.text.Split(';');
                         string commandOnRight = commandsInInput[commandsInInput.Length - 1].Trim().Split(' ')[0];
                         //Commands.SkCommand matchCommand = SkCommandProcessor.Instance.CommandList.Find(cmd => cmd.Command.ToLower().Contains(inputSplit2.ToLower()));
-                        matchCommandList = SkCommandProcessor.Instance.CommandList.Where(cmd => 
-                                                                           cmd.Command.ToLower().Contains(commandOnRight.ToLower()) 
+                        matchCommandList = SkCommandProcessor.Instance.CommandList.Where(cmd =>
+                                                                           cmd.Command.ToLower().Contains(commandOnRight.ToLower())
+                                                                        && cmd.Enabled
                                                                         && cmd.VisibilityFlag != Commands.SkCommandEnum.VisiblityFlag.Hidden
                                                                         && cmd.VisibilityFlag != Commands.SkCommandEnum.VisiblityFlag.FullHidden
                                                                         //&& !cmd.Command.ToLower().Equals(commandOnRight.ToLower())
                                                                         ).ToList();
-                        foreach(Commands.SkCommand cmd in matchCommandList)
+                        foreach (Commands.SkCommand cmd in matchCommandList)
                         {
                             suggestedCommands += cmd.Command + " "; // Change suggested commands to buttons instead of labels
                         }
+                        if (matchCommandList.Count == 1)
+                        {
+                            suggestedCommand = matchCommandList[0];
+                        }
                     }
-                } else
+                }
+                else
                 {
                     suggestedCommands = string.Empty;
+                    suggestedCommand = null;
                 }
             }
 
@@ -455,7 +467,7 @@ namespace SkToolbox
             {
                 logs.Clear();
             }
-            
+
             foreach (LogType logType in lFKeys)
             {
                 bool currentState = logTypeFilters[logType];
@@ -471,31 +483,20 @@ namespace SkToolbox
 
         private void DrawSuggestions()
         {
-            GUILayout.Label(string.IsNullOrEmpty(suggestedCommands) ? "" : "Suggested: " + suggestedCommands);
+            if (suggestedCommand != null)
+            {
+                suggestedCommands = suggestedCommand.Command + " ";
+                foreach (string hint in suggestedCommand.Hints)
+                {
+                    suggestedCommands += "[" + hint + "] ";
+                }
 
-            //GUILayout.BeginHorizontal();
-            ////foreach (Commands.SkCommand suggestedCmd in matchCommandList)
-            ////{
-            //for (int x = 0; x < matchCommandList.Count - 1; x++)
-            //{
-            //    if (GUILayout.Button(matchCommandList[x].Command))
-            //    {
-            //        string[] inputSplit = inputString.Split(';');
-            //        if (inputSplit.Length == 1)
-            //        {
-            //            inputString = matchCommandList[x].Command;
-            //        }
-            //        else
-            //        {
-            //            inputString = string.Empty;
-            //            for (int k = 0; k < inputSplit.Length - 1; k++)
-            //            {
-            //                inputString += inputSplit[k].Trim() + "; ";
-            //            }
-            //        }
-            //    }
-            //}
-            //GUILayout.EndHorizontal();
+                GUILayout.Label("Suggested: " + suggestedCommands);
+            }
+            else
+            {
+                GUILayout.Label(string.IsNullOrEmpty(suggestedCommands) ? "" : "Suggested: " + suggestedCommands);
+            }
         }
 
         private void DrawInput()
@@ -529,6 +530,7 @@ namespace SkToolbox
                 consoleHistory.Add(inputString);
                 SkCommandProcessor.Instance.ExecuteCommand(inputString);
                 suggestedCommands = string.Empty;
+                suggestedCommand = null;
                 inputString = string.Empty;
                 matchCommandList.Clear();
             }

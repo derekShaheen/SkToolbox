@@ -231,7 +231,7 @@ namespace SkToolbox
         public void BeginMainMenu()
         {
 
-            //RegisterModules();
+            RegisterModules();
             //Create a game object for each module
             //moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
             //moduleGeneric = gameObject.AddComponent<SkModules.ModGeneric>();
