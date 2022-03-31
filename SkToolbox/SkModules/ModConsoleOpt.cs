@@ -18,7 +18,7 @@ namespace SkToolbox.SkModules
         {
             base.ModuleName = "Console Controller";
             base.Loading();
-            base.CallerEntry = new SkMenuItem("Console Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu()));
+            base.CallerEntry = new SkMenuItem("Toolbox Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu()));
         }
 
         public void Start()
@@ -56,7 +56,7 @@ namespace SkToolbox.SkModules
         public void ToggleWriteFile()
         {
             conWriteToFile = !conWriteToFile;
-            SkToolbox.SkConsole.writeToFile = conWriteToFile;
+            SkConsole.writeToFile = conWriteToFile;
             BeginMenu();
         }
 

@@ -12,8 +12,8 @@ namespace SkToolbox.SkModules
 
         public ModGeneric() : base()
         {
+            base.IsEnabled = false; // Example module
             base.ModuleName = "Generic";
-            
             base.Loading();
         }
 
