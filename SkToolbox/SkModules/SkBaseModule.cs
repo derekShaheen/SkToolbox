@@ -13,7 +13,25 @@ namespace SkToolbox.SkModules
         public SkMenu MenuOptions { get; set; } = new SkMenu();
         public SkMenuItem CallerEntry { get; set; } = new SkMenuItem();
         public SkUtilities.Status ModuleStatus { get; set; } = SkUtilities.Status.Initialized;
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set
+            {
+                if(IsEnabled && ModuleStatus != SkUtilities.Status.Ready) // If the module is ready, then it is loaded and running.
+                {   // To disable, set the status to "Unload" so it properly unloads.
+                    isEnabled = value;
+                }
+                if(!IsEnabled)
+                {
+                    IsEnabled = value;
+                }
+            }
+        }
+
         public string ModuleName = "UNNAMED";
+
+        private bool isEnabled = true;
 
         public SkBaseModule()
         {

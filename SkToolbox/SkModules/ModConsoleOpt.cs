@@ -12,6 +12,7 @@ namespace SkToolbox.SkModules
     public class ModConsoleOpt : SkBaseModule, IModule
     {
         internal bool conWriteToFile = false;
+        private bool conAdvancedOptions = false;
 
         public ModConsoleOpt() : base()
         {
@@ -33,10 +34,24 @@ namespace SkToolbox.SkModules
             consoleOptMenu.AddItem("Open Log Folder", new Action(OpenLogFolder));
             consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu));
             consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu));
+            //consoleOptMenu.AddItem("Timescale\t►", new Action(BeginMenu)); // Example how to make a submenu
+
+            if(conAdvancedOptions)
+            {
+                consoleOptMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects));
+            }
+
             MenuOptions = consoleOptMenu;
         }
 
         //
+
+        //public void BeginTimescaleMenu() // Example how to make a submenu
+        //{
+        //    SkMenu GenericMenu = new SkMenu();
+        //    GenericMenu.AddItem("1.0", new Action(SetTimescale));
+        //    base.RequestMenu(GenericMenu);
+        //}
 
         public void ToggleWriteFile()
         {

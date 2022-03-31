@@ -189,7 +189,7 @@ namespace SkToolbox
                     }
                     retryCount++;
                 }
-                else if (retryModule?.Count > 0 && retryCount >= (retryCountMax + 1))
+                else if (retryModule?.Count > 0 && retryCount >= (retryCountMax + 1)) // No retry frames remaining
                 {
                     foreach (SkModules.SkBaseModule Module in retryModule)
                     {
@@ -265,22 +265,20 @@ namespace SkToolbox
 
         }
 
-
-        public void AddModule(SkModules.SkBaseModule module)
+        public List<SkModules.SkBaseModule> ListModules()
         {
-            var obj = gameObject.AddComponent(module.GetType());
-            var obd = gameObject.GetComponents<SkModules.SkBaseModule>();
+            return menuOptions;
+        }
 
-            menuOptions.Clear();
+        public void AddModule(SkModules.SkBaseModule pmodule)
+        {
+            var obj = gameObject.AddComponent(pmodule.GetType());
 
-            foreach (SkModules.SkBaseModule subclass in obd)
-            {
-                SkModules.SkBaseModule moduleTyped = (SkModules.SkBaseModule)GameObject.FindObjectOfType(subclass.GetType());
+            pmodule.CallerEntry = new SkMenuItem((pmodule?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
+                                                            pmodule.CallerEntry.ItemText : pmodule.ModuleName, // or will have a menu text applied to it.
+                                                            () => menuController.RequestSubMenu(pmodule.FlushMenu())); //
+            menuOptions.Add(pmodule);
 
-                //moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.ModuleName + "\t►", () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-                moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-                menuOptions.Add(moduleTyped);
-            }
             menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
             menuController.UpdateMenuOptions(menuOptions);
         }
@@ -308,9 +306,14 @@ namespace SkToolbox
                     {
                         Component module = gameObject.AddComponent(subclass);
                         SkModules.SkBaseModule moduleTyped = (SkModules.SkBaseModule)GameObject.FindObjectOfType(subclass);
-
-                        moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-                        menuOptions.Add(moduleTyped);
+                        if (moduleTyped.IsEnabled)
+                        {
+                            moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
+                            menuOptions.Add(moduleTyped);
+                        } else
+                        {
+                            moduleTyped.RemoveModule();
+                        }
                     }
                 }
             }

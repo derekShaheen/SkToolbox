@@ -13,6 +13,7 @@ namespace SkToolbox.SkModules
         public ModGeneric() : base()
         {
             base.ModuleName = "Generic";
+            
             base.Loading();
         }
 
