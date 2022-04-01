@@ -4,10 +4,10 @@ name: Build Beta Project
 on:
   push:
     branches: 
-      - main
+      - 'main'
   pull_request:
       branches: 
-      - main
+      - 'main'
   workflow_run:
     workflows: ["Build Beta Project"]
     types: [requested]
