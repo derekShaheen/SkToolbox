@@ -46,7 +46,7 @@ jobs:
     - name: Zip release
       uses: vimtor/action-zip@v1
       with:
-        files: ${{env.SOLUTION_FILE_PATH}}\bin\Release\ README.md
+        files: ${{env.SOLUTION_FILE_PATH}} README.md
         recursive: true
         dest: SkToolbox.zip
 
@@ -55,7 +55,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/main' }}
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "Nightly Release"
+        automatic_release_tag: "nightly"
         prerelease: false
         files: |
           README.md
