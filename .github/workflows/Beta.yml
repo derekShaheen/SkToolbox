@@ -46,7 +46,7 @@ jobs:
     - name: Zip release
       uses: vimtor/action-zip@v1
       with:
-        files: bin\Release\ README.md
+        files: D:\a\SkToolbox\SkToolbox\SkToolbox\bin\Release\SkToolbox.dll README.md
         recursive: true
         dest: SkToolbox.zip
 
