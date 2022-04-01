@@ -87,6 +87,5 @@
     <Compile Include="Utility\SkUtilities.cs" />
     <Compile Include="Utility\SkVersionChecker.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
