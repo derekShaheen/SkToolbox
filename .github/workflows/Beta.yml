@@ -1,6 +1,17 @@
-name: Build project
+name: Build Beta Project
 
-on: [push, pull_request]
+#on: [push, pull_request]
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["Build Beta Project"]
+    types: [requested]
+    branches:
+      - 'main'
 
 env:
   # Path to the solution file relative to the root of the project.
