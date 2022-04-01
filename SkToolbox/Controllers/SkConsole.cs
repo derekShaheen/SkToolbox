@@ -112,7 +112,6 @@ namespace SkToolbox
         private TextEditor editor;
         private string suggestedCommands = string.Empty;
         private string previousInput = string.Empty;
-        private string hints = string.Empty;
         private SkCommand suggestedCommand = null;
 
         private bool singleFrame = true;
