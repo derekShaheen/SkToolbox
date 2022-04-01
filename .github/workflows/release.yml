@@ -8,11 +8,11 @@ on:
   pull_request:
       branches: 
       - release
-  workflow_run:
-    workflows: ["Build Release Project"]
-    types: [requested]
-    branches:
-      - 'release'
+#  workflow_run:
+#    workflows: ["Build Release Project"]
+#    types: [requested]
+#    branches:
+#      - 'release'
 
 env:
   # Path to the solution file relative to the root of the project.
