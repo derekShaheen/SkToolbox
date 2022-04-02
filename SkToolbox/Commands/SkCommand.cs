@@ -24,7 +24,8 @@ namespace SkToolbox.Commands
         public abstract string Description { get; }
 
         /// <summary>
-        ///     The help text or description text associated with this command.
+        ///     The parameters associated with this command.
+        ///     Example Hints = new string[] { "Param1", "Param2", "Param3" };
         /// </summary>
         public abstract string[] Hints { get; }
 

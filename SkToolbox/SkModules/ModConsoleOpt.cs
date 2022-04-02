@@ -12,7 +12,6 @@ namespace SkToolbox.SkModules
     public class ModConsoleOpt : SkBaseModule, IModule
     {
         internal bool conWriteToFile = false;
-        private bool conAdvancedOptions = false;
 
         public ModConsoleOpt() : base()
         {
@@ -30,28 +29,23 @@ namespace SkToolbox.SkModules
         public void BeginMenu()
         {
             SkMenu consoleOptMenu = new SkMenu();
-            consoleOptMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
-            consoleOptMenu.AddItem("Open Log Folder", new Action(OpenLogFolder));
-            consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu));
-            consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu));
-            //consoleOptMenu.AddItem("Timescale\t►", new Action(BeginMenu)); // Example how to make a submenu
 
-            if(conAdvancedOptions)
-            {
-                consoleOptMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects));
-            }
-
+            consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu), "Reload the toolbox");
+            consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
+            consoleOptMenu.AddItem("Advanced\t►", new Action(BeginAdvancedMenu), "Show advanced options");
             MenuOptions = consoleOptMenu;
         }
 
         //
 
-        //public void BeginTimescaleMenu() // Example how to make a submenu
-        //{
-        //    SkMenu GenericMenu = new SkMenu();
-        //    GenericMenu.AddItem("1.0", new Action(SetTimescale));
-        //    base.RequestMenu(GenericMenu);
-        //}
+        public void BeginAdvancedMenu()
+        {
+            SkMenu GenericMenu = new SkMenu();
+            GenericMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
+            GenericMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
+            GenericMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects), "Dump root object to log");
+            base.RequestMenu(GenericMenu);
+        }
 
         public void ToggleWriteFile()
         {
