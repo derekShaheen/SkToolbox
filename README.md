@@ -35,7 +35,57 @@ Index:
 ### How To Use (Developer)
 - In order to use the framework, simply download it and reference it in your .NET Framework 4.7.X project. You will then be able to both create *commands* (```SkToolbox.Commands.SkCommand```) for the integrated console and *modules* (```SkToolbox.SkModules.SkBaseModule```) which will be automatically rendered and handled by the menu controller.
 
-**See below for information on Adding Menu Modules and Adding Console Commands**
+- Below we describe and provide examples for:
+	- BepInEx Injection
+	- Adding Menu Modules
+	- Adding Console Commands
+
+#### BepInEx Injection
+- It is recommended that you use BepInEx for your injection. The example below can be used in conjunction with either adding menu modules, adding console commands, or both. This example shows a class that adds a menu module to a running instance of SkToolbox. Commands are automatically detected, but because menu modules are GameObjects, they must be handled with more care.
+
+```chsarp
+using BepInEx;
+using System.Collections;
+using UnityEngine;
+
+namespace TestModule
+{
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    [BepInDependency("com.Skrip.SkToolbox")] // Set dependency so this loads after the SkToolbox
+    class SkBepInExLoader : BaseUnityPlugin
+    {
+        private int retrycount = 0;
+        public const string
+            MODNAME = "SkToolboxExtension",
+            AUTHOR = "Skrip",
+            GUID = "com." + AUTHOR + "." + MODNAME,
+            VERSION = "1.0.0.0";
+
+
+        private void Start()
+        {
+            StartCoroutine(Process());
+        }
+
+        IEnumerator Process()
+        {
+            GameObject _SkGameObject = null; // Initialize
+            ModAsset module = new ModAsset(); // Create module object
+            while (_SkGameObject == null && retrycount < 10) // Try 10 times
+            {
+                yield return new WaitForSecondsRealtime(1); // Wait 1 second between each try
+                _SkGameObject = SkToolbox.Loaders.SkLoader._SkGameObject; // Has the SkToolbox initalized yet? If so, drop out of the loop
+                retrycount += 1;
+
+            }
+            if (_SkGameObject != null)
+            {
+                SkToolbox.Loaders.SkLoader.MenuController.SkModuleController.AddModule(module); // Add the module
+            }
+        }
+    }
+}
+```
 
 #### Add Menu Modules
 - What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.SkBaseModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). These *menu items* are stored inside of the *modules*. Each module is a self contained Unity GameObject, and runs independently of each other *module*.
