@@ -1,6 +1,6 @@
 |Main / Nightly|Full Release|Hit Counter
 | :------------: | :------------: | :------------: |
-|![mainworkflow](https://github.com/derekShaheen/SkToolbox/blob/main/.github/workflows/Beta.yml/badge.svg)|![releaseworkflow](https://github.com/derekShaheen/SkToolbox/blob/release/.github/workflows/Beta.yml/badge.svg)| [![HitCount](https://hits.dwyl.com/derekShaheen/SkToolbox.svg?style=flat-square)](http://hits.dwyl.com/derekShaheen/SkToolbox)|
+|![mainworkflow](https://github.com/derekShaheen/SkToolbox/actions/workflows/Beta.yml/badge.svg)|![releaseworkflow](https://github.com/derekShaheen/SkToolbox/actions/workflows/Beta.yml/badge.svg)| [![HitCount](https://hits.dwyl.com/derekShaheen/SkToolbox.svg?style=flat-square)](http://hits.dwyl.com/derekShaheen/SkToolbox)|
 
 ![SkToolbox Header](https://i.imgur.com/bTaEOXP.png "SkToolbox Header")
 
