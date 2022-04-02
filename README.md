@@ -1,3 +1,7 @@
+|Main / Nightly|Full Release|
+| :------------: | :------------: |
+|[![Build Status](https://app.travis-ci.com/derekShaheen/SkToolbox.svg?branch=main)](https://app.travis-ci.com/derekShaheen/SkToolbox)|[![Build Status](https://app.travis-ci.com/derekShaheen/SkToolbox.svg?branch=release)](https://app.travis-ci.com/derekShaheen/SkToolbox)|
+
 ![SkToolbox Header](https://i.imgur.com/bTaEOXP.png "SkToolbox Header")
 
 #### The SkToolbox is a framework used for quickly designing overlay menus in Unity Games. Typically used for creating a custom menu for use with existing projects. Includes loader module for mono injection or via BepInEx (recommended). These menus can be controlled both via keyboard or mouse input.
