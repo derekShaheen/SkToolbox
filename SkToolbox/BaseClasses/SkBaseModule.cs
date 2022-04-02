@@ -44,7 +44,7 @@ namespace SkToolbox.SkModules
 
         public void Awake()
         {
-            SkMC = GetComponent<SkMenuController>();
+            SkMC = Loaders.SkLoader.MenuController;
         }
 
         public List<SkMenuItem> FlushMenu()
