@@ -1,4 +1,4 @@
-name: Build Release Project
+name: Stable / Release Build
 
 #on: [push, pull_request]
 on:
