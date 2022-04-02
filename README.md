@@ -4,7 +4,11 @@
 
 Index:
 - Examples
-- How To Use (Developer) [section coming soon]
+- How To Use (Developer)
+	- BepInEx Injection	
+	- Adding menu modules
+	- Adding console commands
+	
 ------------
 ### - Example releases with feature highlights:
 - Integrated Console with easy to add commands. This console will capture all debug output to console for whatever game it is attached to. You can also see the output from the Toolbox and your modules easily here.
