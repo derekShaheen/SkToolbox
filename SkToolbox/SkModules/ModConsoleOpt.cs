@@ -1,57 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkToolbox.Utility;
+using System;
 using UnityEngine;
-using SkToolbox.Utility;
-using Random = UnityEngine.Random;
 
 namespace SkToolbox.SkModules
 {
     public class ModConsoleOpt : SkBaseModule, IModule
     {
         internal bool conWriteToFile = false;
-        private bool conAdvancedOptions = false;
 
+        /// <summary>
+        /// Initialize the module
+        /// </summary>
         public ModConsoleOpt() : base()
         {
-            base.ModuleName = "Console Controller";
-            base.Loading();
-            base.CallerEntry = new SkMenuItem("Toolbox Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu()));
+            base.ModuleName = "Console Controller"; // Set the module name
+            base.Loading(); // Module is loading
+            base.CallerEntry = new SkMenuItem("Toolbox Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu())); // Create the CallerEntry
+                                // CallerEntry defines what will be seen on the main SkToolbox menu when opened and what will happen when the menu option is selected.
+                                // Intended behavior is that this will flush the base menu into the menu controller through the request submenu method. This will happen in essetially every module.
         }
 
         public void Start()
         {
-            BeginMenu();
-            base.Ready();
+            BeginMenu(); // Generate the submenu when the module starts
+            base.Ready(); // Set the module status to ready. Must be set after loading on first frame.
         }
 
         public void BeginMenu()
         {
-            SkMenu consoleOptMenu = new SkMenu();
-            consoleOptMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
-            consoleOptMenu.AddItem("Open Log Folder", new Action(OpenLogFolder));
-            consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu));
-            consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu));
-            //consoleOptMenu.AddItem("Timescale\t►", new Action(BeginMenu)); // Example how to make a submenu
+            SkMenu consoleOptMenu = new SkMenu(); // Create a new menu object and add items to it
 
-            if(conAdvancedOptions)
-            {
-                consoleOptMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects));
-            }
-
-            MenuOptions = consoleOptMenu;
+            consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu), "Reload the toolbox");
+            consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
+            consoleOptMenu.AddItem("Advanced\t►", new Action(BeginAdvancedMenu), "Show advanced options");
+            base.MenuOptions = consoleOptMenu; // Set the module menu options to the menu we just created
         }
 
         //
 
-        //public void BeginTimescaleMenu() // Example how to make a submenu
-        //{
-        //    SkMenu GenericMenu = new SkMenu();
-        //    GenericMenu.AddItem("1.0", new Action(SetTimescale));
-        //    base.RequestMenu(GenericMenu);
-        //}
+        public void BeginAdvancedMenu() // Generate submenu
+        {
+            SkMenu GenericMenu = new SkMenu();
+            GenericMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
+            GenericMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
+            GenericMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects), "Dump root object to log");
+            base.RequestMenu(GenericMenu); // Display the submenu
+        }
 
         public void ToggleWriteFile()
         {

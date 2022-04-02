@@ -58,13 +58,34 @@ namespace SkToolbox
                 {
                     if (sMi.Compare(menuItem))
                     {
-                        listItems.Remove(menuItem);
+                        listItems.Remove(sMi);
                         numItems++;
                     }
                 }
 
                 return numItems;
             } catch(Exception)
+            {
+                return -1;
+            }
+        }
+        public int RemoveItem(string menuText)
+        {
+            int numItems = 0;
+            try
+            {
+                foreach (SkMenuItem sMi in listItems)
+                {
+                    if (sMi.ItemText.Equals(menuText))
+                    {
+                        listItems.Remove(sMi);
+                        numItems++;
+                    }
+                }
+
+                return numItems;
+            }
+            catch (Exception)
             {
                 return -1;
             }
