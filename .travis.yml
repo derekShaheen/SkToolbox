@@ -1,1 +1,4 @@
-language: C#
+language: csharp
+solution: SkToolbox.sln
+script:
+  - msbuild /p:Configuration=Release SkToolbox.sln
