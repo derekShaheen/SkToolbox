@@ -22,7 +22,7 @@ namespace SkToolbox.SkModules
             base.Unload();
             BeginMenu();
             //base.Ready(); // Must be called when the module has completed initialization. // End of Start
-            base.CallerEntry = new SkMenuItem("Generic Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu()), "Empty Menu with a long context tip");
+            base.CallerEntry = new SkMenuItem("Generic Menu\t►", () => SkToolbox.Loaders.SkLoader.MenuController.RequestSubMenu(base.FlushMenu()), "Empty Menu with a long context tip");
 
         }
 
