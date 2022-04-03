@@ -57,7 +57,7 @@ namespace SkToolbox.Utility
                     {
                         SkUtilities.Logz(new string[] { "VERSION", "CHECK" },
                             //new string[] { "New version (" + latestVersion + ") of " + ApplicationName + "(" + currentVersion + ") available on " + ApplicationSource + "." });
-                            new string[] { "New version of " + ApplicationName + "(" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
+                            new string[] { "New version of " + ApplicationName + " (" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
                     }
 
                     break;
