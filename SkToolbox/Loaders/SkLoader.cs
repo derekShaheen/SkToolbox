@@ -97,6 +97,8 @@ namespace SkToolbox.Loaders
                 SkLoader._SkGameObject.AddComponent<SkConsole>(); // Load the console first so output from the controller can be observed on the following frame
             }
 
+            SkVersionChecker.CheckVersion();
+
             CheckForUnknownInstance();
 
             SkLoader.Load.transform.parent = null;
