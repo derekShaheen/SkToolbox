@@ -35,11 +35,11 @@ namespace SkToolbox.Commands
                                 hintList += "[" + hint + "] ";
                             }
                         }
-                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + hintList + "- " + foundCmd.Description });
+                        SkUtilities.Logz(new string[] { "HELP" }, new string[] { foundCmd.Command + " " + hintList + "- " + foundCmd.Description });
                     }
                     else
                     {
-                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { "No similar command found." });
+                        SkUtilities.Logz(new string[] { "HELP" }, new string[] { "No similar command found." });
                     }
                 }
             }
@@ -57,7 +57,7 @@ namespace SkToolbox.Commands
                                 hintList += "[" + hint + "] ";
                             }
                         }
-                        Utility.SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + " " + hintList + "- " + cmd.Description });
+                        SkUtilities.Logz(new string[] { "HELP" }, new string[] { cmd.Command + " " + hintList + "- " + cmd.Description });
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace SkToolbox.Commands
                 console.ClearConsole();
                 return;
             }
-            Utility.SkUtilities.Logz(new string[] { "CLS", "ERR" }, new string[] { "Could not clear the console." });
+            SkUtilities.Logz(new string[] { "CLS", "ERR" }, new string[] { "Could not clear the console." });
         }
     }
 
@@ -103,7 +103,7 @@ namespace SkToolbox.Commands
 
         public override void Execute(string[] args)
         {
-            Utility.SkUtilities.Logz(new string[] { "QUIT" }, new string[] { "Exiting the game now..." }, LogType.Error);
+            SkUtilities.Logz(new string[] { "QUIT" }, new string[] { "Exiting the game now..." }, LogType.Error);
             //Application.Quit();
         }
     }
@@ -180,13 +180,13 @@ namespace SkToolbox.Commands
             console = GameObject.FindObjectOfType<SkConsole>();
             if (console == null)
             {
-                Utility.SkUtilities.Logz(new string[] { "CONSETFONTSIZE", "ERR" }, new string[] { "Couldn't find the console object." });
+                SkUtilities.Logz(new string[] { "CONSETFONTSIZE", "ERR" }, new string[] { "Couldn't find the console object." });
                 return;
             }
 
             if (args.Length == 0)
             {
-                Utility.SkUtilities.Logz(new string[] { "CONSETFONTSIZE" }, new string[] { "Current font size: " + console.logFontSize });
+                SkUtilities.Logz(new string[] { "CONSETFONTSIZE" }, new string[] { "Current font size: " + console.logFontSize });
                 return;
             }
 
@@ -194,14 +194,14 @@ namespace SkToolbox.Commands
             {
                 if (int.TryParse(args[0], out int newValue))
                 {
-                    Utility.SkUtilities.Logz(new string[] { "CONSETFONTSIZE" }, new string[] { "Set console font size: " + console.logFontSize + " → " + newValue });
+                    SkUtilities.Logz(new string[] { "CONSETFONTSIZE" }, new string[] { "Set console font size: " + console.logFontSize + " → " + newValue });
                     console.logFontSize = newValue;
                     return;
                 }
             }
             else
             {
-                Utility.SkUtilities.Logz(new string[] { "CONSETFONTSIZE", "ERR" }, new string[] { "ConSetFontSize only accepts one parameter." });
+                SkUtilities.Logz(new string[] { "CONSETFONTSIZE", "ERR" }, new string[] { "ConSetFontSize only accepts one parameter." });
             }
         }
     }
@@ -222,7 +222,7 @@ namespace SkToolbox.Commands
         {
             if (args.Length == 0)
             {
-                Utility.SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Current timescale: " + Time.timeScale.ToString() });
+                SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Current timescale: " + Time.timeScale.ToString() });
                 return;
             }
 
@@ -230,13 +230,13 @@ namespace SkToolbox.Commands
             {
                 if (float.TryParse(args[0], out float newValue))
                 {
-                    Utility.SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Set timescale: " + Time.timeScale.ToString() + " → " + newValue });
+                    SkUtilities.Logz(new string[] { "TIMESCALE" }, new string[] { "Set timescale: " + Time.timeScale.ToString() + " → " + newValue });
                     Time.timeScale = newValue;
                 }
             }
             else
             {
-                Utility.SkUtilities.Logz(new string[] { "TIMESCALE", "ERR" }, new string[] { "timescale [Value] - Timescale only accepts one parameter." });
+                SkUtilities.Logz(new string[] { "TIMESCALE", "ERR" }, new string[] { "timescale [Value] - Timescale only accepts one parameter." });
             }
         }
     }
@@ -262,14 +262,14 @@ namespace SkToolbox.Commands
             {
                 if (GameObject.Find(args[0]) == null)
                 {
-                    Utility.SkUtilities.Logz(new string[] { "OBJECTVAR", "ERR" }, new string[] { "Object not found. Check object name, character case matters." });
+                    SkUtilities.Logz(new string[] { "OBJECTVAR", "ERR" }, new string[] { "Object not found. Check object name, character case matters." });
                     return;
                 }
             }
 
             if (args.Length == 1)
             {
-                Utility.SkUtilities.Logz(new string[] { "OBJECTVAR", "GET" }, new string[] { SkUtilities.GetAllComponentsOnGameobject(args[0]) });
+                SkUtilities.Logz(new string[] { "OBJECTVAR", "GET" }, new string[] { SkUtilities.GetAllComponentsOnGameobject(args[0]) });
                 return;
             }
             else if (args.Length == 2)
@@ -279,7 +279,7 @@ namespace SkToolbox.Commands
             }
             else if (args.Length == 3)
             {
-                Utility.SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "Current value: " + SkUtilities.GameobjectGetPrivateField<object>(args[0], args[1], args[2]) });
+                SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "Current value: " + SkUtilities.GameobjectGetPrivateField<object>(args[0], args[1], args[2]) });
                 return;
             }
             else if (args.Length == 4)
@@ -290,7 +290,7 @@ namespace SkToolbox.Commands
             }
             else
             {
-                Utility.SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "SetObjectVar [Gameobject Name] [Component Name] [Field Name] [Value]" });
+                SkUtilities.Logz(new string[] { "OBJECTVAR" }, new string[] { "SetObjectVar [Gameobject Name] [Component Name] [Field Name] [Value]" });
             }
         }
     }
