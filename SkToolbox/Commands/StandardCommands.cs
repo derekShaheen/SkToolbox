@@ -104,7 +104,7 @@ namespace SkToolbox.Commands
         public override void Execute(string[] args)
         {
             SkUtilities.Logz(new string[] { "QUIT" }, new string[] { "Exiting the game now..." }, LogType.Error);
-            //Application.Quit();
+            Application.Quit();
         }
     }
 
