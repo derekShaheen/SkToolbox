@@ -484,11 +484,13 @@ namespace SkToolbox
             if (suggestedCommand != null)
             {
                 suggestedCommands = suggestedCommand.Command + " ";
-                foreach (string hint in suggestedCommand.Hints)
+                if (suggestedCommand.Hints != null && suggestedCommand.Hints.Length > 0)
                 {
-                    suggestedCommands += "[" + hint + "] ";
+                    foreach (string hint in suggestedCommand.Hints)
+                    {
+                        suggestedCommands += "[" + hint + "] ";
+                    }
                 }
-
                 GUILayout.Label("Suggested: " + suggestedCommands);
             }
             else
