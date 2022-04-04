@@ -283,23 +283,30 @@ namespace SkToolbox.Utility
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             for (int i = 0; i < assemblies.Length; i++)
             {
-                foreach (Type typeInfo in assemblies[i].GetTypes())
+                try
                 {
-                    if (typeInfo.IsClass && typeInfo.IsPublic && !typeInfo.IsAbstract && typeInfo.FullName != null)
+                    foreach (Type typeInfo in assemblies[i].GetTypes())
                     {
-                        Type typeFromHandle = Type.GetTypeFromHandle(typeInfo.TypeHandle);
-                        if (type.IsAssignableFrom(typeFromHandle))
+                        if (typeInfo.IsClass && typeInfo.IsPublic && !typeInfo.IsAbstract && typeInfo.FullName != null)
                         {
-                            try
+                            Type typeFromHandle = Type.GetTypeFromHandle(typeInfo.TypeHandle);
+                            if (type.IsAssignableFrom(typeFromHandle))
                             {
-                                list.Add((T)((object)Activator.CreateInstance(typeFromHandle)));
-                            }
-                            catch (Exception rootCause)
-                            {
-                                throw new Exception("Failed to instantiate type '" + typeInfo.Name + "'.", rootCause);
+                                try
+                                {
+                                    list.Add((T)((object)Activator.CreateInstance(typeFromHandle)));
+                                }
+                                catch (Exception rootCause)
+                                {
+                                    throw new Exception("Failed to instantiate type '" + typeInfo.Name + "'.", rootCause);
+                                }
                             }
                         }
                     }
+                } catch (ReflectionTypeLoadException ex)
+                {
+                    Logr(new string[] {"LOAD", "CATCH"}, new string[] {ex.Message});
+                    continue;
                 }
             }
             return list;

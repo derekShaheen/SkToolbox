@@ -9,7 +9,7 @@ namespace SkToolbox.SkModules
     /// </summary>
     public class SkBaseModule : MonoBehaviour
     {
-        internal SkMenuController SkMC;
+        public SkMenuController SkMC;
         public SkMenu MenuOptions { get; set; } = new SkMenu();
         public SkMenuItem CallerEntry { get; set; } = new SkMenuItem();
         public SkUtilities.Status ModuleStatus { get; set; } = SkUtilities.Status.Initialized;

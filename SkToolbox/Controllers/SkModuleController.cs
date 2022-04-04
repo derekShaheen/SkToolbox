@@ -35,7 +35,7 @@ namespace SkToolbox
 
         #endregion
 
-        //private SkModules.ModConsoleOpt moduleConsole;
+        private SkModules.ModConsoleOpt moduleConsole;
         //private SkModules.ModGeneric moduleGeneric;
         //private SkModules.ModTestMenu moduleTestMenu;
         private List<SkModules.SkBaseModule> _menuOptions = new List<SkModules.SkBaseModule>();
@@ -231,16 +231,16 @@ namespace SkToolbox
         public void BeginMainMenu()
         {
 
-            RegisterModules();
+            //RegisterModules();
             //Create a game object for each module
-            //moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
+            moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
             //moduleGeneric = gameObject.AddComponent<SkModules.ModGeneric>();
             //moduleTestMenu = gameObject.AddComponent<SkModules.ModTestMenu>();
 
             // Add modules to the menu list
             // This is the order the menu items will be shown as well.
             //menuOptions.Add(moduleTestMenu);
-            //menuOptions.Add(moduleConsole);
+            menuOptions.Add(moduleConsole);
 
             //menuOptions.Add(moduleGeneric);
         }
@@ -272,12 +272,12 @@ namespace SkToolbox
 
         public void AddModule(SkModules.SkBaseModule pmodule)
         {
-            var obj = gameObject.AddComponent(pmodule.GetType());
-
-            pmodule.CallerEntry = new SkMenuItem((pmodule?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
-                                                            pmodule.CallerEntry.ItemText : pmodule.ModuleName, // or will have a menu text applied to it.
-                                                            () => menuController.RequestSubMenu(pmodule.FlushMenu())); // We also want to make sure the proper menu controller reference is set
-            menuOptions.Add(pmodule);
+            SkModules.SkBaseModule obj = gameObject.AddComponent(pmodule.GetType()) as SkModules.SkBaseModule;
+            if(obj.CallerEntry == null)
+                obj.CallerEntry = new SkMenuItem((obj?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
+                                                            obj.CallerEntry.ItemText : obj.ModuleName, // or will have a menu text applied to it.
+                                                            () => menuController.RequestSubMenu(obj.FlushMenu())); // We also want to make sure the proper menu controller reference is set
+            menuOptions.Add(obj);
 
             menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
             menuController.UpdateMenuOptions(menuOptions);
