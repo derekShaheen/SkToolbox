@@ -11,7 +11,7 @@ namespace SkToolbox.Utility
         private static readonly string HitTracker = "https://hits.dwyl.com/derekShaheen/SkToolbox.svg"; // 
         public static string ApplicationName = "SkToolbox";
         public static string ApplicationSource = "Github";
-        public static Version currentVersion = new Version("0.9.0.0");
+        public static Version currentVersion = new Version("1.0.0.0");
         public static Version latestVersion = new Version("0.0.0.0");
         public static void CheckVersion()
         {
