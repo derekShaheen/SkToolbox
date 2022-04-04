@@ -11,7 +11,7 @@ namespace SkToolbox.Utility
         private static readonly string HitTracker = "https://hits.dwyl.com/derekShaheen/SkToolbox.svg"; // 
         public static string ApplicationName = "SkToolbox";
         public static string ApplicationSource = "Github";
-        public static Version currentVersion = new Version("1.0.0.0");
+        public static Version currentVersion = new Version("0.9.0.0");
         public static Version latestVersion = new Version("0.0.0.0");
         public static void CheckVersion()
         {
@@ -19,13 +19,18 @@ namespace SkToolbox.Utility
             {
                 WebClient wClient = new WebClient();
                 wClient.Headers.Add("User-Agent: SkToolboxUser" + UnityEngine.Random.Range(0, 999999).ToString());
-                Uri uri = new Uri(VersionURL);
-
-                wClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompletedCallback);
-
-                wClient.DownloadStringAsync(uri); // Check version
 
                 wClient.DownloadStringAsync(new Uri(HitTracker)); // Log the hit (only 454 btyes)
+                
+                WebClient wClient2 = new WebClient();
+                wClient2.Headers.Add("User-Agent: SkToolboxUser" + UnityEngine.Random.Range(0, 999999).ToString());
+                Uri uri = new Uri(VersionURL);
+                
+
+                wClient2.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompletedCallback);
+
+                wClient2.DownloadStringAsync(uri); // Check version
+
             }
             catch (Exception)
             {
