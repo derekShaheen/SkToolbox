@@ -36,8 +36,7 @@ namespace SkToolbox
         #endregion
 
         private SkModules.ModConsoleOpt moduleConsole;
-        //private SkModules.ModGeneric moduleGeneric;
-        //private SkModules.ModTestMenu moduleTestMenu;
+
         private List<SkModules.SkBaseModule> _menuOptions = new List<SkModules.SkBaseModule>();
 
         //
@@ -234,15 +233,10 @@ namespace SkToolbox
             //RegisterModules();
             //Create a game object for each module
             moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
-            //moduleGeneric = gameObject.AddComponent<SkModules.ModGeneric>();
-            //moduleTestMenu = gameObject.AddComponent<SkModules.ModTestMenu>();
 
             // Add modules to the menu list
             // This is the order the menu items will be shown as well.
-            //menuOptions.Add(moduleTestMenu);
             menuOptions.Add(moduleConsole);
-
-            //menuOptions.Add(moduleGeneric);
         }
 
         public static T ParseEnum<T>(string value)
@@ -283,42 +277,61 @@ namespace SkToolbox
             menuController.UpdateMenuOptions(menuOptions);
         }
 
-        public void RegisterModules()
-        {
-            var ourAssemblyList = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => assembly == typeof(SkModules.SkBaseModule).Assembly);
-            menuOptions.Clear();
-            foreach (Assembly ourAssembly in ourAssemblyList)
-            {
+        //public void RegisterModules()
+        //{
+        //    var ourAssemblyList = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => assembly == typeof(SkModules.SkBaseModule).Assembly);
+        //    menuOptions.Clear();
+        //    foreach (Assembly ourAssembly in ourAssemblyList)
+        //    {
 
-                Type[] theseTypes;
-                try
-                {
-                    theseTypes = ourAssembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    theseTypes = e.Types;
-                }
+        //        Type[] theseTypes;
+        //        try
+        //        {
+        //            theseTypes = ourAssembly.GetTypes();
+        //        }
+        //        catch (ReflectionTypeLoadException e)
+        //        {
+        //            theseTypes = e.Types;
+        //        }
 
-                foreach (Type subclass in theseTypes)
-                {
-                    if (subclass.IsSubclassOf(typeof(SkModules.SkBaseModule)))
-                    {
-                        Component module = gameObject.AddComponent(subclass);
-                        SkModules.SkBaseModule moduleTyped = (SkModules.SkBaseModule)GameObject.FindObjectOfType(subclass);
-                        if (moduleTyped.IsEnabled)
-                        {
-                            moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-                            menuOptions.Add(moduleTyped);
-                        } else
-                        {
-                            moduleTyped.RemoveModule();
-                        }
-                    }
-                }
-            }
-            menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
-        }
+        //        foreach (Type subclass in theseTypes)
+        //        {
+        //            if (subclass.IsSubclassOf(typeof(SkModules.SkBaseModule)))
+        //            {
+        //                SkModules.SkBaseModule moduleTyped = gameObject.AddComponent(subclass) as SkModules.SkBaseModule;
+
+        //                if (moduleTyped.IsEnabled)
+        //                {
+        //                    moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
+        //                    menuOptions.Add(moduleTyped);
+        //                } else
+        //                {
+        //                    moduleTyped.RemoveModule();
+        //                }
+        //            }
+        //        }
+        //    }
+        //    menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
+        //}
+
+        //public void RegisterModules()
+        //{
+        //    List<SkModules.SkBaseModule> modulesTyped = Utility.SkUtilities.FindImplementationsByType<SkModules.SkBaseModule>(typeof(SkModules.SkBaseModule));
+        //    foreach (SkModules.SkBaseModule module in modulesTyped)
+        //    {
+        //        if (module != null)
+        //        {
+        //            SkModules.SkBaseModule moduleTyped = gameObject.AddComponent(module.GetType()) as SkModules.SkBaseModule;
+        //            //if (moduleTyped.IsEnabled)
+        //            //{
+        //                //moduleTyped.CallerEntry = new SkMenuItem(module.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
+        //                menuOptions.Add(moduleTyped);
+        //            //}
+        //        }
+        //    }
+        //    menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
+        //    menuController.UpdateMenuOptions(menuOptions);
+        //}
 
     }
 }
