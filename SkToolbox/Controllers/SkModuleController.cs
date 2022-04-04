@@ -24,20 +24,15 @@ namespace SkToolbox
         private int retryCount = 1; // Current load try
         private int retryCountMax = 3; // How many frames should it check for ready before it unloads the module?
 
-        private SkMenuController menuController;
-        //SkModules.ModConsoleOpt moduleConsole = new SkModules.ModConsoleOpt();
-        //SkModules.ModTestMenu moduleTestMenu = new SkModules.ModTestMenu();
+        public SkMenuController menuController;
 
-
-        public List<SkModules.SkBaseModule> menuOptions { get => _menuOptions; set => _menuOptions = value; }
-        private List<SkModules.SkBaseModule> retryModule { get; set; } = new List<SkModules.SkBaseModule>();
+        public List<SkModules.IModule> menuOptions { get => _menuOptions; set => _menuOptions = value; }
+        private List<SkModules.IModule> retryModule { get; set; } = new List<SkModules.IModule>();
 
 
         #endregion
 
-        private SkModules.ModConsoleOpt moduleConsole;
-
-        private List<SkModules.SkBaseModule> _menuOptions = new List<SkModules.SkBaseModule>();
+        public List<SkModules.IModule> _menuOptions = new List<SkModules.IModule>();
 
         //
 
@@ -66,13 +61,13 @@ namespace SkToolbox
         }
         public void Update()
         {
-            if (!firstLoad)// This is set to false on the 2nd frame, giving the modules one frame to initialize and run their Start() method.
+            if (!firstLoad && menuOptions.Count > 0)// This is set to false on the 2nd frame, giving the modules one frame to initialize and run their Start() method.
             {
                 if (SkMainStatus == Status.Loading && needLoadModules && !needRetry) // Are we loading, still needing to load the modules, but don't need to retry yet...
                 {
-                    foreach (SkModules.SkBaseModule Module in menuOptions)
+                    foreach (SkModules.IModule Module in menuOptions)
                     {
-                        Logz(new string[] { "TOOLBOX", "MODULE", "NOTIFY" }, new string[] { "NAME: " + Module.ModuleName.ToUpper(), "STATUS: " + Module.ModuleStatus.ToString().ToUpper() });
+                        Logz(new string[] { "TOOLBOX", "MODULE", "NOTIFY" }, new string[] { "NAME: " + Module?.ModuleName.ToUpper(), "STATUS: " + Module.ModuleStatus.ToString().ToUpper() });
                         if (Module.ModuleStatus != Status.Ready) // Log any modules that aren't ready
                         {
                             needRetry = true;
@@ -135,11 +130,11 @@ namespace SkToolbox
                     else if (retryCount >= (retryCountMax + 1))
                     {
                         Logz(new string[] { "TOOLBOX", "NOTIFY" }, new string[] { "MODULE NOT MOVING TO READY STATUS.", "UNLOADING THE MODULE(S)." }, LogType.Warning); // Notify the console that the menu is ready
-                        foreach (SkModules.SkBaseModule Module in retryModule)
+                        foreach (SkModules.IModule Module in retryModule)
                         {
                             if (Module.ModuleStatus != Status.Ready)
                             {
-                                Module.RemoveModule();
+                                //Module.RemoveModule();
                                 menuOptions.Remove(Module);
                             }
                         }
@@ -167,7 +162,7 @@ namespace SkToolbox
                     else if (menuOptions[Module]?.ModuleStatus == Status.Unload)
                     {
                         Logz(new string[] { "TOOLBOX", "NOTIFY" }, new string[] { "MODULE READY TO UNLOAD. UNLOADING MODULE: " + menuOptions[Module].ModuleName.ToUpper() }, LogType.Warning); // Notify ready to unload
-                        menuOptions[Module].RemoveModule();
+                        //menuOptions[Module].RemoveModule();
                         menuOptions.Remove(menuOptions[Module]);
                         menuController.UpdateMenuOptions(menuOptions);
                     }
@@ -190,12 +185,12 @@ namespace SkToolbox
                 }
                 else if (retryModule?.Count > 0 && retryCount >= (retryCountMax + 1)) // No retry frames remaining
                 {
-                    foreach (SkModules.SkBaseModule Module in retryModule)
+                    foreach (SkModules.IModule Module in retryModule)
                     {
                         if (Module.ModuleStatus != Status.Ready)
                         {
                             Logz(new string[] { "TOOLBOX", "NOTIFY" }, new string[] { "COULD NOT RESOLVE ERROR.", "UNLOADING THE MODULE: " + Module.ModuleName.ToUpper() }, LogType.Warning); // Notify the console that the menu is ready
-                            Module.RemoveModule();
+                            //Module.RemoveModule();
                             menuOptions.Remove(Module);
                         }
                     }
@@ -214,7 +209,7 @@ namespace SkToolbox
             OnUpdate();
         }
 
-        public List<SkModules.SkBaseModule> GetOptions()
+        public List<SkModules.IModule> GetOptions()
         {
             return menuOptions;
         }
@@ -230,13 +225,14 @@ namespace SkToolbox
         public void BeginMainMenu()
         {
 
-            //RegisterModules();
+            RegisterModules();
             //Create a game object for each module
-            moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
+            //moduleConsole = gameObject.AddComponent<SkModules.ModConsoleOpt>();
 
             // Add modules to the menu list
             // This is the order the menu items will be shown as well.
-            menuOptions.Add(moduleConsole);
+
+            //menuOptions.Add(moduleConsole);
         }
 
         public static T ParseEnum<T>(string value)
@@ -259,79 +255,67 @@ namespace SkToolbox
 
         }
 
-        public List<SkModules.SkBaseModule> ListModules()
+        public List<SkModules.IModule> ListModules()
         {
             return menuOptions;
         }
 
-        public void AddModule(SkModules.SkBaseModule pmodule)
+        public void AddModule(SkModules.IModule pmodule)
         {
-            SkModules.SkBaseModule obj = gameObject.AddComponent(pmodule.GetType()) as SkModules.SkBaseModule;
-            if(obj.CallerEntry == null)
-                obj.CallerEntry = new SkMenuItem((obj?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
-                                                            obj.CallerEntry.ItemText : obj.ModuleName, // or will have a menu text applied to it.
-                                                            () => menuController.RequestSubMenu(obj.FlushMenu())); // We also want to make sure the proper menu controller reference is set
-            menuOptions.Add(obj);
+            //SkModules.IModule obj = gameObject.AddComponent(pmodule.GetType()) as SkModules.IModule;
+            if (pmodule.CallerEntry == null)
+                pmodule.CallerEntry = new SkMenuItem((pmodule?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
+                                                            pmodule.CallerEntry.ItemText : pmodule.ModuleName, // or will have a menu text applied to it.
+                                                            () => menuController.RequestSubMenu(pmodule.FlushMenu())); // We also want to make sure the proper menu controller reference is set
+            menuOptions.Add(pmodule);
+
+            Logz(new string[] { "TOOLBOX", "NOTIFY" }, new string[] { "Module added.", pmodule.ModuleName });
 
             menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
             menuController.UpdateMenuOptions(menuOptions);
         }
 
-        //public void RegisterModules()
-        //{
-        //    var ourAssemblyList = AppDomain.CurrentDomain.GetAssemblies().Where(assembly => assembly == typeof(SkModules.SkBaseModule).Assembly);
-        //    menuOptions.Clear();
-        //    foreach (Assembly ourAssembly in ourAssemblyList)
-        //    {
+        public void RegisterModules()
+        {
+            var ourAssemblyList = AppDomain.CurrentDomain.GetAssemblies();
 
-        //        Type[] theseTypes;
-        //        try
-        //        {
-        //            theseTypes = ourAssembly.GetTypes();
-        //        }
-        //        catch (ReflectionTypeLoadException e)
-        //        {
-        //            theseTypes = e.Types;
-        //        }
+            try
+            {
+                foreach (Assembly ourAssembly in ourAssemblyList)
+                {
+                    Type[] theseTypes;
+                    try
+                    {
+                        theseTypes = ourAssembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException e)
+                    {
+                        theseTypes = e.Types;
+                    }
 
-        //        foreach (Type subclass in theseTypes)
-        //        {
-        //            if (subclass.IsSubclassOf(typeof(SkModules.SkBaseModule)))
-        //            {
-        //                SkModules.SkBaseModule moduleTyped = gameObject.AddComponent(subclass) as SkModules.SkBaseModule;
+                    foreach (Type foundType in theseTypes)
+                    {
+                        if (foundType.GetInterfaces().Contains(typeof(SkModules.IModule)) && foundType.GetConstructor(Type.EmptyTypes) != null)
+                        {
+                            SkModules.IModule module = (SkModules.IModule)Activator.CreateInstance(foundType);
 
-        //                if (moduleTyped.IsEnabled)
-        //                {
-        //                    moduleTyped.CallerEntry = new SkMenuItem(moduleTyped.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-        //                    menuOptions.Add(moduleTyped);
-        //                } else
-        //                {
-        //                    moduleTyped.RemoveModule();
-        //                }
-        //            }
-        //        }
-        //    }
-        //    menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
-        //}
-
-        //public void RegisterModules()
-        //{
-        //    List<SkModules.SkBaseModule> modulesTyped = Utility.SkUtilities.FindImplementationsByType<SkModules.SkBaseModule>(typeof(SkModules.SkBaseModule));
-        //    foreach (SkModules.SkBaseModule module in modulesTyped)
-        //    {
-        //        if (module != null)
-        //        {
-        //            SkModules.SkBaseModule moduleTyped = gameObject.AddComponent(module.GetType()) as SkModules.SkBaseModule;
-        //            //if (moduleTyped.IsEnabled)
-        //            //{
-        //                //moduleTyped.CallerEntry = new SkMenuItem(module.CallerEntry.ItemText, () => menuController.RequestSubMenu(moduleTyped.FlushMenu()));
-        //                menuOptions.Add(moduleTyped);
-        //            //}
-        //        }
-        //    }
-        //    menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
-        //    menuController.UpdateMenuOptions(menuOptions);
-        //}
-
+                            if (module.IsEnabled)
+                            {
+                                //module.CallerEntry = new SkMenuItem(module.CallerEntry.ItemText, () => menuController.RequestSubMenu(module.FlushMenu()));
+                                menuOptions.Add(module);
+                            }
+                            else
+                            {
+                                //module.RemoveModule();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Debug.Log(ex.Message);
+            }
+            menuOptions.Sort((a, b) => a.ModuleName.CompareTo(b.ModuleName));
+        }
     }
 }

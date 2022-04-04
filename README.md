@@ -62,7 +62,6 @@ namespace TestModule
     [BepInDependency("com.Skrip.SkToolbox")] // Set dependency so this loads after the SkToolbox
     class SkBepInExLoader : BaseUnityPlugin
     {
-        private int retrycount = 0;
         public const string
             MODNAME = "SkToolboxExtension",
             AUTHOR = "Skrip",
@@ -70,65 +69,131 @@ namespace TestModule
             VERSION = "1.0.0.0";
 
 
-        private void Start()
+        /*private void Start()
         {
-            StartCoroutine(Process());
-        }
-
-        IEnumerator Process()
-        {
-            GameObject _SkGameObject = null; // Initialize
-            ModAsset module = new ModAsset(); // Create module object
-            while (_SkGameObject == null && retrycount < 10) // Try 10 times
-            {
-                yield return new WaitForSecondsRealtime(1); // Wait 1 second between each try
-                _SkGameObject = SkToolbox.Loaders.SkLoader._SkGameObject; // Has the SkToolbox initalized yet? If so, drop out of the loop
-                retrycount += 1;
-
-            }
-            if (_SkGameObject != null)
-            {
-                SkToolbox.Loaders.SkLoader.MenuController.SkModuleController.AddModule(module); // Add the module
-            }
-        }
+            // Simply allow BepInEx to load the plugin. The SkToolbox will automatically detect menu modules and console commands.
+            // You can manually add and remove modules from the plugin though if you choose.
+            // No other code is required in this class by default, and this method only needs to be uncommented if you have your own reason.
+        }*/
     }
 }
 ```
 
 #### Add Menu Modules
-- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.SkBaseModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). These *menu items* are stored inside of the *modules*. Each module is a self contained Unity GameObject, and runs independently of each other *module*.
+- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.SkBaseModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). 
+These *menu items* are stored inside of the *modules*. Each module is a self contained class, and runs independently of each other *module*. These classes are free to spawn ```UnityEngine.GameObject```s if standard Unity MonoBehavior methods are needed.
 
 ![MenuModules](https://i.imgur.com/lARhjfv.png)
 
 See example code below for a module that is standard within the SkToolbox, for controlling the toolbox, and some other example options. Functionality will be expanded eventually.
+Be sure to look at the region notes. 
 
 ```csharp
+using System.Collections.Generic;
+using UnityEngine;
 using SkToolbox.Utility;
 using System;
-using UnityEngine;
 
 namespace SkToolbox.SkModules
 {
-    public class ModConsoleOpt : SkBaseModule, IModule
+    /// <summary>
+    /// All modules must inerhit from this base class. Within those modules, base.Ready() must be called when the module is ready for use, and this must happen within 3 frames of module initialization.
+    /// </summary>
+    public class ModConsoleOpt : IModule
     {
+        private string moduleName = "Console Controller";
+
+        #region Standard Methods
+        /// <summary>
+        /// These methods will be used in every menu module. Copy / Paste this entire Standard Methods region to new modules as they are created.
+        /// These are placed here instead of a base class due to Activator.CreateInstance() not being able to call subclass constructors. 
+        /// 
+        /// !! This region generally does not need to be modified.
+        /// </summary>
+        public SkMenu MenuOptions { get; set; } = new SkMenu();
+        public SkMenuItem CallerEntry { get; set; } = new SkMenuItem();
+        public SkUtilities.Status ModuleStatus { get; set; } = SkUtilities.Status.Initialized;
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set
+            {
+                if (IsEnabled && ModuleStatus != SkUtilities.Status.Ready) // If the module is ready, then it is loaded and running.
+                {   // To disable, set the status to "Unload" so it properly unloads.
+                    isEnabled = value;
+                }
+                if (!IsEnabled)
+                {
+                    IsEnabled = value;
+                }
+            }
+        }
+        
+        public string ModuleName { get => moduleName; set => moduleName = value; }
+
+
+        private bool isEnabled = true;
+
         internal bool conWriteToFile = false;
 
-        /// <summary>
-        /// Initialize the module
-        /// </summary>
-        public ModConsoleOpt() : base()
+        public List<SkMenuItem> FlushMenu()
         {
-            base.ModuleName = "Console Controller"; // Set the module name
-            base.Loading(); // Module is loading
-            base.CallerEntry = new SkMenuItem("Toolbox Menu\t►", () => base.SkMC.RequestSubMenu(base.FlushMenu())); // Create the CallerEntry
-                                // CallerEntry defines what will be seen on the main SkToolbox menu when opened and what will happen when the menu option is selected.
-                                // Intended behavior is that this will flush the base menu into the menu controller through the request submenu method. This will happen in essetially every module.
+            return MenuOptions.FlushMenu();
+        }
+
+        public void RequestMenu()
+        {
+            Loaders.SkLoader.MenuController.RequestSubMenu(MenuOptions.FlushMenu());
+        }
+
+        public void RequestMenu(SkMenu Menu)
+        {
+            Loaders.SkLoader.MenuController.RequestSubMenu(Menu);
+        }
+
+        public void RemoveModule()
+        {
+
+            throw new NotImplementedException();
+            //Destroy(this);
+        }
+
+        public void Ready()
+        {
+            ModuleStatus = SkUtilities.Status.Ready;
+        }
+        public void Loading()
+        {
+            ModuleStatus = SkUtilities.Status.Loading;
+        }
+        public void Error()
+        {
+            ModuleStatus = SkUtilities.Status.Error;
+        }
+        public void Unload()
+        {
+            ModuleStatus = SkUtilities.Status.Unload;
+        }
+        #endregion Standard Methods
+
+        #region Required but Individual
+        /// <summary>
+        /// This region is also copied to each new module, but needs to be modified individually to set up each module.
+        /// </summary>
+
+        public ModConsoleOpt()
+        {
+            Start();
         }
 
         public void Start()
         {
+            Loading(); // Module is loading
+            CallerEntry = new SkMenuItem("Toolbox Menu\t►", () => Loaders.SkLoader.MenuController.RequestSubMenu(FlushMenu())); // Create the CallerEntry
+                                                                                                                                // CallerEntry defines what will be seen on the main SkToolbox menu when opened and what will happen when the menu option is selected.
+                                                                                                                                // Intended behavior is that this will flush the base menu into the menu controller through the request submenu method. This will happen in essetially every module.
             BeginMenu(); // Generate the submenu when the module starts
-            base.Ready(); // Set the module status to ready. Must be set after loading on first frame.
+            Ready(); // Set the module status to ready. Must be set after loading on first frame.
         }
 
         public void BeginMenu()
@@ -137,19 +202,23 @@ namespace SkToolbox.SkModules
 
             consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu), "Reload the toolbox");
             consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
+            consoleOptMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
             consoleOptMenu.AddItem("Advanced\t►", new Action(BeginAdvancedMenu), "Show advanced options");
-            base.MenuOptions = consoleOptMenu; // Set the module menu options to the menu we just created
+            MenuOptions = consoleOptMenu; // Set the module menu options to the menu we just created
         }
 
-        //
+        #endregion Required but Individual
+
+        // Methods called from the menu
 
         public void BeginAdvancedMenu() // Generate submenu
         {
             SkMenu GenericMenu = new SkMenu();
-            GenericMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
+            GenericMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
             GenericMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
+            GenericMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
             GenericMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects), "Dump root object to log");
-            base.RequestMenu(GenericMenu); // Display the submenu
+            RequestMenu(GenericMenu); // Display the submenu
         }
 
         public void ToggleWriteFile()
@@ -184,15 +253,13 @@ namespace SkToolbox.SkModules
                 GameObject[] rootObjs = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i).GetRootGameObjects();
                 foreach (GameObject obj in rootObjs)
                 {
-                    SkUtilities.Logz(new string[] { "DUMP", "OBJ" }, new string[] { obj.name });
+                    SkUtilities.Logz(new string[] { "DUMP", "OBJ" }, new string[] { obj.name, obj.GetType().ToString() });
                 }
 
             }
         }
     }
-}
-
-```
+}```
 
 #### Add Commands
 - Commands are automatically detected by the SkToolbox and added to the console for use upon load. Commands can also be manually manipulated or added via methods in the *command processor* (```SkToolbox.SkCommandProcessor```). 
@@ -253,5 +320,4 @@ See example code below of a command actually used in the SkToolbox - Mini Metro 
                 }
             }
         }
-    }
-```
+    }```

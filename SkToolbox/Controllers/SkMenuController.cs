@@ -42,7 +42,7 @@ namespace SkToolbox
         private int subMenuMaxItemsPerPage = 12;
         private int subMenuCurrentPage = 1;
 
-        public List<SkModules.SkBaseModule> menuOptions;
+        public List<SkModules.IModule> menuOptions;
         public List<SkMenuItem> subMenuOptions;
         public List<SkMenuItem> subMenuOptionsDisplay;
         public SkModuleController SkModuleController;
@@ -247,7 +247,7 @@ namespace SkToolbox
                         float largestCalculatedWidth = 0;
                         GUIStyle style = GUI.skin.box;
                         // Calculate width
-                        foreach (SkModules.SkBaseModule optList in menuOptions)
+                        foreach (SkModules.IModule optList in menuOptions)
                         {
                             GUIContent menuTextItem = new GUIContent(optList.CallerEntry.ItemText);
                             Vector2 size = style.CalcSize(menuTextItem);
@@ -625,7 +625,7 @@ namespace SkToolbox
             }
         }
 
-        public void UpdateMenuOptions(List<SkModules.SkBaseModule> newMenuOptions)
+        public void UpdateMenuOptions(List<SkModules.IModule> newMenuOptions)
         {
             subMenuOpen = false;
             menuOpen = false;
