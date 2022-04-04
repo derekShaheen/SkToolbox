@@ -51,7 +51,7 @@ Index:
 #### BepInEx Injection
 - It is recommended that you use BepInEx for your injection. The example below can be used in conjunction with either adding menu modules, adding console commands, or both. This example shows a class that adds a menu module to a running instance of SkToolbox. Commands are automatically detected, but because menu modules are GameObjects, they must be handled with more care.
 
-```chsarp
+```csharp
 using BepInEx;
 using System.Collections;
 using UnityEngine;
