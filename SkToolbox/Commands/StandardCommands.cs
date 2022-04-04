@@ -104,7 +104,7 @@ namespace SkToolbox.Commands
         public override void Execute(string[] args)
         {
             SkUtilities.Logz(new string[] { "QUIT" }, new string[] { "Exiting the game now..." }, LogType.Error);
-            //Application.Quit();
+            Application.Quit();
         }
     }
 
@@ -246,9 +246,9 @@ namespace SkToolbox.Commands
         public override string Command => "objectvar";
 
         public override string Description => "Get/Set the value of a variable attached to a gameobject." +
-                                                "\nNo component name parameter will report all components attached to this object." +
-                                                "\nNo field name parameter provided will report all fields for this object/component." +
-                                                "\nNo value parameter provided will report current value of that field.";
+                                                "\n\tNo component name parameter will report all components attached to this object." +
+                                                "\n\tNo field name parameter provided will report all fields for this object/component." +
+                                                "\n\tNo value parameter provided will report current value of that field.";
 
         public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
 
