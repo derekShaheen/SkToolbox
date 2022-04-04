@@ -86,7 +86,7 @@ namespace SkToolbox
 
                     if (processCommand != null)
                     {
-                        string[] paramStringArray = Regex.Matches(commandTrimmed, @"""[^""]+""|\S+")
+                        string[] paramStringArray = Regex.Matches(commandTrimmed, @"""[^""]+""|\S+") // command param1 param2 parm3 ...
                                                             .Cast<Match>()
                                                             .Select(p => p.Value.Trim('"'))
                                                             .Skip(1)
