@@ -259,7 +259,8 @@ namespace SkToolbox.SkModules
             }
         }
     }
-}```
+}
+```
 
 #### Add Commands
 - Commands are automatically detected by the SkToolbox and added to the console for use upon load. Commands can also be manually manipulated or added via methods in the *command processor* (```SkToolbox.SkCommandProcessor```). 
@@ -267,57 +268,58 @@ namespace SkToolbox.SkModules
 See example code below of a command actually used in the SkToolbox - Mini Metro release.
 
 ```csharp
-    public class CmdSetGamemode : SkCommand
+public class CmdSetGamemode : SkCommand
+{
+	Game game;
+    GameController gameController;
+    public override string Command => "SetGamemode";
+
+    public override string Description => "[Gamemode] - CLASSIC, ZEN, EXTREME, SANDBOX, PLAYABLE_COUNT, FAQ";
+
+    public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
+
+    public override bool Enabled => true;
+
+    public override void Execute(string[] args)
     {
-	    Game game;
-        GameController gameController;
-        public override string Command => "SetGamemode";
-
-        public override string Description => "[Gamemode] - CLASSIC, ZEN, EXTREME, SANDBOX, PLAYABLE_COUNT, FAQ";
-
-        public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
-
-        public override bool Enabled => true;
-
-        public override void Execute(string[] args)
+        if (args.Length > 0) // Arg was provided, attempt to set gamemode
         {
-            if (args.Length > 0) // Arg was provided, attempt to set gamemode
+            GetObjects(); // Get the objects needed from the game
+
+            GameMode gameMode = GameMode.CLASSIC; // Set default gamemode
+
+            Enum.TryParse(args[0], out gameMode); // Attempt to parse the arg provided
+
+            if (game != null)
             {
-                GetObjects(); // Get the objects needed from the game
-
-                GameMode gameMode = GameMode.CLASSIC; // Set default gamemode
-
-                Enum.TryParse(args[0], out gameMode); // Attempt to parse the arg provided
-
-                if (game != null)
-                {
-                    game.Mode = gameMode;
-                    game?.HudScreen?.HandleGameModeChanged();
-                    SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Game mode set to: " + game.ModeString }); // Report to the console the successful change
-                }
-            }
-            else // No arg provided, display the current gamemode
-            {
-                GetObjects(); // Get the objects needed from the game
-                SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Gamemode: " + game.ModeString }); // Display the gamemode
+                game.Mode = gameMode;
+                game?.HudScreen?.HandleGameModeChanged();
+                SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Game mode set to: " + game.ModeString }); // Report to the console the successful change
             }
         }
-
-        public void GetObjects() // Find the objects needed to set the gamemode
+        else // No arg provided, display the current gamemode
         {
-            if (Main.Instance != null) // If main isn't loaded, we're not in game
-            {
-                gameController = SkUtilities.GetPrivateField<GameController>(Main.Instance, "controller"); // Use the SkUtilities from the SkToolbox to get the private GameController "controller" field in Main.instance (Main.instance.controller)
-                if (gameController == null)
-                {
-                    SkUtilities.Logz("Could not find game controller.");
-                }
+            GetObjects(); // Get the objects needed from the game
+            SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Gamemode: " + game.ModeString }); // Display the gamemode
+        }
+    }
 
-                game = SkUtilities.GetPrivateField<Game>(gameController, "game");
-                if (gameController == null)
-                {
-                    SkUtilities.Logz("Could not find game.");
-                }
+    public void GetObjects() // Find the objects needed to set the gamemode
+    {
+        if (Main.Instance != null) // If main isn't loaded, we're not in game
+        {
+            gameController = SkUtilities.GetPrivateField<GameController>(Main.Instance, "controller"); // Use the SkUtilities from the SkToolbox to get the private GameController "controller" field in Main.instance (Main.instance.controller)
+            if (gameController == null)
+            {
+                SkUtilities.Logz("Could not find game controller.");
+            }
+
+            game = SkUtilities.GetPrivateField<Game>(gameController, "game");
+            if (gameController == null)
+            {
+                SkUtilities.Logz("Could not find game.");
             }
         }
-    }```
+    }
+}
+```
