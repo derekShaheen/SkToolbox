@@ -18,6 +18,7 @@ Index:
 - Integrated Console with easy to add commands. This console will capture all debug output to console for whatever game it is attached to. You can also see the output from the Toolbox and your modules easily here.
 
 ![Console1](https://i.imgur.com/f34jbtC.png)
+![Console2](https://media.giphy.com/media/wMQ1G00sI2jK1FQarq/giphy.gif)
 
 - **[SkToolbox - Valheim](https://www.nexusmods.com/valheim/mods/8 "SkToolbox for Valheim")**
 
