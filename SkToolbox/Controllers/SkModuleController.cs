@@ -262,7 +262,6 @@ namespace SkToolbox
 
         public void AddModule(SkModules.IModule pmodule)
         {
-            //SkModules.IModule obj = gameObject.AddComponent(pmodule.GetType()) as SkModules.IModule;
             if (pmodule.CallerEntry == null)
                 pmodule.CallerEntry = new SkMenuItem((pmodule?.CallerEntry?.ItemText?.Length > 0) ? // We have to create a new caller entry to ensure one was either provided
                                                             pmodule.CallerEntry.ItemText : pmodule.ModuleName, // or will have a menu text applied to it.
@@ -301,7 +300,10 @@ namespace SkToolbox
 
                             if (module.IsEnabled)
                             {
-                                //module.CallerEntry = new SkMenuItem(module.CallerEntry.ItemText, () => menuController.RequestSubMenu(module.FlushMenu()));
+                                if (module.CallerEntry == null)
+                                {
+                                    module.CallerEntry = new SkMenuItem(module.CallerEntry.ItemText + "\t►", () => menuController.RequestSubMenu(module.FlushMenu()));
+                                }
                                 menuOptions.Add(module);
                             }
                             else

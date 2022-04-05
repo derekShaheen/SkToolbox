@@ -41,7 +41,11 @@ Index:
 
 ------------
 ### How To Use (Developer)
+- The SkToolbox framework is designed to facilitate the creation of on-screen menus and in-game console commands. It is expected that you'll have an SkToolbox.dll and your own dll module that will be loaded by the framework.
 - In order to use the framework, simply download it and reference it in your .NET Framework 4.7.X project. You will then be able to both create *commands* (```SkToolbox.Commands.SkCommand```) for the integrated console and *modules* (```SkToolbox.SkModules.SkBaseModule```) which will be automatically rendered and handled by the menu controller.
+- While it is recommended that you use BepInEx for injection, it is not required, and any mono injector can be used. The SkToolbox is designed for use with BepInEx, essentially any mono injector, doorstop, etc. Take into account that most of the module examples you'll find are created for use with BepInEx, but you can simply substitute that class with another loader and it should work as expected.
+
+	#### Module Example: [Link to working module for Mini Metro](https://github.com/derekShaheen/SkToolbox-for-MiniMetro "Link to full, working module for Mini Metro")
 
 - Below we describe and provide examples for:
 	- BepInEx Injection
@@ -86,7 +90,7 @@ These *menu items* are stored inside of the *modules*. Each module is a self con
 ![MenuModules](https://i.imgur.com/lARhjfv.png)
 
 See example code below for a module that is standard within the SkToolbox, for controlling the toolbox, and some other example options. Functionality will be expanded eventually.
-Be sure to look at the region notes. 
+Be sure to look at the region notes.
 
 ```csharp
 using System.Collections.Generic;
