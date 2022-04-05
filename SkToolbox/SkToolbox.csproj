@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>A:\Games\Power to the People\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\corlib\BepInEx.dll</HintPath>
     </Reference>
@@ -73,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Commands\SkCommand.cs" />
     <Compile Include="Commands\StandardCommands.cs" />
+    <Compile Include="Controllers\SkPatcher.cs" />
     <Compile Include="Loaders\SkBepInExLoader.cs" />
     <Compile Include="Loaders\SkLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
