@@ -7,14 +7,11 @@ namespace SkToolbox.Controllers
     public static class SkPatcher
     {
         private static Harmony harmony = null;
-        private static bool initComplete = false;
-
-        public static bool InitComplete { get => initComplete; set => initComplete = value; }
 
         public static void InitPatch()
         {
 
-            if (!InitComplete)
+            if (harmony == null)
             {
                 //SkUtilities.Logz(new string[] { "SkCommandPatcher", "INJECT" }, new string[] { "Attempting injection..." });
                 try
@@ -24,14 +21,10 @@ namespace SkToolbox.Controllers
                     //SkUtilities.Logz(new string[] { "SkCommandPatcher", "INJECT" }, new string[] { "INJECT => COMPLETE" });
                 }
                 catch (Exception ex)
-                //catch (Exception)
                 {
                     SkUtilities.Logz(new string[] { "SkCommandPatcher", "PATCH" }, new string[] { "PATCH => FAILED.", ex.Message, ex.StackTrace }, UnityEngine.LogType.Error);
                 }
-                finally
-                {
-                    InitComplete = true;
-                }
+
             }
         }
     }
