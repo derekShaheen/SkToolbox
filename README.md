@@ -45,7 +45,7 @@ Index:
 - In order to use the framework, simply download it and reference it in your .NET Framework 4.7.X project. You will then be able to both create *commands* (```SkToolbox.Commands.SkCommand```) for the integrated console and *modules* (```SkToolbox.SkModules.SkBaseModule```) which will be automatically rendered and handled by the menu controller.
 - While it is recommended that you use BepInEx for injection, it is not required, and any mono injector can be used. The SkToolbox is designed for use with BepInEx, essentially any mono injector, doorstop, etc. Take into account that most of the module examples you'll find are created for use with BepInEx, but you can simply substitute that class with another loader and it should work as expected.
 
-	#### Module Example: [Link to working module for Mini Metro](https://github.com/derekShaheen/SkToolbox-for-MiniMetro "Link to full, working module for Mini Metro")
+	#### 🟢 Module Example: [Link to working module for Mini Metro](https://github.com/derekShaheen/SkToolbox-for-MiniMetro "Link to full, working module for Mini Metro")
 
 - Below we describe and provide examples for:
 	- BepInEx Injection
@@ -84,7 +84,7 @@ namespace TestModule
 ```
 
 #### Add Menu Modules
-- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.SkBaseModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). 
+- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.IModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). 
 These *menu items* are stored inside of the *modules*. Each module is a self contained class, and runs independently of each other *module*. These classes are free to spawn ```UnityEngine.GameObject```s if standard Unity MonoBehavior methods are needed.
 
 ![MenuModules](https://i.imgur.com/lARhjfv.png)
