@@ -18,6 +18,7 @@ Index:
 - Integrated Console with easy to add commands. This console will capture all debug output to console for whatever game it is attached to. You can also see the output from the Toolbox and your modules easily here.
 
 ![Console1](https://i.imgur.com/f34jbtC.png)
+![Console2](https://media.giphy.com/media/wMQ1G00sI2jK1FQarq/giphy.gif)
 
 - **[SkToolbox - Valheim](https://www.nexusmods.com/valheim/mods/8 "SkToolbox for Valheim")**
 
@@ -41,7 +42,11 @@ Index:
 
 ------------
 ### How To Use (Developer)
-- In order to use the framework, simply download it and reference it in your .NET Framework 4.7.X project. You will then be able to both create *commands* (```SkToolbox.Commands.SkCommand```) for the integrated console and *modules* (```SkToolbox.SkModules.SkBaseModule```) which will be automatically rendered and handled by the menu controller.
+- The SkToolbox framework is designed to facilitate the creation of on-screen menus and in-game console commands. It is expected that you'll have an SkToolbox.dll and your own dll module that will be loaded by the framework.
+- In order to use the framework, simply download it and reference it in your .NET Framework 4.7.X project. You will then be able to both create *commands* (```SkToolbox.Commands.SkCommand```) for the integrated console and *modules* (```SkToolbox.SkModules.IModule```) which will be automatically rendered and handled by the menu controller.
+- While it is recommended that you use BepInEx for injection, it is not required, and any mono injector can be used. The SkToolbox is designed for use with BepInEx, essentially any mono injector, doorstop, etc. Take into account that most of the module examples you'll find are created for use with BepInEx, but you can simply substitute that class with another loader and it should work as expected.
+
+	#### 🟢 Module Example: [Link to working module for Mini Metro](https://github.com/derekShaheen/SkToolbox-for-MiniMetro "Link to full, working module for Mini Metro")
 
 - Below we describe and provide examples for:
 	- BepInEx Injection
@@ -80,13 +85,13 @@ namespace TestModule
 ```
 
 #### Add Menu Modules
-- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.SkBaseModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). 
+- What is a menu module? In the image below, we refer to the entries in the *yellow* box as *modules* (```SkToolbox.SkModules.IModule```) and the entries in the *cyan* box as *menu items* (```SkToolbox.SkMenuItem```). 
 These *menu items* are stored inside of the *modules*. Each module is a self contained class, and runs independently of each other *module*. These classes are free to spawn ```UnityEngine.GameObject```s if standard Unity MonoBehavior methods are needed.
 
 ![MenuModules](https://i.imgur.com/lARhjfv.png)
 
 See example code below for a module that is standard within the SkToolbox, for controlling the toolbox, and some other example options. Functionality will be expanded eventually.
-Be sure to look at the region notes. 
+Be sure to look at the region notes.
 
 ```csharp
 using System.Collections.Generic;
@@ -270,45 +275,47 @@ See example code below of a command actually used in the SkToolbox - Mini Metro 
 ```csharp
 public class CmdSetGamemode : SkCommand
 {
-	Game game;
-    GameController gameController;
     public override string Command => "SetGamemode";
 
-    public override string Description => "[Gamemode] - CLASSIC, ZEN, EXTREME, SANDBOX, PLAYABLE_COUNT, FAQ";
+    public override string Description => "CLASSIC, ZEN, EXTREME, SANDBOX, PLAYABLE_COUNT, FAQ";
 
     public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
 
     public override bool Enabled => true;
 
+    public override string[] Hints => new string[] {"Gamemode"};
+
     public override void Execute(string[] args)
     {
-        if (args.Length > 0) // Arg was provided, attempt to set gamemode
+        if (args.Length > 0) // Search for specific commands
         {
-            GetObjects(); // Get the objects needed from the game
+            GetObjects();
 
-            GameMode gameMode = GameMode.CLASSIC; // Set default gamemode
+            GameMode gameMode = GameMode.CLASSIC;
 
-            Enum.TryParse(args[0], out gameMode); // Attempt to parse the arg provided
+            Enum.TryParse(args[0], out gameMode);
 
             if (game != null)
             {
                 game.Mode = gameMode;
                 game?.HudScreen?.HandleGameModeChanged();
-                SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Game mode set to: " + game.ModeString }); // Report to the console the successful change
+                SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Game mode set to: " + game.ModeString });
             }
         }
-        else // No arg provided, display the current gamemode
+        else // Search for all commands
         {
-            GetObjects(); // Get the objects needed from the game
-            SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Gamemode: " + game.ModeString }); // Display the gamemode
+            GetObjects();
+            SkUtilities.Logz(new string[] { "SetGamemode" }, new string[] { "Gamemode: " + game.ModeString });
         }
     }
 
-    public void GetObjects() // Find the objects needed to set the gamemode
+    Game game;
+    GameController gameController;
+    public void GetObjects()
     {
-        if (Main.Instance != null) // If main isn't loaded, we're not in game
+        if (Main.Instance != null)
         {
-            gameController = SkUtilities.GetPrivateField<GameController>(Main.Instance, "controller"); // Use the SkUtilities from the SkToolbox to get the private GameController "controller" field in Main.instance (Main.instance.controller)
+            gameController = SkUtilities.GetPrivateField<GameController>(Main.Instance, "controller");
             if (gameController == null)
             {
                 SkUtilities.Logz("Could not find game controller.");

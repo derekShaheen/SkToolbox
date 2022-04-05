@@ -108,9 +108,6 @@ namespace SkToolbox.SkModules
         public void BeginMenu()
         {
             SkMenu consoleOptMenu = new SkMenu(); // Create a new menu object and add items to it
-
-            consoleOptMenu.AddItem("Reload Menu", new Action(ReloadMenu), "Reload the toolbox");
-            consoleOptMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
             consoleOptMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
             consoleOptMenu.AddItem("Advanced\t►", new Action(BeginAdvancedMenu), "Show advanced options");
             MenuOptions = consoleOptMenu; // Set the module menu options to the menu we just created
@@ -123,9 +120,10 @@ namespace SkToolbox.SkModules
         public void BeginAdvancedMenu() // Generate submenu
         {
             SkMenu GenericMenu = new SkMenu();
-            GenericMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
-            GenericMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
             GenericMenu.AddItemToggle("Write to File", ref conWriteToFile, new Action(ToggleWriteFile), "Write log output to file?");
+            GenericMenu.AddItem("Open Log Folder", new Action(OpenLogFolder), "Open Unity log folder");
+            GenericMenu.AddItem("Reload Menu", new Action(ReloadMenu), "Reload the toolbox");
+            GenericMenu.AddItem("Unload Toolbox", new Action(UnloadMenu), "Unload the toolbox from memory");
             GenericMenu.AddItem("Dump Root Objects", new Action(DumpRootObjects), "Dump root object to log");
             RequestMenu(GenericMenu); // Display the submenu
         }

@@ -82,7 +82,7 @@
     <Compile Include="Controllers\SkMenuController.cs" />
     <Compile Include="BaseClasses\SkMenuItem.cs" />
     <Compile Include="Controllers\SkModuleController.cs" />
-    <Compile Include="BaseClasses\IModule.cs" />
+    <Compile Include="SkModules\IModule.cs" />
     <Compile Include="SkModules\ModConsoleOpt.cs" />
     <Compile Include="SkModules\ModGeneric.cs" />
     <Compile Include="BaseClasses\SkBaseModule.cs" />
