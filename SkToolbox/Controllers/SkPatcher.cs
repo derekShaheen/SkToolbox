@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SkToolbox.Utility;
 using System;
+using System.Reflection;
 
 namespace SkToolbox.Controllers
 {
@@ -10,6 +11,16 @@ namespace SkToolbox.Controllers
 
         public static void InitPatch()
         {
+            InitPatch(typeof(SkPatcher).Assembly);
+        }
+
+        public static void InitPatch(Type type)
+        {
+            InitPatch(type.Assembly);
+        }
+
+        public static void InitPatch(Assembly assembly)
+        {
 
             if (harmony == null)
             {
@@ -17,7 +28,7 @@ namespace SkToolbox.Controllers
                 try
                 {
                     //Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-                    harmony = Harmony.CreateAndPatchAll(typeof(SkPatcher).Assembly);
+                    harmony = Harmony.CreateAndPatchAll(assembly);
                     //SkUtilities.Logz(new string[] { "SkCommandPatcher", "INJECT" }, new string[] { "INJECT => COMPLETE" });
                 }
                 catch (Exception ex)

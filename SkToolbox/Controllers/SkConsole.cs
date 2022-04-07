@@ -508,6 +508,7 @@ namespace SkToolbox
 
             editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
             editor.multiline = false;
+
             if (GUILayout.Button(submitLabel, GUILayout.ExpandWidth(false)))
             {
                 //Utility.SkUtilities.Logz(new string[] { "INPUT" }, new string[] { outputString, SkCommandProcessor.Instance.ExecuteCommand(outputString).ToString()});
