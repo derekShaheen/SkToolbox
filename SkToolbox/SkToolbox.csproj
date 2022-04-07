@@ -31,8 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>A:\Games\Power to the People\BepInEx\core\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\corlib\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\corlib\BepInEx.dll</HintPath>
