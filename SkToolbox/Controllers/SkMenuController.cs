@@ -189,11 +189,11 @@ namespace SkToolbox
                         {
                             try
                             {
-                                if (subMenuOptionsDisplay[subMenuSelection - 1].ItemText.Equals("Next >"))
+                                if (subMenuOptionsDisplay[subMenuSelection - 1].ItemText.Equals("Next ►"))
                                 {
                                     IncreasePage();
                                 }
-                                else if (subMenuOptionsDisplay[subMenuSelection - 1].ItemText.Equals("< Previous"))
+                                else if (subMenuOptionsDisplay[subMenuSelection - 1].ItemText.Equals("◄ Previous"))
                                 {
                                     DecreasePage();
                                 }
@@ -533,11 +533,11 @@ namespace SkToolbox
                         {
                             try
                             {
-                                if (subMenuOptionsDisplay[i].ItemText.Equals("Next >"))
+                                if (subMenuOptionsDisplay[i].ItemText.Equals("Next ►"))
                                 {
                                     IncreasePage();
                                 }
-                                else if (subMenuOptionsDisplay[i].ItemText.Equals("< Previous"))
+                                else if (subMenuOptionsDisplay[i].ItemText.Equals("◄ Previous"))
                                 {
                                     DecreasePage();
                                 }
