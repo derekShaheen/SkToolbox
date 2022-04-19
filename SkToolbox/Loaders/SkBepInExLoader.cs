@@ -34,9 +34,10 @@ namespace SkToolbox.Loaders
                 , "Enables the console without launch option.");
         }
 
-    internal class ConfigEntry
-    {
-        public static ConfigEntry<bool> CDescriptor { get; set; }
-        public static ConfigEntry<bool> CConsoleEnabled { get; set; }
+        internal class ConfigEntry
+        {
+            public static ConfigEntry<bool> CDescriptor { get; set; }
+            public static ConfigEntry<bool> CConsoleEnabled { get; set; }
+        }
     }
 }
