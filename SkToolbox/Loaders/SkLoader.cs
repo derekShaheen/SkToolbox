@@ -19,6 +19,7 @@ namespace SkToolbox.Loaders
         public static bool MenuEnabled = true;
 
         private static bool FirstLoad = true;
+        public static bool LoadedWithBepInEx = false;
         private static bool InitLogging = false;
 
         private static bool ReadyForGameObject = true;

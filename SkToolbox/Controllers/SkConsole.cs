@@ -154,6 +154,14 @@ namespace SkToolbox
 
         private void Start()
         {
+            if(Loaders.SkLoader.LoadedWithBepInEx)
+            {
+                if(Loaders.SkBepInExLoader.ConfigEntry.CConsoleEnabled.Value == false)
+                {
+                    return;
+                }
+            }
+
             lFKeys = logTypeFilters.Keys.ToList();
             logSavePath = Application.persistentDataPath + "/!SkToolbox Console Log.txt";
             if (openOnStart)
