@@ -294,4 +294,22 @@ namespace SkToolbox.Commands
             }
         }
     }
+
+    public class CmdStdMenuToggle : SkCommand
+    {
+        public override string Command => "ctoggle";
+
+        public override string Description => "Toggle the on-screen menu.";
+
+        public override SkCommandEnum.VisiblityFlag VisibilityFlag => SkCommandEnum.VisiblityFlag.Visible;
+
+        public override bool Enabled => true;
+
+        public override string[] Hints => null;
+
+        public override void Execute(string[] args)
+        {
+            Loaders.SkLoader.MenuController.ToggleMenu();
+        }
+    }
 }

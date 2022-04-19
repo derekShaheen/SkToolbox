@@ -662,5 +662,11 @@ namespace SkToolbox
             menuOpen = false;
             subMenuOpen = false;
         }
+
+        public void ToggleMenu()
+        {
+            subMenuOpen = false;
+            menuOpen = !menuOpen;
+        }
     }
 }
