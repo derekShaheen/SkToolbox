@@ -11,7 +11,8 @@ namespace SkToolbox.Controllers
 
         public static void InitPatch()
         {
-            InitPatch(typeof(SkPatcher).Assembly);
+            //InitPatch(typeof(SkPatcher).Assembly);
+            InitPatch(Assembly.GetExecutingAssembly());
         }
 
         public static void InitPatch(Type type)
