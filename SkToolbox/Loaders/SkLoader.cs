@@ -1,4 +1,5 @@
 ﻿using SkToolbox.Utility;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -23,6 +24,14 @@ namespace SkToolbox.Loaders
         private static bool InitLogging = false;
 
         private static bool ReadyForGameObject = true;
+
+        public static void Unload()
+        {
+            if (FirstLoad)
+            {
+                SelfDestruct();
+            }
+        }
 
         public static void SelfDestruct()
         {
@@ -102,15 +111,22 @@ namespace SkToolbox.Loaders
 
             CheckForUnknownInstance();
 
-            SkLoader.Load.transform.parent = null;
-            Transform root = SkLoader.Load.transform.root;
-            if (root != null)
+            try
             {
-                if (root.gameObject != SkLoader.Load)
+                SkLoader.Load.transform.parent = null;
+                Transform root = SkLoader.Load.transform.root;
+                if (root != null)
                 {
-                    root.parent = SkLoader.Load.transform;
+                    if (root.gameObject != SkLoader.Load)
+                    {
+                        root.parent = SkLoader.Load.transform;
+                    }
                 }
+            } catch (NullReferenceException)
+            {
+                // Just suppress it
             }
+
             if (MenuEnabled)
             {
                 MenuController = SkLoader._SkGameObject.AddComponent<SkMenuController>(); // Load the menu controller

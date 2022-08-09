@@ -111,7 +111,13 @@ namespace SkToolbox
             {
                 if (command.Enabled)
                 {
-                    SkCommandProcessor.Instance.AddCommand(command, false);
+                    try
+                    {
+                        SkCommandProcessor.Instance.AddCommand(command, false);
+                    } catch (Exception ex)
+                    {
+                        Utility.SkUtilities.Logz(new string[] { "CONTROLLER", "ERROR" }, new string[] { "Command Discovery failure", ex.Message });
+                    }
                 }
             }
             SkCommandProcessor.Instance.SortCommands();

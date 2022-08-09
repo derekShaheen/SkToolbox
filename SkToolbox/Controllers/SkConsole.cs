@@ -154,13 +154,13 @@ namespace SkToolbox
 
         private void Start()
         {
-            if(Loaders.SkLoader.LoadedWithBepInEx)
-            {
-                if(Loaders.SkBepInExLoader.ConfigEntry.CConsoleEnabled.Value == false)
-                {
-                    return;
-                }
-            }
+            //if(Loaders.SkLoader.LoadedWithBepInEx)
+            //{
+            //    if(Loaders.SkBepInExLoader.ConfigEntry.CConsoleEnabled.Value == false)
+            //    {
+            //        return;
+            //    }
+            //}
 
             lFKeys = logTypeFilters.Keys.ToList();
             logSavePath = Application.persistentDataPath + "/!SkToolbox Console Log.txt";
@@ -168,7 +168,6 @@ namespace SkToolbox
             {
                 isVisible = true;
             }
-            SkCommandProcessor.Instance.DiscoverCommands();
 
             customFont = Font.CreateDynamicFontFromOSFont("Consolas.ttf", logFontSize);
             width = (Screen.width / scaleFactor) - (margin * 2);
@@ -188,6 +187,12 @@ namespace SkToolbox
                 {
                     case KeyCode.BackQuote:
                         isVisible = !isVisible;
+
+                        if(SkCommandProcessor.Instance.CommandList.Count == 0)
+                        {
+                            SkCommandProcessor.Instance.DiscoverCommands();
+                        }
+                        
                         inputString = string.Empty;
                         break;
                     default:

@@ -26,7 +26,7 @@ namespace SkToolbox.Loaders
             ConfigEntry.CDescriptor = Config.Bind("- Index", "ThisIsJustAnIndex-NotASetting", true
                 , "Config sections:" +
                 "\n0 - General" +
-                //"\n1 - Auto Run [Currently Disabled due to Hearth and Home patch. Fix coming soon]" +
+                //"\n1 - Section 2" +
                 // ...
                 "\n");
 
