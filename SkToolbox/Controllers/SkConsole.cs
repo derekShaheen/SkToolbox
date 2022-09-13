@@ -169,6 +169,11 @@ namespace SkToolbox
                 isVisible = true;
             }
 
+            if (SkCommandProcessor.Instance.CommandList.Count == 0)
+            {
+                SkCommandProcessor.Instance.DiscoverCommands();
+            }
+
             customFont = Font.CreateDynamicFontFromOSFont("Consolas.ttf", logFontSize);
             width = (Screen.width / scaleFactor) - (margin * 2);
             height = (Screen.height / scaleFactor) - (margin * 2);

@@ -21,11 +21,11 @@ namespace SkToolbox
         internal static Status SkMenuControllerStatus = Status.Initialized;
 
         private readonly string appName = "SkToolbox";
-        private readonly string welcomeMsg = "[SkToolbox Loaded]\nPress NumPad 0\nto Toggle Menu.";
+        private string welcomeMsg = "[SkToolbox Loaded]\nPress NumPad 0\nto Toggle Menu.";
         //private readonly string welcomeMsg = "[SkToolbox Loaded]\nPress NumPad 0\nto Acknowledge.";
-        private readonly string welcomeMotd = "";
+        private string welcomeMotd = "";
 
-        private bool displayWelcome = false;
+        private bool displayWelcome = true;
         private bool initialCheck = true;
         internal bool logResponse = false;
 

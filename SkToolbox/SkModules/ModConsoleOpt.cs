@@ -10,7 +10,7 @@ namespace SkToolbox.SkModules
     /// </summary>
     public class ModConsoleOpt : IModule
     {
-        private string moduleName = "Console Controller";
+        private string moduleName = "~Console Controller";
 
         #region Standard Methods
         /// <summary>
