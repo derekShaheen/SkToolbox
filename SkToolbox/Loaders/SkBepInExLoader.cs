@@ -11,14 +11,37 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "1.0.0.0";
+            VERSION = "2.0.0.0";
+
+        private static Controllers.MainConsole m_Console;
+
+        private static GameObject skGameObject;
+        public static GameObject SkGameObject 
+        { 
+            get 
+            {
+                if (skGameObject == null)
+                {
+                    skGameObject = new GameObject("SkToolbox");
+                }
+                return skGameObject;
+            } 
+            set => skGameObject = value; 
+        }
 
         private void Start()
         {
             base.transform.parent = null;
             Object.DontDestroyOnLoad(this);
-            SkLoader.LoadedWithBepInEx = true;
-            SkLoader.Init();
+            Object.DontDestroyOnLoad(SkGameObject);
+            Init();
+        }
+
+        public void Init()
+        {
+            Application.runInBackground = true;
+            m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
+
         }
 
         public void InitConfig() // These settings are only used if this is loaded from BepInEx
@@ -30,8 +53,8 @@ namespace SkToolbox.Loaders
                 // ...
                 "\n");
 
-            ConfigEntry.CConsoleEnabled = Config.Bind("0 - General", "ConsoleEnabled", true
-                , "Enables the console without launch option.");
+            //ConfigEntry.CConsoleEnabled = Config.Bind("0 - General", "ConsoleEnabled", true
+            //    , "Enables the console without launch option.");
         }
 
         internal class ConfigEntry
