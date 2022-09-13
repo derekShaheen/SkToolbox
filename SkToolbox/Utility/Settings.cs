@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SkToolbox.Settings
 {
-    internal class Console
+    public class Console
     {
         public static int FontSize = 16;
 
@@ -15,16 +15,33 @@ namespace SkToolbox.Settings
         public static string OutputPrefix = "SkToolbox → "; // "(SkToolbox)"
         public static Color OutputPrefixColor = new Color(255, 51, 51);
         public static int MaxOutputEntries = 999;
+        public static bool ShowPanel = true;
+        public static bool ShowConsole = true;
 
         // Console Controls
         public static KeyCode KeyToggleWindow = KeyCode.BackQuote;
         public static KeyCode KeyAutoComplete = KeyCode.Tab;
 
         //Console Sizes
-        public static ConsolePos Position = ConsolePos.TopCentered;
-        public static int Width = -2;   // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
-        public static int Height = -2;  // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        private static ConsolePos position = ConsolePos.TopCentered;
+        public static ConsolePos Position
+        {
+            get
+            {
+
+                return position;
+            }
+            set
+            {
+                position = value;
+                Logger.MainConsole.HandlePositioning();
+            }
+        }
+
+        public static int Width = -1;   // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        public static int Height = -1;  // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
         public static int Margin = 15;  // Default 15
+
 
         public enum ConsolePos
         {

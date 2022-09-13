@@ -54,7 +54,9 @@ namespace SkToolbox.Controllers
         private TextEditor m_Editor;
 
         private bool m_MoveCursorOnNextFrame = false;
+
         private CommandHandler m_handler;
+        public CommandHandler Handler { get => m_handler; set => m_handler = value; }
 
         private const string s_argPattern = @"((?:<[^>]+>)|(?:\[[^\]]+\]))";
 
@@ -67,7 +69,7 @@ namespace SkToolbox.Controllers
 
             gameObject.name = "SkConsole";
 
-            m_handler = new CommandHandler(this);
+            Handler = new CommandHandler(this);
             font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
 
             HandlePositioning();
@@ -75,18 +77,18 @@ namespace SkToolbox.Controllers
             //m_MainWindow = new Rect(m_Xpos, m_Ypos, m_Width, m_Height);
 
             Logger.Submit("Welcome to SkToolbox " + SkVersionChecker.currentVersion + "!", false);
-            StartCoroutine(m_handler.Register());
+            StartCoroutine(Handler.Register());
         }
 
         void Update()
         {
             if (isVisible)
             {
-                if (m_handler.GetAllCommands().Count == 0)
-                {
-                    Logger.Submit("Searching for commands...");
-                    m_handler.Register();
-                }
+                //if (m_handler.GetAllCommands().Count == 0)
+                //{
+                //    Logger.Submit("Searching for commands...");
+                //    StartCoroutine(m_handler.Register());
+                //}
                 UpdateCommandHint();
             }
             HandleKeys();
@@ -96,9 +98,9 @@ namespace SkToolbox.Controllers
         {
             if (m_NeedsXAdjustment) // Run once
             {
-                if (m_handler.GetAllCommands().Count > 0)
+                if (Handler.GetAllCommands().Count > 0)
                 {
-                    foreach (KeyValuePair<string, CommandMeta> command in m_handler.GetAllCommands())
+                    foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
                     {
 
                         GUIContent textItem = new GUIContent(command.Value.data.keyword);
@@ -107,6 +109,10 @@ namespace SkToolbox.Controllers
                         {
                             m_PanelXSize = (int)tempSize.x + 50;
                         }
+                    }
+                    if (!Console.ShowConsole)
+                    {
+                        HandlePositioning(m_PanelXSize);
                     }
                     m_NeedsXAdjustment = false;
                 }
@@ -202,12 +208,17 @@ namespace SkToolbox.Controllers
                     case KeyCode.Tab:
                         if (!string.IsNullOrEmpty(m_InputString))
                         {
-                            var matchCommand = m_handler.GetLikelyCommand(m_InputString);
+                            var matchCommand = Handler.GetLikelyCommand(m_InputString);
 
-                            if (!string.IsNullOrEmpty(matchCommand.Value.data.keyword))
+                            if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
                             {
                                 m_InputString = matchCommand.Value.data.keyword;
                             }
+                            m_MoveCursorOnNextFrame = true;
+                        }
+                        else
+                        {
+                            m_InputString = m_InputHistory.Fetch(m_InputString, true).Split()[0] + " ";
                             m_MoveCursorOnNextFrame = true;
                         }
                         break;
@@ -240,53 +251,60 @@ namespace SkToolbox.Controllers
 
         private void DrawWindow(int GuiID)
         {
-            GUILayout.BeginHorizontal();
-
-            BuildPanel();
-
-            GUILayout.BeginVertical(m_StyleInput);
-            m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
-                new GUILayoutOption[]
-                {
-                GUILayout.Height(m_Height)
-                });
-
-            GUILayout.FlexibleSpace();
-            foreach (string line in m_OutputHistory)
+            if (Console.ShowPanel)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(line, m_StyleOutput);
-                if (GUILayout.Button(" ", GUI.skin.box, GUILayout.Width(22)))
+                BuildPanel();
+            }
+            if (Console.ShowConsole)
+            {
+                GUILayout.BeginVertical(m_StyleInput);
+                m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
+                    new GUILayoutOption[]
+                    {
+                        GUILayout.Height(m_Height)
+                    });
+
+                GUILayout.FlexibleSpace();
+                foreach (string line in m_OutputHistory)
                 {
-                    m_InputString = line;
-                };
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(line, m_StyleOutput);
+                    if (GUILayout.Button(" ", GUI.skin.box, GUILayout.Width(22)))
+                    {
+                        m_InputString = line;
+                    };
+                    GUILayout.EndHorizontal();
+                    GUILayout.Space(m_LineMargin);
+                }
+
+                GUILayout.EndScrollView();
+
+                GUILayout.BeginHorizontal();
+
+                GUI.SetNextControlName("InputBar");
+                m_InputString = GUILayout.TextField(m_InputString, m_StyleInput);
+                m_Editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+                m_Editor.multiline = false;
+
+                if (m_MoveCursorOnNextFrame)
+                {
+                    m_Editor.MoveCursorToPosition(new Vector2(0, 9999));
+                    m_MoveCursorOnNextFrame = false;
+                }
+                if (GUILayout.Button("Submit", m_StyleInput, GUILayout.Width(60)))
+                {
+                    HandleInput(m_InputString);
+                }
                 GUILayout.EndHorizontal();
-                GUILayout.Space(m_LineMargin);
+
+                GUILayout.Label(m_currentHint, m_StyleHint);
+                GUILayout.EndVertical();
             }
-
-            GUILayout.EndScrollView();
-
-            GUILayout.BeginHorizontal();
-
-            GUI.SetNextControlName("InputBar");
-            m_InputString = GUILayout.TextField(m_InputString, m_StyleInput);
-            m_Editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
-            m_Editor.multiline = false;
-
-            if (m_MoveCursorOnNextFrame)
+            if (Console.ShowPanel)
             {
-                m_Editor.MoveCursorToPosition(new Vector2(0, 9999));
-                m_MoveCursorOnNextFrame = false;
+                GUILayout.EndHorizontal();
             }
-            if (GUILayout.Button("Submit", m_StyleInput, GUILayout.Width(60)))
-            {
-                HandleInput(m_InputString);
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.Label(m_currentHint, m_StyleHint);
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
         }
 
         // Code sampled from https://github.com/zambony/Gungnir
@@ -366,7 +384,7 @@ namespace SkToolbox.Controllers
             {
                 m_currentCommand = null;
                 m_currentHint = string.Empty;
-                foreach (KeyValuePair<string, CommandMeta> kv in m_handler.GetPossibleCommands(m_InputString))
+                foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(m_InputString))
                 {
                     m_currentHint = m_currentHint + kv.Value.data.keyword + ", ";
                 }
@@ -396,7 +414,7 @@ namespace SkToolbox.Controllers
 
             m_LinesScrollPosition2 = GUILayout.BeginScrollView(m_LinesScrollPosition2);
 
-            foreach (KeyValuePair<string, CommandMeta> command in m_handler.GetAllCommands())
+            foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
             {
                 if (command.Value.data.displayOnPanel)
                 {
@@ -419,7 +437,7 @@ namespace SkToolbox.Controllers
                             //if (Event.current.isKey && Event.current.keyCode == KeyCode.LeftShift)
                             //{
                             Logger.Submit(command.Value.data.keyword, false);
-                            m_handler.Run(command.Value.data.keyword);
+                            Handler.Run(command.Value.data.keyword);
                             ScrollToBottom();
                             //}
                             //else
@@ -457,7 +475,7 @@ namespace SkToolbox.Controllers
                 {
                     m_CurrentString = m_InputString;
                     string command = m_InputString.Split()[0];
-                    m_currentCommand = m_handler.GetCommand(command);
+                    m_currentCommand = Handler.GetCommand(command);
                     m_caretPos = m_InputString.Length;
 
                     return true;
@@ -493,7 +511,7 @@ namespace SkToolbox.Controllers
             {
                 m_InputHistory.Add(consoleInput);
                 Submit(consoleInput, false);
-                m_handler.Run(consoleInput);
+                Handler.Run(consoleInput);
                 m_InputString = string.Empty;
                 m_currentCommand = null;
                 m_currentHint = string.Empty;
@@ -541,7 +559,7 @@ namespace SkToolbox.Controllers
 
         }
 
-        public void HandlePositioning()
+        public void HandlePositioning(int xOverride = -1)
         {
             // Setup sizing
             if (Console.Width == 0) Console.Width = -1;
@@ -611,6 +629,11 @@ namespace SkToolbox.Controllers
                 default:
                     break;
             }
+            if (xOverride > 0)
+            {
+                m_Width = xOverride;
+            }
+
             m_MainWindow = new Rect(m_Xpos, m_Ypos, m_Width, m_Height);
         }
 

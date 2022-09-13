@@ -127,10 +127,10 @@ namespace SkToolbox
         internal Controllers.MainConsole Console { get => m_console; set => m_console = value; }
         public Dictionary<string, string> Aliases { get => m_aliases; set => m_aliases = value; }
 
-        [Command("help", "Prints the command list, or looks up the syntax of a specific command.", "  Base")]
+        [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
         public void Help(string command = null)
         {
-            if (command == null)
+            if (string.IsNullOrEmpty(command))
             {
                 var cmds =
                     m_actions.Values.ToList()
@@ -139,7 +139,7 @@ namespace SkToolbox
                 foreach (CommandMeta meta in cmds)
                 {
                     string fullCommand = meta.data.keyword;
-                    // Not using logger because this doesn't need to be logged.
+
                     if (meta.arguments.Count > 0)
                         Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}");
                     else
@@ -148,16 +148,19 @@ namespace SkToolbox
             }
             else
             {
-                if (!m_actions.TryGetValue(command, out var meta))
-                {
-                    Console.Submit($"Sorry, couldn't find a command named {command.WithColor(Color.white)}.");
-                    return;
-                }
-                if (meta.arguments.Count > 0)
-                    Console.Submit($"{command.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}");
-                else
-                    Console.Submit($"{command.WithColor(Color.yellow)}\n{meta.data.description}");
+                var cmds = m_actions.Values.Where(cmd =>
+                                            cmd.data.keyword.ToLower().StartsWith(command.ToLower())).ToList()
+                                            .OrderBy(cmd => cmd.data.keyword);
 
+                foreach (CommandMeta meta in cmds)
+                {
+                    string fullCommand = meta.data.keyword;
+
+                    if (meta.arguments.Count > 0)
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}");
+                    else
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}");
+                }
             }
         }
 
@@ -167,10 +170,18 @@ namespace SkToolbox
             Console.Clear();
         }
 
+        [Command("cmdRegister", "Searches and registers all commands.", "  Base", false)]
+        public void CmdRegister()
+        {
+            Logger.Submit("Searching and registering commands...");
+            Register();
+            Logger.Submit("Complete.");
+        }
+
         public CommandHandler(Controllers.MainConsole mainConsole) : base()
         {
             Console = mainConsole;
-            //Register();
+            Register();
         }
 
         /// <summary>
