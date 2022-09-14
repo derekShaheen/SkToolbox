@@ -14,7 +14,7 @@ namespace SkToolbox.Controllers
         private bool isVisible = false;
 
         // Styles
-        private GUIStyle m_StyleOutput = new GUIStyle(GUIStyle.none);
+        public GUIStyle m_StyleOutput = new GUIStyle(GUIStyle.none);
         private GUIStyle m_StyleInput;
         private GUIStyle m_StyleWindow;
         private GUIStyle m_StyleBanner;
@@ -59,6 +59,7 @@ namespace SkToolbox.Controllers
         public CommandHandler Handler { get => m_handler; set => m_handler = value; }
 
         private const string s_argPattern = @"((?:<[^>]+>)|(?:\[[^\]]+\]))";
+        private string m_currentCategory = string.Empty;
 
         void Start()
         {
@@ -66,7 +67,7 @@ namespace SkToolbox.Controllers
             {
                 _instance = this;
             }
-
+            m_StyleOutput.normal.background = new Texture2D(1, 1);
             gameObject.name = "SkConsole";
 
             Handler = new CommandHandler(this);
@@ -208,11 +209,18 @@ namespace SkToolbox.Controllers
                     case KeyCode.Tab:
                         if (!string.IsNullOrEmpty(m_InputString))
                         {
-                            var matchCommand = Handler.GetLikelyCommand(m_InputString);
+                            string[] commands = m_InputString.Split(';');
+                            string command = commands[commands.Length - 1].Simplified().Split()[0];
+                            var matchCommand = Handler.GetLikelyCommand(command);
 
                             if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
                             {
-                                m_InputString = matchCommand.Value.data.keyword;
+                                m_InputString = string.Empty;
+                                for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
+                                {
+                                    m_InputString = m_InputString + commands[i].Simplified() + "; ";
+                                }
+                                m_InputString = m_InputString + matchCommand.Value.data.keyword;
                             }
                             m_MoveCursorOnNextFrame = true;
                         }
@@ -384,18 +392,21 @@ namespace SkToolbox.Controllers
             {
                 m_currentCommand = null;
                 m_currentHint = string.Empty;
-                foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(m_InputString))
+                string[] commands = m_InputString.Split(';');
+                string command = commands[commands.Length - 1].Simplified().Split()[0];
+                if (!string.IsNullOrEmpty(command))
                 {
-                    m_currentHint = m_currentHint + kv.Value.data.keyword + ", ";
-                }
-                if (m_currentHint.EndsWith(", "))
-                {
-                    m_currentHint = m_currentHint.Substring(0, m_currentHint.Length - 2);
+                    foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(command))
+                    {
+                        m_currentHint = m_currentHint + kv.Value.data.keyword + ", ";
+                    }
+                    if (m_currentHint.EndsWith(", "))
+                    {
+                        m_currentHint = m_currentHint.Substring(0, m_currentHint.Length - 2);
+                    }
                 }
             }
         }
-
-        private string m_currentCategory = string.Empty;
 
         private void BuildPanel()
         {
@@ -474,10 +485,13 @@ namespace SkToolbox.Controllers
                 if (!m_CurrentString.Equals(m_InputString))
                 {
                     m_CurrentString = m_InputString;
-                    string command = m_InputString.Split()[0];
-                    m_currentCommand = Handler.GetCommand(command);
-                    m_caretPos = m_InputString.Length;
+                    string[] commands = m_InputString.Split(';');
+                    string command = commands[commands.Length - 1].Simplified().Split()[0];
 
+                    m_currentCommand = Handler.GetCommand(command);
+                    //m_caretPos = m_InputString.Length;
+                    m_caretPos = m_Editor.cursorIndex;
+                    Debug.Log(m_caretPos);
                     return true;
                 }
                 return false;

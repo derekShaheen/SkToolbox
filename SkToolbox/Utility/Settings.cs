@@ -38,8 +38,8 @@ namespace SkToolbox.Settings
             }
         }
 
-        public static int Width = -1;   // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
-        public static int Height = -1;  // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        public static int Width = -2;   // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        public static int Height = -2;  // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
         public static int Margin = 15;  // Default 15
 
 
