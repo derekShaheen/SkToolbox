@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkToolbox.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,32 +15,69 @@ namespace SkToolbox.Settings
         //
         public static string OutputPrefix = "SkToolbox → "; // "(SkToolbox)"
         public static Color OutputPrefixColor = new Color(255, 51, 51);
-        public static int MaxOutputEntries = 999;
-        public static bool ShowPanel = true;
-        public static bool ShowConsole = true;
+        public static int MaxOutputEntries
+        {
+            get { return SettingsController.Get<int>("ConsoleMaxOutput"); }
+            set
+            {
+                SettingsController.Set("ConsoleMaxOutput", value);
+            }
+        }
+
+        public static bool ShowPanel
+        {
+            get { return SettingsController.Get<bool>("PanelEnabled"); }
+            set
+            {
+                SettingsController.Set("PanelEnabled", value);
+                Logger.MainConsole.HandlePositioning();
+            }
+        }
+
+        public static bool ShowConsole
+        {
+            get { return SettingsController.Get<bool>("ConsoleEnabled"); }
+            set
+            {
+                SettingsController.Set("ConsoleEnabled", value);
+                Logger.MainConsole.HandlePositioning();
+            }
+        }
 
         // Console Controls
         public static KeyCode KeyToggleWindow = KeyCode.BackQuote;
         public static KeyCode KeyAutoComplete = KeyCode.Tab;
 
         //Console Sizes
-        private static ConsolePos position = ConsolePos.TopCentered;
         public static ConsolePos Position
         {
-            get
-            {
-
-                return position;
-            }
+            get { return SettingsController.Get<ConsolePos>("ConsolePosition"); }
             set
             {
-                position = value;
+                SettingsController.Set("ConsolePosition", value);
                 Logger.MainConsole.HandlePositioning();
             }
         }
-
-        public static int Width = -2;   // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
-        public static int Height = -2;  // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        public static int Width 
+        { 
+            get { return SettingsController.Get<int>("ConsoleWidth"); }
+            set 
+            { 
+                SettingsController.Set("ConsoleWidth", value);
+                Logger.MainConsole.HandlePositioning();
+            } 
+        }
+        // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
+        public static int Height
+        {
+            get { return SettingsController.Get<int>("ConsoleHeight"); }
+            set 
+            { 
+                SettingsController.Set("ConsoleHeight", value);
+                Logger.MainConsole.HandlePositioning();
+            }
+        }
         public static int Margin = 15;  // Default 15
 
 

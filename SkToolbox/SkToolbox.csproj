@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CommandHandler.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\SkPatcher.cs" />
     <Compile Include="Controllers\StandardCommands.cs" />
     <Compile Include="Loaders\SkBepInExLoader.cs" />

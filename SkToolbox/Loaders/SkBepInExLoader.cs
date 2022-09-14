@@ -40,21 +40,9 @@ namespace SkToolbox.Loaders
         public void Init()
         {
             Application.runInBackground = true;
+            Controllers.SettingsController.Init(Config);
             m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
 
-        }
-
-        public void InitConfig() // These settings are only used if this is loaded from BepInEx
-        {
-            ConfigEntry.CDescriptor = Config.Bind("- Index", "ThisIsJustAnIndex-NotASetting", true
-                , "Config sections:" +
-                "\n0 - General" +
-                //"\n1 - Section 2" +
-                // ...
-                "\n");
-
-            //ConfigEntry.CConsoleEnabled = Config.Bind("0 - General", "ConsoleEnabled", true
-            //    , "Enables the console without launch option.");
         }
 
         internal class ConfigEntry

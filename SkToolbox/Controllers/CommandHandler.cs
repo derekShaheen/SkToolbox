@@ -389,10 +389,10 @@ namespace SkToolbox
                         , StringComparison.InvariantCultureIgnoreCase));
         }
 
-        public KeyValuePair<string, CommandMeta> GetLikelyCommand(string commandPartial)
+        public KeyValuePair<string, CommandMeta> GetLikelyCommand(string commandPartial, int skip = 0)
         {
             return m_actions.Where(cmd => cmd.Value.data.keyword.ToLower().StartsWith(commandPartial.ToLower()
-                        , StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+                        , StringComparison.InvariantCultureIgnoreCase)).Skip(skip).FirstOrDefault();
         }
 
         public Dictionary<string, CommandMeta> GetAllCommands()
