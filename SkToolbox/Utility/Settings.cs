@@ -40,7 +40,7 @@ namespace SkToolbox.Settings
             set
             {
                 SettingsController.Set("ConsoleEnabled", value);
-                Logger.MainConsole.HandlePositioning();
+                Logger.MainConsole.HandlePositioning(-1, true);
             }
         }
 

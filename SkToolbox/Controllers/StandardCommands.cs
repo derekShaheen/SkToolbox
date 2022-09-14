@@ -31,5 +31,25 @@ namespace SkToolbox
 
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
+
+        [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", false)]
+        public static void conDisplay(bool displayPanel = true, bool displayConsole = true)
+        {
+
+            Settings.Console.ShowConsole = displayConsole;
+
+            if(!Settings.Console.ShowConsole) { displayPanel = true; } // if the console is hidden, we must show the panel
+            Settings.Console.ShowPanel = displayPanel;
+
+            Logger.Submit("Panel set: " + Settings.Console.ShowPanel + ", Console set: " + Settings.Console.ShowConsole);
+        }
+
+        [Command("OpenConsole", "Enables the console.", "  Base", false, 0)]
+        public static void conEnable()
+        {
+            Settings.Console.ShowConsole = true;
+
+            Logger.Submit("Console set: " + Settings.Console.ShowConsole);
+        }
     }
 }

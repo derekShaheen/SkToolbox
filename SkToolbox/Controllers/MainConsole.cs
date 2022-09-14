@@ -125,11 +125,22 @@ namespace SkToolbox.Controllers
                 Stylize();
 
                 m_StyleWindow = GUI.skin.window;
-                m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, string.Empty, m_StyleWindow, new GUILayoutOption[]
+                if (Console.ShowPanel)
+                {
+                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, string.Empty, m_StyleWindow, new GUILayoutOption[]
                     {
                         GUILayout.MinWidth(m_Width),
                         GUILayout.MaxWidth(m_Width),
                     });
+                } else
+                {
+                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, "SkToolbox", m_StyleWindow, new GUILayoutOption[]
+{
+                        GUILayout.MinWidth(m_Width),
+                        GUILayout.MaxWidth(m_Width),
+});
+                }
+
 
                 if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
                 {
@@ -496,19 +507,9 @@ namespace SkToolbox.Controllers
                     {
                         if (GUILayout.Button(command.Value.data.keyword.Trim(), m_StylePanelButtons))
                         {
-                            //if (Event.current.isKey && Event.current.keyCode == KeyCode.LeftShift)
-                            //{
                             Logger.Submit(command.Value.data.keyword, false);
                             Handler.Run(command.Value.data.keyword);
                             ScrollToBottom();
-                            //}
-                            //else
-                            //{
-                            //    m_InputString = command.Value.data.keyword + " ";
-                            //    m_Editor.SelectNone();
-                            //    m_MoveCursorOnNextFrame = true;
-                            //    ScrollToBottom();
-                            //}
                         }
                     }
                     else
@@ -519,6 +520,17 @@ namespace SkToolbox.Controllers
                             m_Editor.SelectNone();
                             m_MoveCursorOnNextFrame = true;
                             ScrollToBottom();
+                        }
+                    }
+                } else
+                { // These buttons normally do not show
+                    if (!Console.ShowConsole) {
+                        if (command.Value.data.keyword.Equals("OpenConsole")) { // Allow the user to open the console if it's disabled
+                            if (GUILayout.Button(command.Value.data.keyword.Trim(), m_StylePanelButtons))
+                            {
+                                Handler.Run(command.Value.data.keyword);
+                                ScrollToBottom();
+                            }
                         }
                     }
                 }
@@ -617,7 +629,7 @@ namespace SkToolbox.Controllers
 
         }
 
-        public void HandlePositioning(int xOverride = -1)
+        public void HandlePositioning(int xOverride = -1, bool panelNeedsXAdjustment = false)
         {
             // Setup sizing
             if (Console.Width == 0) Console.Width = -1;
@@ -693,6 +705,8 @@ namespace SkToolbox.Controllers
             }
 
             m_MainWindow = new Rect(m_Xpos, m_Ypos, m_Width, m_Height);
+
+            if (panelNeedsXAdjustment) { m_NeedsXAdjustment = true; }
         }
 
         private class HistoryController

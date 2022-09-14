@@ -18,11 +18,12 @@ namespace SkToolbox
     {
         public readonly string keyword;
         public readonly string description;
-        public readonly string autoCompleteTarget;
+        //public readonly string autoCompleteTarget;
         public readonly string category;
         public readonly bool displayOnPanel;
+        public readonly int sortPriority;
 
-        public Command(string keyword, string description, string category = "zzzzz", bool displayOnPanel = true, string autoComplete = null)
+        public Command(string keyword, string description, string category = "zzzzz", bool displayOnPanel = true, int sortPriority = 100) //string autoComplete = null)
         {
             this.keyword = keyword;
             this.description = description;
@@ -32,7 +33,8 @@ namespace SkToolbox
             }
             this.category = category;
             this.displayOnPanel = displayOnPanel;
-            this.autoCompleteTarget = autoComplete;
+            this.sortPriority = sortPriority;
+            //this.autoCompleteTarget = autoComplete;
         }
     }
 
@@ -41,7 +43,7 @@ namespace SkToolbox
     /// </summary>
     public class CommandMeta
     {
-        public delegate List<string> AutoCompleteDelegate();
+        //public delegate List<string> AutoCompleteDelegate();
 
         /// <summary>
         /// <see cref="Command"/> attribute data to access the command name and description.
@@ -67,14 +69,14 @@ namespace SkToolbox
         /// <summary>
         /// Delegate to return potential autocomplete topics.
         /// </summary>
-        public readonly AutoCompleteDelegate AutoComplete;
+        //public readonly AutoCompleteDelegate AutoComplete;
 
-        public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments, AutoCompleteDelegate autoCompleteDelegate = null)
+        public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments)//, AutoCompleteDelegate autoCompleteDelegate = null)
         {
             this.data = data;
             this.method = method;
             this.arguments = arguments;
-            this.AutoComplete = autoCompleteDelegate;
+            //this.AutoComplete = autoCompleteDelegate;
 
             // If we have any arguments, attempt to build the argument hint string.
             if (arguments.Count > 0)
@@ -130,6 +132,11 @@ namespace SkToolbox
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
         public void Help(string command = null)
         {
+            Console.Submit("Features" +
+                        "\n  ▪ Auto-complete your command inputs by pressing tab" +
+                        "\n  ▪ Pressing tab with empty input will populate the last input command with no parameters" +
+                        "\n  ▪ Press the up and down arrow keys to cycle commands" +
+                        "\n  ▪ Chain your commands by separating them with a semi-colon (;)");
             if (string.IsNullOrEmpty(command))
             {
                 var cmds =
@@ -141,9 +148,9 @@ namespace SkToolbox
                     string fullCommand = meta.data.keyword;
 
                     if (meta.arguments.Count > 0)
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}");
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
                     else
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}");
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
                 }
             }
             else
@@ -157,9 +164,9 @@ namespace SkToolbox
                     string fullCommand = meta.data.keyword;
 
                     if (meta.arguments.Count > 0)
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}");
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
                     else
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}");
+                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
                 }
             }
         }
@@ -189,22 +196,22 @@ namespace SkToolbox
         /// </summary>
         /// <param name="method">Name of the method attached to the <see cref="CommandHandler"/> class that will provide autocomplete values.</param>
         /// <returns>A <see cref="CommandMeta.AutoCompleteDelegate"/> if the <paramref name="method"/> exists, otherwise <see langword="null"/>.</returns>
-        private static CommandMeta.AutoCompleteDelegate MakeAutoCompleteDelegate(string method)
-        {
-            if (string.IsNullOrEmpty(method))
-                return null;
+        //private static CommandMeta.AutoCompleteDelegate MakeAutoCompleteDelegate(string method)
+        //{
+        //    if (string.IsNullOrEmpty(method))
+        //        return null;
 
-            var query =
-                from assemblies in Assembly.GetExecutingAssembly().GetTypes()
-                from methods in assemblies.GetMethods(s_bindingFlags)
-                where methods.GetType().Name == method
-                select methods;
+        //    var query =
+        //        from assemblies in Assembly.GetExecutingAssembly().GetTypes()
+        //        from methods in assemblies.GetMethods(s_bindingFlags)
+        //        where methods.GetType().Name == method
+        //        select methods;
 
-            if (query.Count() > 0)
-                return query.First().CreateDelegate(typeof(CommandMeta.AutoCompleteDelegate)) as CommandMeta.AutoCompleteDelegate;
+        //    if (query.Count() > 0)
+        //        return query.First().CreateDelegate(typeof(CommandMeta.AutoCompleteDelegate)) as CommandMeta.AutoCompleteDelegate;
 
-            return null;
-        }
+        //    return null;
+        //}
 
         /// <summary>
         /// Uses reflection to find all of the methods in this class annotated with the <see cref="Command"/> attribute
@@ -225,14 +232,16 @@ namespace SkToolbox
                     select new CommandMeta(
                         attribute,
                         method,
-                        method.GetParameters().ToList(),
-                        MakeAutoCompleteDelegate(attribute.autoCompleteTarget)
+                        method.GetParameters().ToList()//,
+                        //MakeAutoCompleteDelegate(attribute.autoCompleteTarget)
                     );
 
                 Debug.Log($"{Settings.Console.OutputPrefix} Registering {query.Count()} commands...");
 
-                // Iterate over commands in alphabetical order, so they're sorted nicely by the default help command.
-                foreach (CommandMeta command in query.OrderBy(m => m.data.category).ThenBy(n => n.data.keyword))
+                // Iterate over commands in alphabetical order, so they're sorted nicely by the default help command and panel.
+                foreach (CommandMeta command in query.OrderBy(m => m.data.category)
+                                                     .ThenBy(n => n.data.sortPriority)
+                                                     .ThenBy(o => o.data.keyword))
                 {
                     m_actions.Add(command.data.keyword, command);
 
@@ -250,7 +259,7 @@ namespace SkToolbox
             }
             catch (Exception ex)
             {
-                Debug.Log("Failed to register commands. " + ex.ToString());
+                Debug.LogError("Failed to register commands. \n\n" + ex.ToString());
             }
             yield return null;
         }
