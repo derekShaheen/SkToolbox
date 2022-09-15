@@ -51,7 +51,7 @@ namespace SkToolbox.Loaders
                 foreach (KeyValuePair<KeyCode, string> pair in m_binds)
                 {
                     if (Input.GetKeyDown(pair.Key))
-                        m_Console.HandleInput(pair.Value);
+                        m_Console.HandleInput(pair.Value, false);
                 }
             }
         }

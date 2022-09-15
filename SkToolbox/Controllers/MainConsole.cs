@@ -602,11 +602,15 @@ namespace SkToolbox.Controllers
             m_InputString = string.Empty;
         }
 
-        public void HandleInput(string consoleInput)
+        public void HandleInput(string consoleInput, bool logToInputHistory = true)
         {
             if (!string.IsNullOrEmpty(consoleInput))
             {
-                m_InputHistory.Add(consoleInput);
+                if (logToInputHistory)
+                {
+                    m_InputHistory.Add(consoleInput);
+                }
+
                 Submit(consoleInput, false);
                 Handler.Run(consoleInput);
                 m_InputString = string.Empty;
