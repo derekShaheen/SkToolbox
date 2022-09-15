@@ -58,9 +58,9 @@ namespace SkToolbox
         }
 
         [Command("Time", "Sets or gets the timescale. [0.1f - 10.0f]", "  Base", false)]
-        public static void SetTime(bool setTime = false, float timeScale = 1.0f)
+        public static void SetTime(string setOrGet = "get", float timeScale = 1.0f)
         {
-            if (setTime)
+            if (setOrGet.Equals("set"))
             {
                 timeScale = Mathf.Clamp(timeScale, 0.1f, 10.0f);
                 Time.timeScale = timeScale;

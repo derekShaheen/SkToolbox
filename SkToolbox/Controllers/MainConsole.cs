@@ -608,6 +608,7 @@ namespace SkToolbox.Controllers
 
         private void Stylize()
         {
+            font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
             GUI.skin.window.fontStyle = FontStyle.Bold;
 
             m_StyleOutput.font = font;

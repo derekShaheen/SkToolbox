@@ -10,7 +10,14 @@ namespace SkToolbox.Settings
 {
     public class Console
     {
-        public static int FontSize = 16;
+        public static int FontSize
+        {
+            get { return SettingsController.Get<int>("ConsoleFontSize"); }
+            set
+            {
+                SettingsController.Set("ConsoleFontSize", value);
+            }
+        }
 
         //
         public static string OutputPrefix = "SkToolbox → "; // "(SkToolbox)"

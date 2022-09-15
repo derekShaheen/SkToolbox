@@ -32,8 +32,9 @@ namespace SkToolbox.Controllers
             s_config.Add("ConsoleWidth", config.Bind(CategoryConsoleDraw, "ConsoleWidth", -1, "Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc.."));
             s_config.Add("ConsoleHeight", config.Bind(CategoryConsoleDraw, "ConsoleHeight", -2, "Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc.."));
             s_config.Add("ConsoleMaxOutput", config.Bind(CategoryConsoleDraw, "ConsoleMaxOutput", 999, "Maximum number of lines to display in output window."));
+            s_config.Add("ConsoleFontSize", config.Bind(CategoryConsoleDraw, "ConsoleFontSize", 16, "Size of the font within the console window."));
 
-            if(!Settings.Console.ShowConsole)
+            if (!Settings.Console.ShowConsole)
             {
                 Settings.Console.ShowPanel = true; // Show panel if console is disabled
             }
