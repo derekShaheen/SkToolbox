@@ -37,6 +37,14 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
+        [Command("conSetFontSize", "Set the size of the font in the console.", "  Base", false)]
+        public static void ConFontSetSize(int fontSize = 16)
+        {
+
+            Settings.Console.FontSize = fontSize;
+            Logger.Submit("Font size set to " + Settings.Console.FontSize);
+        }
+
         [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", false)]
         public static void ConDisplay(bool displayPanel = true, bool displayConsole = true)
         {
