@@ -31,11 +31,11 @@ namespace SkToolbox
 
             if (MainConsole.GetCommandHandler().GetActions().ContainsKey(name))
             {
-                Logger.Submit($"{name.WithColor(Color.white)} is a Gungnir command and cannot be overwritten.", true);
+                Logger.Submit($"{name.WithColor(Color.white)} already exists.", true);
                 return;
             }
 
-            if (MainConsole.GetCommandHandler().GetActions().ContainsKey(name))
+            if (MainConsole.GetCommandHandler().GetAliases().ContainsKey(name))
                 MainConsole.GetCommandHandler().GetAliases().Remove(name);
 
             string cmd = string.Join(" ", commandText);
@@ -97,7 +97,7 @@ namespace SkToolbox
         [Command("listaliases", "List all of your custom aliases, or check what a specific alias does.", "  Base", false)]
         public static void ListAliases(string alias = null)
         {
-            if (MainConsole.GetCommandHandler().GetActions().Count == 0)
+            if (MainConsole.GetCommandHandler().GetAliases().Count == 0)
             {
                 Logger.Submit($"You have no aliases currently set. Use {"/alias".WithColor(Color.white)} to add some.");
                 return;
@@ -105,19 +105,19 @@ namespace SkToolbox
 
             if (string.IsNullOrEmpty(alias))
             {
-                foreach (var pair in MainConsole.GetCommandHandler().GetActions())
-                    Logger.Submit($"{pair.Key} = <color=cyan>{pair.Value.data.keyword}</color>");
+                foreach (var pair in MainConsole.GetCommandHandler().GetAliases())
+                    Logger.Submit($"{pair.Key} = <color=cyan>{pair.Value}</color>");
 
                 return;
             }
 
-            if (!MainConsole.GetCommandHandler().GetActions().TryGetValue(alias, out CommandMeta cmd))
+            if (!MainConsole.GetCommandHandler().GetAliases().TryGetValue(alias, out string cmd))
             {
                 Logger.Submit($"The alias {alias.WithColor(Color.white)} does not exist.", true);
                 return;
             }
 
-            Logger.Submit($"{alias} = {cmd.data.keyword.WithColor(Color.yellow)}");
+            Logger.Submit($"{alias} = {cmd.WithColor(Color.yellow)}");
         }
 
         [Command("listbinds", "List all of your custom keybinds, or check what an individual keycode is bound to.", "  Base", false)]
@@ -125,7 +125,7 @@ namespace SkToolbox
         {
             if (MainConsole.SkBepInExLoader.Binds.Count == 0)
             {
-                Logger.Submit($"You have no keybinds currently set. Use {"/bind".WithColor(Color.white)} to add some.", true);
+                Logger.Submit($"You have no keybinds currently set. Use the {"bind".WithColor(Color.white)} to add some.", true);
                 return;
             }
 

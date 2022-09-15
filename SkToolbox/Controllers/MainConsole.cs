@@ -266,7 +266,7 @@ namespace SkToolbox.Controllers
             if (!string.IsNullOrEmpty(m_InputString))
             {
                 string[] commands = m_InputString.Split(';');
-                if (commands.Length > 1)
+                if (commands.Length > 1) // Are there multiple commands found?
                 {
                     string command = commands[commands.Length - 1].Simplified().Split()[0];
                     var matchCommand = Handler.GetLikelyCommand(command);
@@ -282,7 +282,7 @@ namespace SkToolbox.Controllers
                     }
                     m_MoveCursorOnNextFrame = true;
                 }
-                else
+                else // Only one found
                 {
                     string strToCursor = m_InputString.Substring(0, m_caretPos);
                     string command = strToCursor.Simplified().Split()[0];
@@ -396,7 +396,7 @@ namespace SkToolbox.Controllers
             }
         }
 
-        // Code sampled from https://github.com/zambony/Gungnir
+        // Code based on from https://github.com/zambony/Gungnir
         private void UpdateCommandHint()
         {
             if (!NewInput)
@@ -480,6 +480,10 @@ namespace SkToolbox.Controllers
                     foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(command))
                     {
                         m_currentHint = m_currentHint + kv.Value.data.keyword + ", ";
+                    }
+                    foreach (KeyValuePair<string, string> kv in Handler.GetPossibleAliasCommands(command))
+                    {
+                        m_currentHint = m_currentHint + kv.Key + ", ";
                     }
                     if (m_currentHint.EndsWith(", "))
                     {

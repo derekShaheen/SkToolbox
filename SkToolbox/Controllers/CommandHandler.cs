@@ -471,6 +471,18 @@ namespace SkToolbox
                         , StringComparison.InvariantCultureIgnoreCase)).Skip(skip).FirstOrDefault();
         }
 
+        public IEnumerable<KeyValuePair<string, string>> GetPossibleAliasCommands(string commandPartial)
+        {
+            return m_aliases.Where(cmd => cmd.Value.ToLower().StartsWith(commandPartial.ToLower()
+                        , StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public KeyValuePair<string, string> GetLikelyAliasCommand(string commandPartial, int skip = 0)
+        {
+            return m_aliases.Where(cmd => cmd.Value.ToLower().StartsWith(commandPartial.ToLower()
+                        , StringComparison.InvariantCultureIgnoreCase)).Skip(skip).FirstOrDefault();
+        }
+
         public Dictionary<string, CommandMeta> GetAllCommands()
         {
             return m_actions;
