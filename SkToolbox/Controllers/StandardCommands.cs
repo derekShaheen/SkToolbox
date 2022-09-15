@@ -37,7 +37,7 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
-        [Command("conSetFontSize", "Set the size of the font in the console.", "  Base", false)]
+        [Command("conSetFontSize", "Set the size of the font in the console. [10 - 24]", "  Base", false)]
         public static void ConFontSetSize(int fontSize = 16)
         {
 

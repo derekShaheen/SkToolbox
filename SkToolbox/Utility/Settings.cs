@@ -15,6 +15,7 @@ namespace SkToolbox.Settings
             get { return SettingsController.Get<int>("ConsoleFontSize"); }
             set
             {
+                value = Mathf.Clamp(value, 10, 24);
                 SettingsController.Set("ConsoleFontSize", value);
             }
         }

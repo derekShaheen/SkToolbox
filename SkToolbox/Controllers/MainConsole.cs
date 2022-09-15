@@ -638,6 +638,7 @@ namespace SkToolbox.Controllers
             m_StyleCategoryBanner.fontStyle = FontStyle.Bold;
 
             m_StylePanelButtons = new GUIStyle(GUI.skin.textArea);
+            m_StylePanelButtons.fontSize = font.fontSize;
             m_StylePanelButtons.alignment = TextAnchor.MiddleCenter;
 
         }
