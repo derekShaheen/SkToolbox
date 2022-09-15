@@ -243,7 +243,14 @@ namespace SkToolbox
                                                      .ThenBy(n => n.data.sortPriority)
                                                      .ThenBy(o => o.data.keyword))
                 {
-                    m_actions.Add(command.data.keyword, command);
+                    try
+                    {
+                        m_actions.Add(command.data.keyword, command);
+                    } catch (ArgumentException)
+                    {
+                        Debug.Log($"{Settings.Console.OutputPrefix} WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
+                        break;
+                    }
 
                     string helpText;
 
@@ -332,17 +339,17 @@ namespace SkToolbox
                         catch (SystemException e)
                         {
                             Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
-                            return;
+                            break;
                         }
                         catch (TooManyValuesException)
                         {
                             Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            return;
+                            break;
                         }
                         catch (NoMatchFoundException)
                         {
                             Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            return;
+                            break;
                         }
 
                         // Couldn't convert, oh well!
