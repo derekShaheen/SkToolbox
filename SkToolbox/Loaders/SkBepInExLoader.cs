@@ -42,6 +42,12 @@ namespace SkToolbox.Loaders
             Application.runInBackground = true;
             Controllers.SettingsController.Init(Config);
             m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
+            
+            Utility.SkVersionChecker.CheckVersion();
+            if(Utility.SkVersionChecker.currentVersion < Utility.SkVersionChecker.latestVersion)
+            {
+                m_Console.Submit($"New version of SkToolbox available! ({Utility.SkVersionChecker.currentVersion}) -> ({Utility.SkVersionChecker.latestVersion})");
+            }
 
         }
     }

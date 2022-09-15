@@ -217,79 +217,7 @@ namespace SkToolbox.Controllers
                         m_MoveCursorOnNextFrame = true;
                         break;
                     case KeyCode.Tab:
-                        if (!string.IsNullOrEmpty(m_InputString))
-                        {
-                            string[] commands = m_InputString.Split(';');
-                            if (commands.Length > 1)
-                            {
-                                string command = commands[commands.Length - 1].Simplified().Split()[0];
-                                var matchCommand = Handler.GetLikelyCommand(command);
-
-                                if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
-                                {
-                                    m_InputString = string.Empty;
-                                    for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
-                                    {
-                                        m_InputString = m_InputString + commands[i].Simplified() + "; ";
-                                    }
-                                    m_InputString = m_InputString + matchCommand.Value.data.keyword;
-                                }
-                                m_MoveCursorOnNextFrame = true;
-                            }
-                            else
-                            {
-                                string strToCursor = m_InputString.Substring(0, m_caretPos);
-                                string command = strToCursor.Simplified().Split()[0];
-                                KeyValuePair<string, CommandMeta> matchCommand = new KeyValuePair<string, CommandMeta>();
-                                if (m_caretPosStored != m_caretPos)
-                                {
-                                    m_caretPosStored = m_caretPos;
-                                    m_CurrentSkip = 0;
-                                    matchCommand = Handler.GetLikelyCommand(command);
-                                }
-                                else
-                                {
-                                    m_CurrentSkip++;
-                                    matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                                    if (string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
-                                    { // Did we loop the whole list? Go back to the start
-                                        m_CurrentSkip = 0;
-                                        matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                                    }
-                                }
-
-                                int tempCounter = 0;
-                                // Are there more than 1 possible commands found?
-                                foreach (var possibleCommands in Handler.GetPossibleCommands(command))
-                                {
-                                    tempCounter++;
-                                    if (tempCounter > 1)
-                                    {
-                                        break;
-                                    }
-                                }
-                                // If there's only one command, then move the cursor to the end 
-                                if (tempCounter == 1)
-                                {
-                                    m_MoveCursorOnNextFrame = true;
-                                }
-
-                                if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
-                                {
-                                    m_InputString = string.Empty;
-                                    for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
-                                    {
-                                        m_InputString = m_InputString + commands[i].Simplified() + "; ";
-                                    }
-                                    m_InputString = m_InputString + matchCommand.Value.data.keyword;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            m_InputString = m_InputHistory.Fetch(m_InputString, true).Split()[0] + " ";
-                            m_MoveCursorOnNextFrame = true;
-                        }
+                        HandleAutoComplete();
                         break;
                     default:
                         break;
@@ -316,6 +244,83 @@ namespace SkToolbox.Controllers
                     break;
             }
 
+        }
+
+        private void HandleAutoComplete()
+        {
+            if (!string.IsNullOrEmpty(m_InputString))
+            {
+                string[] commands = m_InputString.Split(';');
+                if (commands.Length > 1)
+                {
+                    string command = commands[commands.Length - 1].Simplified().Split()[0];
+                    var matchCommand = Handler.GetLikelyCommand(command);
+
+                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                    {
+                        m_InputString = string.Empty;
+                        for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
+                        {
+                            m_InputString = m_InputString + commands[i].Simplified() + "; ";
+                        }
+                        m_InputString = m_InputString + matchCommand.Value.data.keyword;
+                    }
+                    m_MoveCursorOnNextFrame = true;
+                }
+                else
+                {
+                    string strToCursor = m_InputString.Substring(0, m_caretPos);
+                    string command = strToCursor.Simplified().Split()[0];
+                    KeyValuePair<string, CommandMeta> matchCommand = new KeyValuePair<string, CommandMeta>();
+                    if (m_caretPosStored != m_caretPos)
+                    {
+                        m_caretPosStored = m_caretPos;
+                        m_CurrentSkip = 0;
+                        matchCommand = Handler.GetLikelyCommand(command);
+                    }
+                    else
+                    {
+                        m_CurrentSkip++;
+                        matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                        if (string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                        { // Did we loop the whole list? Go back to the start
+                            m_CurrentSkip = 0;
+                            matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                        }
+                    }
+
+                    int tempCounter = 0;
+                    // Are there more than 1 possible commands found?
+                    foreach (var possibleCommands in Handler.GetPossibleCommands(command))
+                    {
+                        tempCounter++;
+                        if (tempCounter > 1)
+                        {
+                            break;
+                        }
+                    }
+                    // If there's only one command, then move the cursor to the end 
+                    if (tempCounter == 1)
+                    {
+                        m_MoveCursorOnNextFrame = true;
+                    }
+
+                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                    {
+                        m_InputString = string.Empty;
+                        for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
+                        {
+                            m_InputString = m_InputString + commands[i].Simplified() + "; ";
+                        }
+                        m_InputString = m_InputString + matchCommand.Value.data.keyword;
+                    }
+                }
+            }
+            else
+            {
+                m_InputString = m_InputHistory.Fetch(m_InputString, true).Split()[0] + " ";
+                m_MoveCursorOnNextFrame = true;
+            }
         }
 
         private void DrawWindow(int GuiID)
