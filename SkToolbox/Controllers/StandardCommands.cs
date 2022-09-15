@@ -68,9 +68,9 @@ namespace SkToolbox
         [Command("unalias", "Remove an alias you've created.", "  Base", false)]
         public static void Unalias(string alias)
         {
-            if (MainConsole.GetCommandHandler().GetActions().ContainsKey(alias))
+            if (MainConsole.GetCommandHandler().GetAliases().ContainsKey(alias))
             {
-                MainConsole.GetCommandHandler().GetActions().Remove(alias);
+                MainConsole.GetCommandHandler().GetAliases().Remove(alias);
                 Logger.Submit($"Alias {alias.WithColor(Color.cyan)} deleted.", true);
 
                 return;
@@ -88,7 +88,7 @@ namespace SkToolbox
                 return;
             }
 
-            MainConsole.GetCommandHandler().GetActions().Clear();
+            MainConsole.GetCommandHandler().GetAliases().Clear();
             MainConsole.SkBepInExLoader.SaveAliases();
 
             Logger.Submit("All of your aliases have been cleared.", true);

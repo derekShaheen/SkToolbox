@@ -469,7 +469,7 @@ namespace SkToolbox.Controllers
 
                 m_currentHint = $"{(m_currentCommand.data.keyword).WithColor(Color.cyan)} {final.Trim()}\n{m_currentCommand.data.description}";
             }
-            else
+            else // List commands by input name
             {
                 m_currentCommand = null;
                 m_currentHint = string.Empty;
@@ -483,7 +483,7 @@ namespace SkToolbox.Controllers
                     }
                     foreach (KeyValuePair<string, string> kv in Handler.GetPossibleAliasCommands(command))
                     {
-                        m_currentHint = m_currentHint + kv.Key + ", ";
+                        m_currentHint = m_currentHint + kv.Key + " [Alias], ";
                     }
                     if (m_currentHint.EndsWith(", "))
                     {
