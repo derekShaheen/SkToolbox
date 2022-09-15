@@ -11,7 +11,9 @@ namespace SkToolbox
             Application.Quit();
         }
 
-        [Command("conSetPos", "Set the position of the console. TopCentered, LeftCentered, RightCentered, BottomCentered, Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", false)]
+        [Command("conSetPos", "Set the position of the console. " +
+            "TopCentered, LeftCentered, RightCentered, BottomCentered, " +
+            "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", false)]
         public static void ConSetPosition(string consolePosition)
         {
             Settings.Console.ConsolePos newPos = Settings.Console.Position;
@@ -22,7 +24,10 @@ namespace SkToolbox
             Logger.Submit("Position set to " + Settings.Console.Position.ToString());
         }
 
-        [Command("conSetSize", "Set the size of the console. Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", false)]
+        [Command("conSetSize", 
+            "Set the size of the console. Positive in pixels. " +
+            "Negative numbers will divide the screen by the number given. " +
+            "Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", false)]
         public static void ConSetSize(int Width, int Height)
         {
             
@@ -33,7 +38,7 @@ namespace SkToolbox
         }
 
         [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", false)]
-        public static void conDisplay(bool displayPanel = true, bool displayConsole = true)
+        public static void ConDisplay(bool displayPanel = true, bool displayConsole = true)
         {
 
             Settings.Console.ShowConsole = displayConsole;
@@ -45,11 +50,26 @@ namespace SkToolbox
         }
 
         [Command("OpenConsole", "Enables the console.", "  Base", false, 0)]
-        public static void conEnable()
+        public static void ConEnable()
         {
             Settings.Console.ShowConsole = true;
 
             Logger.Submit("Console set: " + Settings.Console.ShowConsole);
+        }
+
+        [Command("Time", "Sets or gets the timescale. [0.1f - 10.0f]", "  Base", false)]
+        public static void SetTime(bool setTime = false, float timeScale = 1.0f)
+        {
+            if (setTime)
+            {
+                timeScale = Mathf.Clamp(timeScale, 0.1f, 10.0f);
+                Time.timeScale = timeScale;
+
+                Logger.Submit("Timescale set: " + Time.timeScale);
+            } else
+            {
+                Logger.Submit("Timescale is currently: " + Time.timeScale);
+            }
         }
     }
 }

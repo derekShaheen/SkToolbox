@@ -132,13 +132,13 @@ namespace SkToolbox
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
         public void Help(string command = null)
         {
-            Console.Submit("Features" +
-                        "\n  ▪ Auto-complete your command inputs by pressing tab" +
-                        "\n  ▪ Pressing tab with empty input will populate the last input command with no parameters" +
-                        "\n  ▪ Press the up and down arrow keys to cycle commands" +
-                        "\n  ▪ Chain your commands by separating them with a semi-colon (;)");
             if (string.IsNullOrEmpty(command))
             {
+                Console.Submit("Features" +
+                    "\n  ▪ Auto-complete your command inputs by pressing tab" +
+                    "\n  ▪ Pressing tab with empty input will populate the last input command with no parameters" +
+                    "\n  ▪ Press the up and down arrow keys to cycle commands" +
+                    "\n  ▪ Chain your commands by separating them with a semi-colon (;)");
                 var cmds =
                     m_actions.Values.ToList()
                     .OrderBy(m => m.data.keyword);
@@ -238,7 +238,7 @@ namespace SkToolbox
 
                 Debug.Log($"{Settings.Console.OutputPrefix} Registering {query.Count()} commands...");
 
-                // Iterate over commands in alphabetical order, so they're sorted nicely by the default help command and panel.
+                // Sort commands by category, sort priority, then keyword
                 foreach (CommandMeta command in query.OrderBy(m => m.data.category)
                                                      .ThenBy(n => n.data.sortPriority)
                                                      .ThenBy(o => o.data.keyword))
@@ -331,23 +331,25 @@ namespace SkToolbox
                         }
                         catch (SystemException e)
                         {
-                            Debug.Log($"System error while converting <color=white>{arg}</color> to <color=white>{argType.Name}</color>: {e.Message}");
+                            Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
+                            return;
                         }
                         catch (TooManyValuesException)
                         {
-                            Debug.Log($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=white>{arg}</color>.");
+                            Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
                         }
                         catch (NoMatchFoundException)
                         {
-                            Debug.Log($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=white>{arg}</color>.");
+                            Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
                         }
 
                         // Couldn't convert, oh well!
                         if (converted == null)
                         {
-                            Debug.Log($"Error while converting arguments for command <color=white>{commandName}</color>.");
+                            Logger.Submit($"Error while converting arguments for command <color=#EEEEEE>{commandName}</color>.");
                             break;
-                            //return;
                         }
 
                         if (converted.GetType().IsArray)

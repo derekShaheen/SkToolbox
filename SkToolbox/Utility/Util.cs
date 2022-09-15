@@ -342,6 +342,50 @@ namespace SkToolbox
         }
 
         /// <summary>
+        /// Convert text from something like "testCommand" to "Test Command"
+        /// </summary>
+        /// <param name="inputText"></param>
+        /// <returns></returns>
+        public static string ConvertCamelToHuman(string inputText)
+        {
+            inputText = inputText.Simplified();
+            if (inputText.Substring(0, 1).Equals(inputText.Substring(0, 1).ToLower()))
+            {
+                inputText = inputText.Substring(0, 1).ToUpper() + inputText.Substring(1);
+            }
+            byte[] asciiBytes = System.Text.Encoding.ASCII.GetBytes(inputText);
+            for (int i = 1; i < asciiBytes.Length; i++)
+            {
+                if (asciiBytes[i] > 64 && asciiBytes[i] < 91)
+                {
+                    inputText = inputText.Insert(i, " ");
+                }
+            }
+            return inputText;
+        }
+
+        /// <summary>
+        /// Strip all non word characters except periods,hyphens, and @ symbols
+        /// </summary>
+        /// <param name="strIn"></param>
+        /// <returns></returns>
+        public static string CleanInput(string strIn)
+        {
+            // Replace invalid characters with empty strings.
+            try
+            {
+                return Regex.Replace(strIn, @"[^\w\.@-]", "",
+                                     RegexOptions.None, TimeSpan.FromSeconds(1.5));
+            }
+            // If we timeout when replacing invalid characters,
+            // we should return Empty.
+            catch (RegexMatchTimeoutException)
+            {
+                return String.Empty;
+            }
+        }
+
+        /// <summary>
         /// Extension method to create markup color tags around a string.
         /// </summary>
         /// <param name="text">Text to wrap with color tags.</param>

@@ -503,9 +503,14 @@ namespace SkToolbox.Controllers
                             GUILayout.Label("[ " + m_currentCategory.Trim() + " ]", m_StyleCategoryBanner);
                         }
                     }
+                    //Strip prefix '/' if the command contains one, then make it readable for display
+                    string buttonText = command.Value.data.keyword;
+                    buttonText = Util.CleanInput(buttonText); // Remove symbols
+                    buttonText = Util.ConvertCamelToHuman(buttonText); // Convert to readable
+
                     if (command.Value.requiredArguments == 0)
                     {
-                        if (GUILayout.Button(command.Value.data.keyword.Trim(), m_StylePanelButtons))
+                        if (GUILayout.Button(buttonText, m_StylePanelButtons))
                         {
                             Logger.Submit(command.Value.data.keyword, false);
                             Handler.Run(command.Value.data.keyword);
@@ -514,7 +519,7 @@ namespace SkToolbox.Controllers
                     }
                     else
                     {
-                        if (GUILayout.Button(command.Value.data.keyword, m_StylePanelButtons))
+                        if (GUILayout.Button(buttonText, m_StylePanelButtons))
                         {
                             m_InputString = command.Value.data.keyword + " ";
                             m_Editor.SelectNone();
@@ -522,11 +527,14 @@ namespace SkToolbox.Controllers
                             ScrollToBottom();
                         }
                     }
-                } else
+                }
+                else
                 { // These buttons normally do not show
-                    if (!Console.ShowConsole) {
-                        if (command.Value.data.keyword.Equals("OpenConsole")) { // Allow the user to open the console if it's disabled
-                            if (GUILayout.Button(command.Value.data.keyword.Trim(), m_StylePanelButtons))
+                    if (!Console.ShowConsole)
+                    {
+                        if (command.Value.data.keyword.Equals("OpenConsole"))
+                        { // Allow the user to open the console if it's disabled
+                            if (GUILayout.Button("Open Console", m_StylePanelButtons))
                             {
                                 Handler.Run(command.Value.data.keyword);
                                 ScrollToBottom();
