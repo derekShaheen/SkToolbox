@@ -65,10 +65,10 @@ namespace SkToolbox
             Logger.Submit("Console set: " + Settings.Console.ShowConsole);
         }
 
-        [Command("Time", "Sets or gets the timescale. [0.1f - 10.0f]", "  Base", false)]
+        [Command("Time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", false)]
         public static void SetTime(string setOrGet = "get", float timeScale = 1.0f)
         {
-            if (setOrGet.Equals("set"))
+            if (setOrGet.ToLower().Equals("set"))
             {
                 timeScale = Mathf.Clamp(timeScale, 0.1f, 10.0f);
                 Time.timeScale = timeScale;
