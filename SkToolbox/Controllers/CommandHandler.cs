@@ -279,118 +279,176 @@ namespace SkToolbox
         /// <param name="text">Command string to evaluate.</param>
         public void Run(string text)
         {
-            string[] textSplit = text.Split(';');
+            string[] textSplit = new string[] { text };
+
+            //Are we setting an alias?
+            bool settingAlias = true;
+            string[] testLine = text.Split(' ');
+            if(testLine.Length > 0 && !testLine[0].Equals("alias") && !testLine[0].Equals("bind")) {
+                textSplit = text.Split(';');
+                settingAlias = false;
+            }
+
             foreach (string line in textSplit)
             {
                 // Remove garbage.
                 string workLine = line.Simplified();
 
-                // Split the text using our pattern. Splits by spaces but preserves quote groups.
-                List<string> args = Util.SplitByQuotes(workLine);
+                workLine = ReplaceAlias(workLine);
 
-                // Store command ID and remove it from our arguments list.
-                string commandName = args[0];
-                args.RemoveAt(0);
+                string[] workLineSplit = new string[] { workLine }; 
 
-                // Look up the command value, fail if it doesn't exist.
-                if (!m_actions.TryGetValue(commandName, out CommandMeta command))
+                if(!settingAlias)
                 {
-                    Console.Submit($"Unknown command <color=yellow>{commandName}</color>.");
-                    continue;
-                    //return;
+                    workLineSplit = workLine.Split(';');
                 }
 
-                if (args.Count < command.requiredArguments)
+                foreach (string distilledWorkLine in workLineSplit)
                 {
-                    Console.Submit($"Missing required number of arguments for <color=yellow>{commandName}</color>.");
-                    continue;
-                    //return;
-                }
+                    // Split the text using our pattern. Splits by spaces but preserves quote groups.
+                    List<string> args = Util.SplitByQuotes(distilledWorkLine);
 
-                List<object> convertedArgs = new List<object>();
+                    // Store command ID and remove it from our arguments list.
+                    string commandName = args[0];
+                    args.RemoveAt(0);
 
-                // Loop through each argument type of the command object
-                // and attempt to convert the corresponding text value to that type.
-                // We'll unpack the converted args list into the function call which will automatically
-                // cast from object -> the parameter type.
-                for (int i = 0; i < command.arguments.Count; ++i)
-                {
-                    // If there is a user supplied value, try to convert it.
-                    if (i < args.Count)
+                    // Look up the command value, fail if it doesn't exist.
+                    if (!m_actions.TryGetValue(commandName, out CommandMeta command))
                     {
-                        Type argType = command.arguments[i].ParameterType;
+                        Console.Submit($"Unknown command <color=yellow>{commandName}</color>.");
+                        continue;
+                        //return;
+                    }
 
-                        string arg = args[i];
+                    if (args.Count < command.requiredArguments)
+                    {
+                        Console.Submit($"Missing required number of arguments for <color=yellow>{commandName}</color>.");
+                        continue;
+                        //return;
+                    }
 
-                        object converted = null;
+                    List<object> convertedArgs = new List<object>();
 
-                        try
+                    // Loop through each argument type of the command object
+                    // and attempt to convert the corresponding text value to that type.
+                    // We'll unpack the converted args list into the function call which will automatically
+                    // cast from object -> the parameter type.
+                    for (int i = 0; i < command.arguments.Count; ++i)
+                    {
+                        // If there is a user supplied value, try to convert it.
+                        if (i < args.Count)
                         {
-                            if (command.arguments[i].GetCustomAttribute(typeof(ParamArrayAttribute)) != null)
+                            Type argType = command.arguments[i].ParameterType;
+
+                            string arg = args[i];
+
+                            object converted = null;
+
+                            try
                             {
-                                argType = argType.GetElementType();
-                                converted = Util.StringsToObjects(args.Skip(i).ToArray(), argType);
+                                if (command.arguments[i].GetCustomAttribute(typeof(ParamArrayAttribute)) != null)
+                                {
+                                    argType = argType.GetElementType();
+                                    converted = Util.StringsToObjects(args.Skip(i).ToArray(), argType);
+                                }
+                                else
+                                {
+                                    converted = Util.StringToObject(arg, argType);
+                                }
+                            }
+                            catch (SystemException e)
+                            {
+                                Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
+                                break;
+                            }
+                            catch (TooManyValuesException)
+                            {
+                                Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                break;
+                            }
+                            catch (NoMatchFoundException)
+                            {
+                                Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                break;
+                            }
+
+                            // Couldn't convert, oh well!
+                            if (converted == null)
+                            {
+                                Logger.Submit($"Error while converting arguments for command <color=#EEEEEE>{commandName}</color>.");
+                                break;
+                            }
+
+                            if (converted.GetType().IsArray)
+                            {
+                                object[] arr = converted as object[];
+                                var things = Array.CreateInstance(argType, arr.Length);
+                                Array.Copy(arr, things, arr.Length);
+                                convertedArgs.Add(things);
                             }
                             else
-                            {
-                                converted = Util.StringToObject(arg, argType);
-                            }
+                                convertedArgs.Add(converted);
                         }
-                        catch (SystemException e)
-                        {
-                            Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
-                            break;
-                        }
-                        catch (TooManyValuesException)
-                        {
-                            Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            break;
-                        }
-                        catch (NoMatchFoundException)
-                        {
-                            Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            break;
-                        }
-
-                        // Couldn't convert, oh well!
-                        if (converted == null)
-                        {
-                            Logger.Submit($"Error while converting arguments for command <color=#EEEEEE>{commandName}</color>.");
-                            break;
-                        }
-
-                        if (converted.GetType().IsArray)
-                        {
-                            object[] arr = converted as object[];
-                            var things = Array.CreateInstance(argType, arr.Length);
-                            Array.Copy(arr, things, arr.Length);
-                            convertedArgs.Add(things);
-                        }
+                        // Otherwise, if we're still iterating, there's parameters they left unfilled.
+                        // This will only execute if they are optional parameters, due to our required arg count check earlier.
                         else
-                            convertedArgs.Add(converted);
+                        {
+                            // Since Invoke requires all parameters to be filled, we have to manually insert the function's default value.
+                            // Very silly.
+                            convertedArgs.Add(command.arguments[i].DefaultValue);
+                        }
                     }
-                    // Otherwise, if we're still iterating, there's parameters they left unfilled.
-                    // This will only execute if they are optional parameters, due to our required arg count check earlier.
-                    else
-                    {
-                        // Since Invoke requires all parameters to be filled, we have to manually insert the function's default value.
-                        // Very silly.
-                        convertedArgs.Add(command.arguments[i].DefaultValue);
-                    }
-                }
 
-                //Debug.Log("Running command " + command.data.keyword);
-                // Invoke the method, which will expand all the arguments automagically.
-                try
-                {
-                    command.method.Invoke(this, convertedArgs.ToArray());
-                }
-                catch (Exception)
-                {
-                    Debug.Log($"Something happened while running {command.data.keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
-                    throw;
+                    //Debug.Log("Running command " + command.data.keyword);
+                    // Invoke the method, which will expand all the arguments automagically.
+                    try
+                    {
+                        command.method.Invoke(this, convertedArgs.ToArray());
+                    }
+                    catch (Exception)
+                    {
+                        Debug.Log($"Something happened while running {command.data.keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
+                        throw;
+                    }
                 }
             }
+        }
+
+        public string GetAlias(string input)
+        {
+            if (m_aliases.TryGetValue(input, out string value))
+                return value;
+
+            return null;
+        }
+
+        public string ReplaceAlias(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            string[] split = input.Split();
+
+            string alias = GetAlias(split[0]);
+
+            if (!string.IsNullOrEmpty(alias))
+            {
+                split[0] = alias;
+
+                return string.Join(" ", split);
+            }
+
+            return input;
+        }
+
+        public Dictionary<string, CommandMeta> GetActions()
+        {
+            return m_actions;
+        }
+
+        public Dictionary<string, string> GetAliases()
+        {
+            return m_aliases;
         }
 
         public CommandMeta GetCommand(string commandName)

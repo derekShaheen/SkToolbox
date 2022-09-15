@@ -8,8 +8,10 @@ namespace SkToolbox.Controllers
     public class MainConsole : MonoBehaviour
     {
         public static MainConsole _instance;
+        public Loaders.SkBepInExLoader SkBepInExLoader;
 
         private bool isVisible = false;
+        public bool IsVisible { get => isVisible; }
 
         // Styles
         public GUIStyle m_StyleOutput = new GUIStyle(GUIStyle.none);
@@ -57,7 +59,21 @@ namespace SkToolbox.Controllers
 
         //
         private CommandHandler m_handler;
-        public CommandHandler Handler { get => m_handler; set => m_handler = value; }
+        public CommandHandler Handler
+        {
+            get 
+            { 
+                if(m_handler == null)
+                {
+                    m_handler = new CommandHandler(this);
+                }
+                return m_handler;
+            }
+            set
+            {
+                m_handler = value;
+            }
+        }
 
         ///
         private const string s_argPattern = @"((?:<[^>]+>)|(?:\[[^\]]+\]))";
@@ -71,7 +87,6 @@ namespace SkToolbox.Controllers
 
             gameObject.name = "SkConsole";
 
-            Handler = new CommandHandler(this);
             font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
 
             HandlePositioning();
@@ -587,7 +602,7 @@ namespace SkToolbox.Controllers
             m_InputString = string.Empty;
         }
 
-        private void HandleInput(string consoleInput)
+        public void HandleInput(string consoleInput)
         {
             if (!string.IsNullOrEmpty(consoleInput))
             {
@@ -721,6 +736,11 @@ namespace SkToolbox.Controllers
             m_MainWindow = new Rect(m_Xpos, m_Ypos, m_Width, m_Height);
 
             if (panelNeedsXAdjustment) { m_NeedsXAdjustment = true; }
+        }
+
+        public CommandHandler GetCommandHandler()
+        {
+            return Handler;
         }
 
         private class HistoryController
