@@ -44,11 +44,5 @@ namespace SkToolbox.Loaders
             m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
 
         }
-
-        internal class ConfigEntry
-        {
-            public static ConfigEntry<bool> CDescriptor { get; set; }
-            public static ConfigEntry<bool> CConsoleEnabled { get; set; }
-        }
     }
 }

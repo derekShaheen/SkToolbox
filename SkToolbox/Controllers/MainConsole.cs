@@ -35,7 +35,7 @@ namespace SkToolbox.Controllers
         private Vector2 m_LinesScrollPosition2 = Vector2.zero;
         private int m_PanelXSize = 100;
         private bool m_NeedsXAdjustment = true;
-
+        private string m_currentCategory = string.Empty;
         //Text
         private List<string> m_OutputHistory = new List<string>();
         private HistoryController m_InputHistory = new HistoryController();
@@ -55,11 +55,12 @@ namespace SkToolbox.Controllers
 
         private bool m_MoveCursorOnNextFrame = false;
 
+        //
         private CommandHandler m_handler;
         public CommandHandler Handler { get => m_handler; set => m_handler = value; }
 
+        ///
         private const string s_argPattern = @"((?:<[^>]+>)|(?:\[[^\]]+\]))";
-        private string m_currentCategory = string.Empty;
 
         void Start()
         {
@@ -74,8 +75,6 @@ namespace SkToolbox.Controllers
             font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
 
             HandlePositioning();
-
-            //m_MainWindow = new Rect(m_Xpos, m_Ypos, m_Width, m_Height);
 
             Logger.Submit("Welcome to SkToolbox " + SkVersionChecker.currentVersion + "!", false);
             StartCoroutine(Handler.Register());
@@ -135,10 +134,10 @@ namespace SkToolbox.Controllers
                 } else
                 {
                     m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, "SkToolbox", m_StyleWindow, new GUILayoutOption[]
-{
+                    {
                         GUILayout.MinWidth(m_Width),
                         GUILayout.MaxWidth(m_Width),
-});
+                    });
                 }
 
 
