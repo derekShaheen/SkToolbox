@@ -194,6 +194,12 @@ namespace SkToolbox
             Application.Quit();
         }
 
+        [Command("echo", "Outputs a message to this console. Intended for use with aliases and key binds.", "  Base", false)]
+        public static void CmdEcho(string inputMessage)
+        {
+            Logger.Submit(inputMessage);
+        }
+
         [Command("conSetPos", "Set the position of the console. " +
             "TopCentered, LeftCentered, RightCentered, BottomCentered, " +
             "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", false)]
