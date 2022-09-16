@@ -23,7 +23,7 @@ namespace SkToolbox
         public readonly Util.DisplayOptions displayOptions;
         public readonly int sortPriority;
 
-        public Command(string keyword, string description, string category = "zzzzz", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100) //string autoComplete = null)
+        public Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100) //string autoComplete = null)
         {
             this.keyword = keyword;
             this.description = description;
