@@ -134,11 +134,6 @@ namespace SkToolbox
         {
             if (string.IsNullOrEmpty(command))
             {
-                Console.Submit("Features" +
-                    "\n  ▪ Auto-complete your command inputs by pressing tab" +
-                    "\n  ▪ Pressing tab with empty input will populate the last input command with no parameters" +
-                    "\n  ▪ Press the up and down arrow keys to cycle commands" +
-                    "\n  ▪ Chain your commands by separating them with a semi-colon (;)");
                 var cmds =
                     m_actions.Values.ToList()
                     .OrderBy(m => m.data.keyword);
