@@ -66,7 +66,9 @@ namespace SkToolboxAvPB
 
 ##### What is a Command and how is it defined?
 The following is the signature for a command. Simply apply these attributes to a method as shown in the example above, and it will be automatically detected upon injection. Only the keyword and description are required parameters.
-Note: Defined methods *must* be **public and static!**
+Note: 
+- Defined methods *must* be **public and static!**
+- SkToolbox modules and commands are not compatible with version >=2.0.0.
 ```csharp
 public static Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100)
 ```
