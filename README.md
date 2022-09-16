@@ -4,9 +4,74 @@
 
 ![SkToolbox Header](https://i.imgur.com/bTaEOXP.png "SkToolbox Header")
 
-#### The SkToolbox is a framework used for quickly designing overlay menus in Unity Games. Typically used for creating a custom menu for use with existing projects. Includes loader module for mono injection or via BepInEx (recommended). These menus can be controlled both via keyboard or mouse input.
+#### The SkToolbox is a framework used for quickly implementing a custom console and commands that can be run from that console. Typically used for creating a custom menu for use with existing projects. This project is expected to be injected via [BepInEx](https://github.com/BepInEx/BepInEx "BepInEx"). 
 
-Readme under construction due to full rewrite. New interface and framework coming soon.
+[![Sample](https://i.imgur.com/JUIOMSf.gif)](https://imgur.com/JUIOMSf "![Sample](https://i.imgur.com/JUIOMSf.gif)")
+---
+#### Index
+- Features
+- Examples
+- How to Use Framework
+
+### Features
+This console supports the following features:
+- Command auto-completion via tab. If the user has partially entered a command, they can use tab to cycle through the potential commands they might be entering.
+- Command chaining, in which multiple commands can be input on a single line, separated by a semi-colon. (Ex. cmd1; cmd2; cmd3; ...)
+- Command cycling via the up/down arrows. Unlimited commands will be remembered.
+- Command suggestions will be displayed as the user types.
+- Command parameters will be automatically suggested and highlighted as the user types.
+- Command aliasing allows the user to create custom chains of commands.
+- Command key binding allows users to run any number of commands via key press when outside of the console.
+- Automatically generate on-screen buttons based on registered commands.
+- Supports color theme changes on the fly! Set the theme to any color via command or config!
+- Many configurable options found in the config.
 ------------
 
-![Sample](https://i.imgur.com/4jftRyZ.png)
+### Examples
+Examples coming soon
+
+### How to Use Framework
+Here we will examine an example, made for the game Autonauts vs Pirates. In this example, we reference the SkToolbox.dll and we declare a command to be added to the left button panel and a command that can be run from the console.
+
+Complete example with code that runs with BepInEx and declares the EnableTools command.
+[![FrameworkScreenResult](https://i.imgur.com/EGERiQN.png "FrameworkScreenResult")](https://i.imgur.com/EGERiQN.png "FrameworkScreenResult")
+```csharp
+using BepInEx;
+using SkToolbox;
+
+/// <summary>
+/// Plugin for SkToolbox, intended for running on Autonauts vs Pirates
+/// </summary>
+namespace SkToolboxAvPB
+{
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    [BepInDependency("com.Skrip.SkToolbox")] // Set the dependency 
+    class SkBepInExLoader : BaseUnityPlugin
+    {
+        public const string // Declare plugin information
+            MODNAME = "SkToolboxAvPB",
+            AUTHOR = "Skrip",
+            GUID = "com." + AUTHOR + "." + MODNAME,
+            VERSION = "1.0.0.0";
+
+        [Command("EnableTools", "Enables the in-game tools menu.", "World")] // Declare the 'EnableTools' command
+        public static void EnableTools()
+        {
+            CheatManager.Instance.m_CheatsEnabled = true;
+            GameStateManager.Instance.SetState(GameStateManager.State.CreativeTools);
+        }
+    }
+}
+```
+
+##### What is a Command and how is it defined?
+The following is the signature for a command. Simply apply these attributes to a method as shown in the example above, and it will be automatically detected upon injection. Only the keyword and description are required parameters.
+Note: Defined methods *must* be **public and static!**
+```csharp
+public static Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100)
+```
+- Keyword: This is the command that will be typed to run it. In the code above, "EnableTools" was the keyword. Key words are also used to display the text in the button panel on the left side. Camel case commands will be automatically converted to readable text for the buttons. NOTE: The keyword does *not* need to match the method name.
+- Description: This is what will be shown when the user is receiving a hint for this command as they type it. This is also what will be shown from the help command.
+- Category: This is the category that the button will be shown within on the left side. Leave default for no category.
+- DisplayOptions: All, PanelOnly, ConsoleOnly - Display this command everywhere or just in one panel? Mostly used to prevent buttons from appearing for specific commands.
+- Sort Priority: This will be used to sort the buttons within categories. Lower is higher on the menu.
