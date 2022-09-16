@@ -4,7 +4,7 @@
 
 ![SkToolbox Header](https://i.imgur.com/bTaEOXP.png "SkToolbox Header")
 
-#### The SkToolbox is a framework used for quickly implementing a custom console and commands that can be run from that console. Typically used for creating a custom menu for use with existing projects. This project is expected to be injected via [BepInEx](https://github.com/BepInEx/BepInEx "BepInEx"). 
+#### The SkToolbox is a framework used for quickly implementing a custom console with executable commands. Typically used for creating a plugin for use with existing projects. This project is expected to be injected via [BepInEx](https://github.com/BepInEx/BepInEx "BepInEx"). Commands are automatically converted to clickable buttons to provide for a more complete user interface.
 
 [![Sample](https://i.imgur.com/JUIOMSf.gif)](https://imgur.com/JUIOMSf "![Sample](https://i.imgur.com/JUIOMSf.gif)")
 ---
@@ -24,7 +24,7 @@ This console supports the following features:
 - Command key binding allows users to run any number of commands via key press when outside of the console.
 - Automatically generate on-screen buttons based on registered commands.
 - Supports color theme changes on the fly! Set the theme to any color via command or config!
-- Many configurable options found in the config.
+- Many options and preferences are found in the configuation file.
 ------------
 
 ### Examples

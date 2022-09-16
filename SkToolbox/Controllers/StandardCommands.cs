@@ -219,6 +219,7 @@ namespace SkToolbox
         {
 
             Settings.Console.FontSize = fontSize;
+            Loaders.SkBepInExLoader.Console.font = Font.CreateDynamicFontFromOSFont("Consolas", fontSize);
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
         }
 

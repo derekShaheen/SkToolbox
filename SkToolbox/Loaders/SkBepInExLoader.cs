@@ -85,8 +85,6 @@ namespace SkToolbox.Loaders
             {
                 Console.Submit($"New version of SkToolbox available! ({Utility.SkVersionChecker.currentVersion}) -> ({Utility.SkVersionChecker.latestVersion})");
             }
-
-            UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
         }
 
         public void ReInit()

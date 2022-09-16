@@ -20,10 +20,11 @@ namespace SkToolbox.Controllers
         private GUIStyle m_StyleCategoryBanner;
         private GUIStyle m_StylePanelButtons;
         private GUIStyle m_StyleHint;
-        Font font;
+        public Font font;
 
         //Window
         private Rect m_MainWindow;
+        private Rect m_Fullscreen;
         private int m_Xpos = Console.Margin;
         private int m_Ypos = Console.Margin;
         private int m_Height = -1;
@@ -84,9 +85,9 @@ namespace SkToolbox.Controllers
                 _instance = this;
             }
 
-            gameObject.name = "SkConsole";
+            m_Fullscreen = new Rect(0, 0, Screen.width, Screen.height);
 
-            font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
+            gameObject.name = "SkConsole";
 
             HandlePositioning();
 
@@ -137,6 +138,8 @@ namespace SkToolbox.Controllers
             {
                 Stylize();
 
+                GUI.Box(m_Fullscreen, "");
+
                 m_StyleWindow = GUI.skin.window;
                 if (Console.ShowPanel)
                 {
@@ -160,6 +163,19 @@ namespace SkToolbox.Controllers
                     GUI.FocusControl("InputBar");
                 }
             }
+        }
+
+        private Texture2D MakeTex(int width, int height, Color col)
+        {
+            Color[] pix = new Color[width * height];
+            for (int i = 0; i < pix.Length; ++i)
+            {
+                pix[i] = col;
+            }
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+            return result;
         }
 
         private void HandleKeys()
@@ -347,11 +363,13 @@ namespace SkToolbox.Controllers
             if (Console.ShowConsole)
             {
                 GUILayout.BeginVertical(m_StyleInput);
+
                 m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
                     new GUILayoutOption[]
                     {
                         GUILayout.Height(m_Height)
                     });
+
 
                 GUILayout.FlexibleSpace();
                 foreach (string line in m_OutputHistory)
