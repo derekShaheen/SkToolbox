@@ -24,5 +24,14 @@ namespace SkToolbox
                 MainConsole.Submit(inputString, prefix);
             }
         }
+
+        public static void Debug(string inputString, bool prefix = true)
+        {
+            if (prefix)
+            {
+                inputString = Settings.Console.OutputPrefix + inputString;
+            }
+            UnityEngine.Debug.Log(inputString);
+        }
     }
 }

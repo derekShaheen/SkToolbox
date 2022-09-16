@@ -217,7 +217,7 @@ namespace SkToolbox
             m_actions.Clear();
             try
             {
-                Debug.Log($"{Settings.Console.OutputPrefix} Searching for commands...");
+                Logger.Debug($"{Settings.Console.OutputPrefix} Searching for commands...");
 
                 IEnumerable<CommandMeta> query =
                     from assemblies in AppDomain.CurrentDomain.GetAssemblies()
@@ -231,7 +231,7 @@ namespace SkToolbox
                         //MakeAutoCompleteDelegate(attribute.autoCompleteTarget)
                     );
 
-                Debug.Log($"{Settings.Console.OutputPrefix} Registering {query.Count()} commands...");
+                Logger.Debug($"{Settings.Console.OutputPrefix} Registering {query.Count()} commands...");
 
                 // Sort commands by category, sort priority, then keyword
                 foreach (CommandMeta command in query.OrderBy(m => m.data.category)
@@ -243,7 +243,7 @@ namespace SkToolbox
                         m_actions.Add(command.data.keyword, command);
                     } catch (ArgumentException)
                     {
-                        Debug.Log($"{Settings.Console.OutputPrefix} WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
+                        Logger.Debug($"{Settings.Console.OutputPrefix} WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
                         break;
                     }
 
@@ -257,11 +257,11 @@ namespace SkToolbox
                     //Debug.Log($"Registered command {command.data.keyword}");
                 }
 
-                Debug.Log($"{Settings.Console.OutputPrefix} Finished registering commands!");
+                Logger.Debug($"{Settings.Console.OutputPrefix} Finished registering commands!");
             }
             catch (Exception ex)
             {
-                Debug.LogError("Failed to register commands. \n\n" + ex.ToString());
+                Logger.Debug("Failed to register commands. \n\n" + ex.ToString());
             }
             yield return null;
         }
