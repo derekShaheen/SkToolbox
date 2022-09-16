@@ -279,15 +279,7 @@ namespace SkToolbox
         /// <param name="text">Command string to evaluate.</param>
         public void Run(string text)
         {
-            string[] textSplit = new string[] { text };
-
-            //Are we setting an alias?
-            bool settingAlias = true;
-            string[] testLine = text.Split(' ');
-            if(testLine.Length > 0 && !testLine[0].Equals("alias") && !testLine[0].Equals("bind")) {
-                textSplit = text.Split(';');
-                settingAlias = false;
-            }
+            List<string> textSplit = text.SplitEscaped(';');
 
             foreach (string line in textSplit)
             {
@@ -297,11 +289,6 @@ namespace SkToolbox
                 workLine = ReplaceAlias(workLine);
 
                 string[] workLineSplit = new string[] { workLine }; 
-
-                if(!settingAlias)
-                {
-                    workLineSplit = workLine.Split(';');
-                }
 
                 foreach (string distilledWorkLine in workLineSplit)
                 {

@@ -42,8 +42,8 @@ namespace SkToolbox
         public enum DisplayOptions
         {
             All = 0,
-            PanelOnly = 1,
-            //ConsoleOnly = 2,
+            ConsoleOnly = 1,
+            PanelOnly = 2,
         }
 
         private static readonly Regex s_tagStripPattern = new Regex(@"<((?:b)|(?:i)|(?:size)|(?:color)|(?:quad)|(?:material)).*?>(.*?)<\/\1>");
