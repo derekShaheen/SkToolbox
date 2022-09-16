@@ -231,7 +231,7 @@ namespace SkToolbox
                         //MakeAutoCompleteDelegate(attribute.autoCompleteTarget)
                     );
 
-                Logger.Debug($"{Settings.Console.OutputPrefix} Registering {query.Count()} commands...");
+                Logger.Debug($"Registering {query.Count()} commands...");
 
                 // Sort commands by category, sort priority, then keyword
                 foreach (CommandMeta command in query.OrderBy(m => m.data.category)
@@ -243,7 +243,7 @@ namespace SkToolbox
                         m_actions.Add(command.data.keyword, command);
                     } catch (ArgumentException)
                     {
-                        Logger.Debug($"{Settings.Console.OutputPrefix} WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
+                        Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
                         break;
                     }
 
@@ -257,7 +257,7 @@ namespace SkToolbox
                     //Debug.Log($"Registered command {command.data.keyword}");
                 }
 
-                Logger.Debug($"{Settings.Console.OutputPrefix} Finished registering commands!");
+                Logger.Debug($"Finished registering commands!");
             }
             catch (Exception ex)
             {

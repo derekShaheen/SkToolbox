@@ -58,6 +58,7 @@ namespace SkToolbox.Loaders
 
         public void Init()
         {
+            SkToolbox.Logger.Debug("Initialization success!");
             Application.runInBackground = true;
             Controllers.SettingsController.Init(Config);
             m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
