@@ -7,19 +7,6 @@ namespace SkToolbox
 {
     public static class StandardCommands
     {
-        private static Controllers.MainConsole m_Console = null;
-        public static Controllers.MainConsole MainConsole
-        {
-            get
-            {
-                if (m_Console == null)
-                {
-                    m_Console = GameObject.FindObjectOfType<Controllers.MainConsole>();
-                }
-                return m_Console;
-            }
-            set => m_Console = value;
-        }
 
         [Command("alias", "Create a shortcut or alternate name for a command, or sequence of commands.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Alias(string name, params string[] commandText)
@@ -30,17 +17,17 @@ namespace SkToolbox
                 return;
             }
 
-            if (MainConsole.GetCommandHandler().GetActions().ContainsKey(name))
+            if (Loaders.SkBepInExLoader.Console.GetCommandHandler().GetActions().ContainsKey(name))
             {
                 Logger.Submit($"{name.WithColor(Color.white)} already exists.", true);
                 return;
             }
 
-            if (MainConsole.GetCommandHandler().GetAliases().ContainsKey(name))
-                MainConsole.GetCommandHandler().GetAliases().Remove(name);
+            if (Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().ContainsKey(name))
+                Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().Remove(name);
 
             string cmd = string.Join(" ", commandText);
-            MainConsole.GetCommandHandler().GetAliases().Add(name, cmd);
+            Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().Add(name, cmd);
             Loaders.SkBepInExLoader.Loader.SaveAliases();
 
             Logger.Submit($"Alias {name.WithColor(Color.yellow)} created for {cmd.WithColor(Color.yellow)}", true);
@@ -69,9 +56,9 @@ namespace SkToolbox
         [Command("unalias", "Remove an alias you've created.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Unalias(string alias)
         {
-            if (MainConsole.GetCommandHandler().GetAliases().ContainsKey(alias))
+            if (Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().ContainsKey(alias))
             {
-                MainConsole.GetCommandHandler().GetAliases().Remove(alias);
+                Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().Remove(alias);
                 Logger.Submit($"Alias {alias.WithColor(Color.cyan)} deleted.", true);
 
                 return;
@@ -89,7 +76,7 @@ namespace SkToolbox
                 return;
             }
 
-            MainConsole.GetCommandHandler().GetAliases().Clear();
+            Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().Clear();
             Loaders.SkBepInExLoader.Loader.SaveAliases();
 
             Logger.Submit("All of your aliases have been cleared.", true);
@@ -98,7 +85,7 @@ namespace SkToolbox
         [Command("listaliases", "List all of your custom aliases, or check what a specific alias does.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ListAliases(string alias = null)
         {
-            if (MainConsole.GetCommandHandler().GetAliases().Count == 0)
+            if (Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().Count == 0)
             {
                 Logger.Submit($"You have no aliases currently set. Use {"/alias".WithColor(Color.white)} to add some.");
                 return;
@@ -106,13 +93,13 @@ namespace SkToolbox
 
             if (string.IsNullOrEmpty(alias))
             {
-                foreach (var pair in MainConsole.GetCommandHandler().GetAliases())
+                foreach (var pair in Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases())
                     Logger.Submit($"{pair.Key} = <color=cyan>{pair.Value}</color>");
 
                 return;
             }
 
-            if (!MainConsole.GetCommandHandler().GetAliases().TryGetValue(alias, out string cmd))
+            if (!Loaders.SkBepInExLoader.Console.GetCommandHandler().GetAliases().TryGetValue(alias, out string cmd))
             {
                 Logger.Submit($"The alias {alias.WithColor(Color.white)} does not exist.", true);
                 return;
