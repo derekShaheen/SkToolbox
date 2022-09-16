@@ -201,7 +201,7 @@ namespace SkToolbox
             Logger.Submit(inputMessage);
         }
 
-        [Command("conSetPos", "Set the position of the console. " +
+        [Command("consetpos", "Set the position of the console. " +
             "TopCentered, LeftCentered, RightCentered, BottomCentered, " +
             "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConSetPosition(string consolePosition)
@@ -214,7 +214,7 @@ namespace SkToolbox
             Logger.Submit("Position set to " + Settings.Console.Position.ToString());
         }
 
-        [Command("conSetSize", 
+        [Command("consetsize", 
             "Set the size of the console. Positive in pixels. " +
             "Negative numbers will divide the screen by the number given. " +
             "Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", DisplayOptions.ConsoleOnly)]
@@ -227,7 +227,7 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
-        [Command("conSetFontSize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("consetfontsize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConFontSetSize(int fontSize = 16)
         {
 
@@ -235,7 +235,25 @@ namespace SkToolbox
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
         }
 
-        [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("consettheme", "Set the color theme of the console. Accepts hex values and some color names (ex. F0D13EFF or blue).", "  Base", DisplayOptions.ConsoleOnly)]
+        public static void ConSetTheme(string color)
+        {
+            Color setColor;
+            if (color.Equals("clear"))
+            {
+                setColor = Color.clear;
+            }
+            else
+            {
+                setColor = Settings.Console.Theme;
+                ColorUtility.TryParseHtmlString(color, out setColor);
+            }
+            
+            Settings.Console.Theme = setColor;
+            Logger.Submit("Theme set to " + Settings.Console.Theme);
+        }
+
+        [Command("condisplay", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConDisplay(bool displayPanel = true, bool displayConsole = true)
         {
 
@@ -255,7 +273,7 @@ namespace SkToolbox
             Logger.Submit("Console set: " + Settings.Console.ShowConsole);
         }
 
-        [Command("Time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void SetTime(string setOrGet = "get", float timeScale = 1.0f)
         {
             if (setOrGet.ToLower().Equals("set"))

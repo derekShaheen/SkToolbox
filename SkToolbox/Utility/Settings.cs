@@ -10,16 +10,6 @@ namespace SkToolbox.Settings
 {
     public class Console
     {
-        public static int FontSize
-        {
-            get { return SettingsController.Get<int>("ConsoleFontSize"); }
-            set
-            {
-                value = Mathf.Clamp(value, 10, 24);
-                SettingsController.Set("ConsoleFontSize", value);
-            }
-        }
-
         //
         public static string OutputPrefix = "SkToolbox → "; // "(SkToolbox)"
         public static Color OutputPrefixColor = new Color(255, 51, 51);
@@ -29,6 +19,23 @@ namespace SkToolbox.Settings
             set
             {
                 SettingsController.Set("ConsoleMaxOutput", value);
+            }
+        }
+        public static int FontSize
+        {
+            get { return SettingsController.Get<int>("ConsoleFontSize"); }
+            set
+            {
+                value = Mathf.Clamp(value, 10, 24);
+                SettingsController.Set("ConsoleFontSize", value);
+            }
+        }
+        public static Color Theme
+        {
+            get { return SettingsController.Get<Color>("ConsoleTheme"); }
+            set
+            {
+                SettingsController.Set("ConsoleTheme", value);
             }
         }
 

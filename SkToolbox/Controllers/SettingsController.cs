@@ -28,6 +28,7 @@ namespace SkToolbox.Controllers
             s_config.Add("ConsoleEnabled", config.Bind(CategoryGeneral, "ConsoleEnabled", true, "Whether the console should be enabled or not. Defaults to true."));
             s_config.Add("PanelEnabled", config.Bind(CategoryGeneral, "PanelEnabled", true, "Whether the panel should be enabled or not. Defaults to true."));
 
+            s_config.Add("ConsoleTheme", config.Bind(CategoryConsoleDraw, "ConsoleTheme", Color.grey, "Sets the overall color theme. Accepts hex and some standard color words."));
             s_config.Add("ConsolePosition", config.Bind(CategoryConsoleDraw, "ConsolePosition", Settings.Console.ConsolePos.TopCentered));
             s_config.Add("ConsoleWidth", config.Bind(CategoryConsoleDraw, "ConsoleWidth", -1, "Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc.."));
             s_config.Add("ConsoleHeight", config.Bind(CategoryConsoleDraw, "ConsoleHeight", -2, "Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc.."));

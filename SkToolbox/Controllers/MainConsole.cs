@@ -631,7 +631,12 @@ namespace SkToolbox.Controllers
 
         private void Stylize()
         {
-            font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
+            if (font == null)
+            {
+                font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
+            }
+            GUI.color = Console.Theme;
+            GUI.skin.window.font = font;
             GUI.skin.window.fontStyle = FontStyle.Bold;
 
             m_StyleOutput.font = font;
@@ -641,29 +646,42 @@ namespace SkToolbox.Controllers
             m_StyleOutput.wordWrap = true;
             m_StyleOutput.alignment = TextAnchor.UpperLeft;
 
-            m_StyleHint = new GUIStyle(m_StyleOutput);
-            m_StyleHint.fontSize = 13;
+            if (m_StyleHint == null)
+            {
+                m_StyleHint = new GUIStyle(m_StyleOutput);
+                m_StyleHint.fontSize = 13;
+            }
 
-            m_StyleInput = new GUIStyle(GUI.skin.box);
-            m_StyleInput.alignment = TextAnchor.LowerLeft;
+            if (m_StyleInput == null)
+            {
+                m_StyleInput = new GUIStyle(GUI.skin.box);
+                m_StyleInput.alignment = TextAnchor.LowerLeft;
+                m_StyleInput.normal.textColor = Color.white;
+                //m_StyleInput.fontSize = font.fontSize;
+            }
 
-            m_StyleInput.fontSize = font.fontSize;
-            m_StyleInput.normal.textColor = Color.white;
+            if (m_StyleBanner == null)
+            {
+                m_StyleBanner = new GUIStyle(m_StyleInput);
+                m_StyleBanner.fontSize = 17;
+                m_StyleBanner.fontStyle = FontStyle.BoldAndItalic;
+                m_StyleBanner.alignment = TextAnchor.MiddleCenter;
+            }
 
-            m_StyleBanner = new GUIStyle(m_StyleInput);
-            m_StyleBanner.fontSize = 17;
-            m_StyleBanner.fontStyle = FontStyle.BoldAndItalic;
-            m_StyleBanner.alignment = TextAnchor.MiddleCenter;
+            if (m_StyleCategoryBanner == null)
+            {
+                m_StyleCategoryBanner = new GUIStyle(m_StyleInput);
+                m_StyleCategoryBanner.fontSize = 14;
+                m_StyleCategoryBanner.alignment = TextAnchor.MiddleCenter;
+                m_StyleCategoryBanner.fontStyle = FontStyle.Bold;
+            }
 
-            m_StyleCategoryBanner = new GUIStyle(m_StyleInput);
-            m_StyleCategoryBanner.fontSize = 14;
-            m_StyleCategoryBanner.alignment = TextAnchor.MiddleCenter;
-            m_StyleCategoryBanner.fontStyle = FontStyle.Bold;
-
-            m_StylePanelButtons = new GUIStyle(GUI.skin.textArea);
+            if (m_StylePanelButtons == null)
+            {
+                m_StylePanelButtons = new GUIStyle(GUI.skin.textArea);
+                m_StylePanelButtons.alignment = TextAnchor.MiddleCenter;
+            }
             m_StylePanelButtons.fontSize = font.fontSize;
-            m_StylePanelButtons.alignment = TextAnchor.MiddleCenter;
-
         }
 
         public void HandlePositioning(int xOverride = -1, bool panelNeedsXAdjustment = false)
