@@ -39,5 +39,12 @@ namespace SkToolbox.Controllers
 
             }
         }
+
+        public static void Unpatch()
+        {
+            if (harmony != null)
+            {
+                harmony.UnpatchSelf();
+            }
     }
 }
