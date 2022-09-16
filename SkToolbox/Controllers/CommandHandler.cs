@@ -175,9 +175,9 @@ namespace SkToolbox
         [Command("cmdRegister", "Searches and registers all commands.", "  Base", Util.DisplayOptions.ConsoleOnly)]
         public void CmdRegister()
         {
-            Logger.Submit("Searching and registering commands...");
+            //Logger.Submit("Searching and registering commands...");
             Register();
-            Logger.Submit("Complete.");
+            //Logger.Submit("Complete.");
         }
 
         public CommandHandler(Controllers.MainConsole mainConsole) : base()
