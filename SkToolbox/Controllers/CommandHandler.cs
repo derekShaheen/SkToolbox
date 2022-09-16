@@ -20,10 +20,10 @@ namespace SkToolbox
         public readonly string description;
         //public readonly string autoCompleteTarget;
         public readonly string category;
-        public readonly bool displayOnPanel;
+        public readonly Util.DisplayOptions displayOptions;
         public readonly int sortPriority;
 
-        public Command(string keyword, string description, string category = "zzzzz", bool displayOnPanel = true, int sortPriority = 100) //string autoComplete = null)
+        public Command(string keyword, string description, string category = "zzzzz", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100) //string autoComplete = null)
         {
             this.keyword = keyword;
             this.description = description;
@@ -32,7 +32,7 @@ namespace SkToolbox
                 category = string.Empty;
             }
             this.category = category;
-            this.displayOnPanel = displayOnPanel;
+            this.displayOptions = displayOptions;
             this.sortPriority = sortPriority;
             //this.autoCompleteTarget = autoComplete;
         }
@@ -171,13 +171,13 @@ namespace SkToolbox
             }
         }
 
-        [Command("cls", "Clears the screen", "  Base")]
+        [Command("cls", "Clears the screen", "  Base", Util.DisplayOptions.ConsoleOnly)]
         public void ClearScreen()
         {
             Console.Clear();
         }
 
-        [Command("cmdRegister", "Searches and registers all commands.", "  Base", false)]
+        [Command("cmdRegister", "Searches and registers all commands.", "  Base", Util.DisplayOptions.ConsoleOnly)]
         public void CmdRegister()
         {
             Logger.Submit("Searching and registering commands...");

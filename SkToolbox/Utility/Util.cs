@@ -37,8 +37,15 @@ namespace SkToolbox
     /// <summary>
     /// Collection of utility functions to find players, trim text, and do basic tasks.
     /// </summary>
-    internal static class Util
+    public static class Util
     {
+        public enum DisplayOptions
+        {
+            All = 0,
+            PanelOnly = 1,
+            //ConsoleOnly = 2,
+        }
+
         private static readonly Regex s_tagStripPattern = new Regex(@"<((?:b)|(?:i)|(?:size)|(?:color)|(?:quad)|(?:material)).*?>(.*?)<\/\1>");
         private static readonly Regex s_colorTagPattern = new Regex(@"<color=#(\w{6})(\w{2})?>");
         private const string s_commandPattern = @"[^\s""']+|""([^""]*)""|'([^']*)'";

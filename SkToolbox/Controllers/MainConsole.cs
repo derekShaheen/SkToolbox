@@ -512,7 +512,7 @@ namespace SkToolbox.Controllers
 
             foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
             {
-                if (command.Value.data.displayOnPanel)
+                if (command.Value.data.displayOptions == Util.DisplayOptions.All || command.Value.data.displayOptions == Util.DisplayOptions.PanelOnly)
                 {
                     if (!command.Value.data.category.Equals(m_currentCategory))
                     {

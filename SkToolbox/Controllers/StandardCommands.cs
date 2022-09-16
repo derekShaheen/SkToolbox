@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static SkToolbox.Util;
 
 namespace SkToolbox
 {
@@ -20,7 +21,7 @@ namespace SkToolbox
             set => m_Console = value;
         }
 
-        [Command("alias", "Create a shortcut or alternate name for a command, or sequence of commands.", "  Base", false)]
+        [Command("alias", "Create a shortcut or alternate name for a command, or sequence of commands.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Alias(string name, params string[] commandText)
         {
             if (name.Contains(" "))
@@ -45,7 +46,7 @@ namespace SkToolbox
             Logger.Submit($"Alias {name.WithColor(Color.yellow)} created for {cmd.WithColor(Color.yellow)}", true);
         }
 
-        [Command("bind", "Bind a console command to a key. See the Unity documentation for KeyCode names.", "  Base", false)]
+        [Command("bind", "Bind a console command to a key. See the Unity documentation for KeyCode names.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Bind(string keyCode, params string[] commandText)
         {
             if (!Enum.TryParse(keyCode, true, out KeyCode result))
@@ -65,7 +66,7 @@ namespace SkToolbox
             Logger.Submit($"Bound {result.ToString().WithColor(Color.yellow)} to {cmd.WithColor(Color.yellow)}.", true);
         }
 
-        [Command("unalias", "Remove an alias you've created.", "  Base", false)]
+        [Command("unalias", "Remove an alias you've created.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Unalias(string alias)
         {
             if (MainConsole.GetCommandHandler().GetAliases().ContainsKey(alias))
@@ -79,7 +80,7 @@ namespace SkToolbox
             Logger.Submit($"No alias named {alias.WithColor(Color.white)} exists.", true);
         }
 
-        [Command("unaliasall", "Removes all of your custom command aliases. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", false)]
+        [Command("unaliasall", "Removes all of your custom command aliases. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void UnaliasAll(bool confirm)
         {
             if (!confirm)
@@ -94,7 +95,7 @@ namespace SkToolbox
             Logger.Submit("All of your aliases have been cleared.", true);
         }
 
-        [Command("listaliases", "List all of your custom aliases, or check what a specific alias does.", "  Base", false)]
+        [Command("listaliases", "List all of your custom aliases, or check what a specific alias does.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ListAliases(string alias = null)
         {
             if (MainConsole.GetCommandHandler().GetAliases().Count == 0)
@@ -120,7 +121,7 @@ namespace SkToolbox
             Logger.Submit($"{alias} = {cmd.WithColor(Color.yellow)}");
         }
 
-        [Command("listbinds", "List all of your custom keybinds, or check what an individual keycode is bound to.", "  Base", false)]
+        [Command("listbinds", "List all of your custom keybinds, or check what an individual keycode is bound to.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ListBinds(string keyCode = null)
         {
             if (MainConsole.SkBepInExLoader.Binds.Count == 0)
@@ -152,7 +153,7 @@ namespace SkToolbox
             Logger.Submit($"{result} = {cmd.WithColor(Color.yellow)}");
         }
 
-        [Command("unbind", "Removes a custom keybind.", "  Base", false)]
+        [Command("unbind", "Removes a custom keybind.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Unbind(string keyCode)
         {
             if (!Enum.TryParse(keyCode, true, out KeyCode result))
@@ -173,7 +174,7 @@ namespace SkToolbox
             Logger.Submit($"Unbound {result.ToString().WithColor(Color.cyan)}.", true);
         }
 
-        [Command("unbindall", "Unbinds ALL of your Gungnir-related keybinds. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", false)]
+        [Command("unbindall", "Unbinds ALL of your Gungnir-related keybinds. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void UnbindAll(bool confirm)
         {
             if (!confirm)
@@ -188,13 +189,13 @@ namespace SkToolbox
             Logger.Submit("All of your binds have been cleared.", true);
         }
 
-        [Command("quit", "Exit the application.", "  Base", false)]
+        [Command("quit", "Exit the application.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ClearScreen()
         {
             Application.Quit();
         }
 
-        [Command("echo", "Outputs a message to this console. Intended for use with aliases and key binds.", "  Base", false)]
+        [Command("echo", "Outputs a message to this console. Intended for use with aliases and key binds.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void CmdEcho(string inputMessage)
         {
             Logger.Submit(inputMessage);
@@ -202,7 +203,7 @@ namespace SkToolbox
 
         [Command("conSetPos", "Set the position of the console. " +
             "TopCentered, LeftCentered, RightCentered, BottomCentered, " +
-            "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", false)]
+            "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConSetPosition(string consolePosition)
         {
             Settings.Console.ConsolePos newPos = Settings.Console.Position;
@@ -216,7 +217,7 @@ namespace SkToolbox
         [Command("conSetSize", 
             "Set the size of the console. Positive in pixels. " +
             "Negative numbers will divide the screen by the number given. " +
-            "Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", false)]
+            "Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConSetSize(int Width, int Height)
         {
             
@@ -226,7 +227,7 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
-        [Command("conSetFontSize", "Set the size of the font in the console. [10 - 24]", "  Base", false)]
+        [Command("conSetFontSize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConFontSetSize(int fontSize = 16)
         {
 
@@ -234,7 +235,7 @@ namespace SkToolbox
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
         }
 
-        [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", false)]
+        [Command("conDisplay", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConDisplay(bool displayPanel = true, bool displayConsole = true)
         {
 
@@ -246,7 +247,7 @@ namespace SkToolbox
             Logger.Submit("Panel set: " + Settings.Console.ShowPanel + ", Console set: " + Settings.Console.ShowConsole);
         }
 
-        [Command("OpenConsole", "Enables the console.", "  Base", false, 0)]
+        [Command("OpenConsole", "Enables the console.", "  Base", DisplayOptions.ConsoleOnly, 0)]
         public static void ConEnable()
         {
             Settings.Console.ShowConsole = true;
@@ -254,7 +255,7 @@ namespace SkToolbox
             Logger.Submit("Console set: " + Settings.Console.ShowConsole);
         }
 
-        [Command("Time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", false)]
+        [Command("Time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void SetTime(string setOrGet = "get", float timeScale = 1.0f)
         {
             if (setOrGet.ToLower().Equals("set"))
