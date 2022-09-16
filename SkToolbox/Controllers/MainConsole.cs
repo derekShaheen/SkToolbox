@@ -8,7 +8,6 @@ namespace SkToolbox.Controllers
     public class MainConsole : MonoBehaviour
     {
         public static MainConsole _instance;
-        public Loaders.SkBepInExLoader SkBepInExLoader;
 
         private bool isVisible = false;
         public bool IsVisible { get => isVisible; }

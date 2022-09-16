@@ -41,7 +41,7 @@ namespace SkToolbox
 
             string cmd = string.Join(" ", commandText);
             MainConsole.GetCommandHandler().GetAliases().Add(name, cmd);
-            MainConsole.SkBepInExLoader.SaveAliases();
+            Loaders.SkBepInExLoader.Loader.SaveAliases();
 
             Logger.Submit($"Alias {name.WithColor(Color.yellow)} created for {cmd.WithColor(Color.yellow)}", true);
         }
@@ -55,13 +55,13 @@ namespace SkToolbox
                 return;
             }
 
-            if (MainConsole.SkBepInExLoader.Binds.ContainsKey(result))
-                MainConsole.SkBepInExLoader.Binds.Remove(result);
+            if (Loaders.SkBepInExLoader.Loader.Binds.ContainsKey(result))
+                Loaders.SkBepInExLoader.Loader.Binds.Remove(result);
 
             string cmd = string.Join(" ", commandText);
-            MainConsole.SkBepInExLoader.Binds.Add(result, cmd);
+            Loaders.SkBepInExLoader.Loader.Binds.Add(result, cmd);
 
-            MainConsole.SkBepInExLoader.SaveBinds();
+            Loaders.SkBepInExLoader.Loader.SaveBinds();
 
             Logger.Submit($"Bound {result.ToString().WithColor(Color.yellow)} to {cmd.WithColor(Color.yellow)}.", true);
         }
@@ -90,7 +90,7 @@ namespace SkToolbox
             }
 
             MainConsole.GetCommandHandler().GetAliases().Clear();
-            MainConsole.SkBepInExLoader.SaveAliases();
+            Loaders.SkBepInExLoader.Loader.SaveAliases();
 
             Logger.Submit("All of your aliases have been cleared.", true);
         }
@@ -124,7 +124,7 @@ namespace SkToolbox
         [Command("listbinds", "List all of your custom keybinds, or check what an individual keycode is bound to.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ListBinds(string keyCode = null)
         {
-            if (MainConsole.SkBepInExLoader.Binds.Count == 0)
+            if (Loaders.SkBepInExLoader.Loader.Binds.Count == 0)
             {
                 Logger.Submit($"You have no keybinds currently set. Use the {"bind".WithColor(Color.white)} to add some.", true);
                 return;
@@ -132,7 +132,7 @@ namespace SkToolbox
 
             if (string.IsNullOrEmpty(keyCode))
             {
-                foreach (var pair in MainConsole.SkBepInExLoader.Binds)
+                foreach (var pair in Loaders.SkBepInExLoader.Loader.Binds)
                     Logger.Submit($"{pair.Key} = {pair.Value.WithColor(Color.yellow)}");
 
                 return;
@@ -144,7 +144,7 @@ namespace SkToolbox
                 return;
             }
 
-            if (!MainConsole.SkBepInExLoader.Binds.TryGetValue(result, out string cmd))
+            if (!Loaders.SkBepInExLoader.Loader.Binds.TryGetValue(result, out string cmd))
             {
                 Logger.Submit($"{keyCode.ToString().WithColor(Color.white)} is not bound to anything.", true);
                 return;
@@ -162,14 +162,14 @@ namespace SkToolbox
                 return;
             }
 
-            if (!MainConsole.SkBepInExLoader.Binds.ContainsKey(result))
+            if (!Loaders.SkBepInExLoader.Loader.Binds.ContainsKey(result))
             {
                 Logger.Submit($"{result.ToString().WithColor(Color.white)} is not bound to anything.", true);
                 return;
             }
 
-            MainConsole.SkBepInExLoader.Binds.Remove(result);
-            MainConsole.SkBepInExLoader.SaveBinds();
+            Loaders.SkBepInExLoader.Loader.Binds.Remove(result);
+            Loaders.SkBepInExLoader.Loader.SaveBinds();
 
             Logger.Submit($"Unbound {result.ToString().WithColor(Color.cyan)}.", true);
         }
@@ -183,8 +183,8 @@ namespace SkToolbox
                 return;
             }
 
-            MainConsole.SkBepInExLoader.Binds.Clear();
-            MainConsole.SkBepInExLoader.SaveBinds();
+            Loaders.SkBepInExLoader.Loader.Binds.Clear();
+            Loaders.SkBepInExLoader.Loader.SaveBinds();
 
             Logger.Submit("All of your binds have been cleared.", true);
         }

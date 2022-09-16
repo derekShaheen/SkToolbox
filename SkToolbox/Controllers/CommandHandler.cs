@@ -217,7 +217,7 @@ namespace SkToolbox
             m_actions.Clear();
             try
             {
-                Logger.Debug($"{Settings.Console.OutputPrefix} Searching for commands...");
+                Logger.Debug($"Searching for commands...");
 
                 IEnumerable<CommandMeta> query =
                     from assemblies in AppDomain.CurrentDomain.GetAssemblies()

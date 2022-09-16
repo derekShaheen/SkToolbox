@@ -1,9 +1,5 @@
 ﻿using SkToolbox.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SkToolbox.Loaders;
 using UnityEngine;
 
 namespace SkToolbox.Settings
@@ -45,7 +41,7 @@ namespace SkToolbox.Settings
             set
             {
                 SettingsController.Set("PanelEnabled", value);
-                Logger.MainConsole.HandlePositioning();
+                SkBepInExLoader.Console.HandlePositioning();
             }
         }
 
@@ -55,7 +51,7 @@ namespace SkToolbox.Settings
             set
             {
                 SettingsController.Set("ConsoleEnabled", value);
-                Logger.MainConsole.HandlePositioning(-1, true);
+                SkBepInExLoader.Console.HandlePositioning(-1, true);
             }
         }
 
@@ -70,7 +66,7 @@ namespace SkToolbox.Settings
             set
             {
                 SettingsController.Set("ConsolePosition", value);
-                Logger.MainConsole.HandlePositioning();
+                SkBepInExLoader.Console.HandlePositioning();
             }
         }
         // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
@@ -80,7 +76,7 @@ namespace SkToolbox.Settings
             set 
             { 
                 SettingsController.Set("ConsoleWidth", value);
-                Logger.MainConsole.HandlePositioning();
+                SkBepInExLoader.Console.HandlePositioning();
             } 
         }
         // Positive in pixels. Negative numbers will divide the screen by the number given. Ex. -2 will divide the screen in half, -3 in thirds, etc..
@@ -90,7 +86,7 @@ namespace SkToolbox.Settings
             set 
             { 
                 SettingsController.Set("ConsoleHeight", value);
-                Logger.MainConsole.HandlePositioning();
+                SkBepInExLoader.Console.HandlePositioning();
             }
         }
         public static int Margin = 15;  // Default 15

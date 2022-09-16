@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using SkToolbox.Controllers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,52 +18,64 @@ namespace SkToolbox.Loaders
             GUID = "com." + AUTHOR + "." + MODNAME,
             VERSION = "2.0.0.0";
 
-        private static Controllers.MainConsole m_Console;
+        private static SkBepInExLoader _loader;
+        public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
+
+        private static GameObject _skGameObject;
+        public static GameObject SkGameObject
+        {
+            get
+            {
+                if (_skGameObject == null)
+                {
+                    _skGameObject = new GameObject("SkToolboxMain");
+                }
+                return _skGameObject;
+            }
+            set => _skGameObject = value;
+        }
+
+        private static MainConsole _console;
+        public static MainConsole Console { get => _console; set => _console = value; }
+
 
         private Dictionary<KeyCode, string> m_binds = new Dictionary<KeyCode, string>();
         internal Dictionary<KeyCode, string> Binds { get => m_binds; set => m_binds = value; }
 
-        private static GameObject skGameObject;
-        public static GameObject SkGameObject 
-        { 
-            get 
-            {
-                if (skGameObject == null)
-                {
-                    skGameObject = new GameObject("SkToolbox");
-                }
-                return skGameObject;
-            } 
-            set => skGameObject = value; 
-        }
-
         private void Start()
         {
+            SkToolbox.Logger.Debug("Initialization success!");
+            if (Loader == null)
+            {
+                Loader = this;
+            }
+
+            base.name = "SkToolbox";
             base.transform.parent = null;
             UnityEngine.Object.DontDestroyOnLoad(this);
-            UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
             Init();
         }
 
         private void Update()
         {
-            if (!m_Console.IsVisible)
+            if (!Console.IsVisible)
             {
                 foreach (KeyValuePair<KeyCode, string> pair in m_binds)
                 {
                     if (Input.GetKeyDown(pair.Key))
-                        m_Console.HandleInput(pair.Value, false);
+                        Console.HandleInput(pair.Value, false);
                 }
             }
         }
 
-        public void Init()
+        private void Init()
         {
-            SkToolbox.Logger.Debug("Initialization success!");
             Application.runInBackground = true;
-            Controllers.SettingsController.Init(Config);
-            m_Console = SkGameObject.AddComponent<Controllers.MainConsole>();
-            m_Console.SkBepInExLoader = this;
+            SettingsController.Init(Config);
+
+            SkGameObject.transform.parent = transform;
+
+            Console = SkGameObject.AddComponent<Controllers.MainConsole>();
 
             LoadAliases();
             LoadBinds();
@@ -70,8 +83,18 @@ namespace SkToolbox.Loaders
             Utility.SkVersionChecker.CheckVersion();
             if(Utility.SkVersionChecker.currentVersion < Utility.SkVersionChecker.latestVersion)
             {
-                m_Console.Submit($"New version of SkToolbox available! ({Utility.SkVersionChecker.currentVersion}) -> ({Utility.SkVersionChecker.latestVersion})");
+                Console.Submit($"New version of SkToolbox available! ({Utility.SkVersionChecker.currentVersion}) -> ({Utility.SkVersionChecker.latestVersion})");
             }
+
+            UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
+        }
+
+        public void ReInit()
+        {
+            Destroy(SkGameObject, 0f);
+            SkGameObject = null;
+
+            Init();
         }
 
         //
@@ -100,7 +123,7 @@ namespace SkToolbox.Loaders
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (KeyValuePair<string, string> pair in m_Console.GetCommandHandler().Aliases)
+            foreach (KeyValuePair<string, string> pair in Console.GetCommandHandler().Aliases)
                 builder.AppendLine($"{pair.Key}={pair.Value}");
 
             string output = builder.ToString();
@@ -158,7 +181,7 @@ namespace SkToolbox.Loaders
                 if (info.Length != 2)
                     continue;
 
-                m_Console.GetCommandHandler().Aliases.Add(info[0], info[1].Trim());
+                Console.GetCommandHandler().Aliases.Add(info[0], info[1].Trim());
             }
         }
     }
