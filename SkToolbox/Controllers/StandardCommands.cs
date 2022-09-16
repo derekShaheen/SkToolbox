@@ -224,7 +224,7 @@ namespace SkToolbox
         }
 
         [Command("consettheme", "Set the color theme of the console. Accepts hex values and some color names (ex. F0D13EFF or blue).", "  Base", DisplayOptions.ConsoleOnly)]
-        public static void ConSetTheme(string color)
+        public static void ConSetTheme(string color = "grey")
         {
             Color setColor;
             if (color.Equals("clear"))
