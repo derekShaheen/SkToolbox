@@ -44,9 +44,9 @@ namespace SkToolbox.Loaders
             Init();
         }
 
-        void Update()
+        private void Update()
         {
-            if (m_Console.IsVisible == false)
+            if (!m_Console.IsVisible)
             {
                 foreach (KeyValuePair<KeyCode, string> pair in m_binds)
                 {
