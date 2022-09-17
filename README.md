@@ -6,7 +6,8 @@
 
 #### The SkToolbox is a framework used for quickly implementing a custom console with executable commands. Typically used for creating a plugin for use with existing projects. This project is expected to be injected via [BepInEx](https://github.com/BepInEx/BepInEx "BepInEx"). Commands are automatically converted to clickable buttons to provide for a more complete user interface.
 
-[![Sample](https://i.imgur.com/pvrEi8Q.gif)](https://i.imgur.com/pvrEi8Q.gif "![Sample](https://i.imgur.com/pvrEi8Q.gif)")
+
+[![Sample](https://i.imgur.com/pvrEi8Q.gif)](https://i.imgur.com/pvrEi8Q.gif "Click for higher resolution!")
 ---
 #### Index
 - Features
@@ -22,16 +23,17 @@ This console supports the following features:
 - Command parameters will be automatically suggested and highlighted as the user types.
 - Command aliasing allows the user to create custom chains of commands.
 - Command key binding allows users to run any number of commands via key press when outside of the console.
-- Automatically generate on-screen buttons based on registered commands.
+- Automatically generate on-screen buttons based on registered commands. As buttons are added, this will become a scrollable menu.
 - Supports color theme changes on the fly! Set the theme to any color via command or config!
 - Many options and preferences are found in the configuation file.
 ------------
 
 ### Examples
-Examples coming soon
+Full game examples coming soon!
+[![Main](https://i.imgur.com/TF0oAnf.png "Main")](https://i.imgur.com/TF0oAnf.png "Main")
 
 ### How to Use Framework
-Here we will examine an example, made for the game Autonauts vs Pirates. In this example, we reference the SkToolbox.dll and we declare a command to be added to the left button panel and a command that can be run from the console.
+Here we will examine an example, made for the game Autonauts vs Pirates. In this example, we reference the SkToolbox.dll and we declare a command to be added to the left button panel and that can be run from the console.
 
 Complete example with code that runs with BepInEx and declares the EnableTools command.
 [![FrameworkScreenResult](https://i.imgur.com/EGERiQN.png "FrameworkScreenResult")](https://i.imgur.com/EGERiQN.png "FrameworkScreenResult")
