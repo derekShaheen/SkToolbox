@@ -386,6 +386,7 @@ namespace SkToolbox.Controllers
                     {
                         
                         m_InputString = Util.StripTags(line).Trim();
+                        m_MoveCursorOnNextFrame = true;
                     };
                     GUILayout.EndHorizontal();
                     GUILayout.Space(m_LineMargin);
@@ -404,6 +405,8 @@ namespace SkToolbox.Controllers
                 {
                     m_Editor.MoveCursorToPosition(new Vector2(0, 9999));
                     m_MoveCursorOnNextFrame = false;
+
+                    m_Editor.SelectNone();
                 }
                 if (GUILayout.Button("Submit", m_StyleInput, GUILayout.Width(60)))
                 {
