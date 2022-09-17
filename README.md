@@ -6,7 +6,7 @@
 
 #### The SkToolbox is a framework used for quickly implementing a custom console with executable commands. Typically used for creating a plugin for use with existing projects. This project is expected to be injected via [BepInEx](https://github.com/BepInEx/BepInEx "BepInEx"). Commands are automatically converted to clickable buttons to provide for a more complete user interface.
 
-[![Sample](https://i.imgur.com/JUIOMSf.gif)](https://imgur.com/JUIOMSf "![Sample](https://i.imgur.com/JUIOMSf.gif)")
+[![Sample](https://i.imgur.com/pvrEi8Q.gif)](https://i.imgur.com/pvrEi8Q.gif "![Sample](https://i.imgur.com/pvrEi8Q.gif)")
 ---
 #### Index
 - Features
