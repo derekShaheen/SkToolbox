@@ -244,7 +244,7 @@ namespace SkToolbox
                     } catch (ArgumentException)
                     {
                         Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
-                        break;
+                        continue;
                     }
 
                     string helpText;
