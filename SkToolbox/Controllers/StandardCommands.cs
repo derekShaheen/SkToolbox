@@ -161,7 +161,7 @@ namespace SkToolbox
             Logger.Submit($"Unbound {result.ToString().WithColor(Color.cyan)}.", true);
         }
 
-        [Command("unbindall", "Unbinds ALL of your Gungnir-related keybinds. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("unbindall", "Unbinds ALL of your custom keybinds. Requires a true/1/yes as parameter to confirm you mean it.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void UnbindAll(bool confirm)
         {
             if (!confirm)
@@ -223,8 +223,8 @@ namespace SkToolbox
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
         }
 
-        [Command("consettheme", "Set the color theme of the console. Accepts hex values and some color names (ex. F0D13EFF or blue).", "  Base", DisplayOptions.ConsoleOnly)]
-        public static void ConSetTheme(string color = "grey")
+        [Command("consettheme", "Set the theme of the console. Accepts hex values and some color names or clear (ex. #RRGGBBAA or blue).", "  Base", DisplayOptions.ConsoleOnly)]
+        public static void ConSetTheme(string color = "grey", bool darkenBackground = false)
         {
             Color setColor;
             if (color.Equals("clear"))
@@ -238,7 +238,10 @@ namespace SkToolbox
             }
             
             Settings.Console.Theme = setColor;
-            Logger.Submit("Theme set to " + Settings.Console.Theme);
+
+            Settings.Console.DarkenBackground = darkenBackground;
+
+            Logger.Submit("Theme set to #" + ColorUtility.ToHtmlStringRGB(Settings.Console.Theme));
         }
 
         [Command("condisplay", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]

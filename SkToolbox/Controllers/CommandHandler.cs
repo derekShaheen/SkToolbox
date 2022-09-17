@@ -130,9 +130,9 @@ namespace SkToolbox
         public Dictionary<string, string> Aliases { get => m_aliases; set => m_aliases = value; }
 
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
-        public void Help(string command = null)
+        public void Help(string command = null, bool displayDescriptions = true)
         {
-            if (string.IsNullOrEmpty(command))
+            if (string.IsNullOrEmpty(command) || command.Equals("\"\""))
             {
                 var cmds =
                     m_actions.Values.ToList()
@@ -141,11 +141,19 @@ namespace SkToolbox
                 foreach (CommandMeta meta in cmds)
                 {
                     string fullCommand = meta.data.keyword;
-
-                    if (meta.arguments.Count > 0)
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
-                    else
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                    if(displayDescriptions)
+                    {
+                        if (meta.arguments.Count > 0)
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
+                        else
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                    } else
+                    {
+                        if (meta.arguments.Count > 0)
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+                        else
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}", false);
+                    }
                 }
             }
             else
@@ -158,10 +166,20 @@ namespace SkToolbox
                 {
                     string fullCommand = meta.data.keyword;
 
-                    if (meta.arguments.Count > 0)
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
+                    if (displayDescriptions)
+                    {
+                        if (meta.arguments.Count > 0)
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
+                        else
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                    }
                     else
-                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                    {
+                        if (meta.arguments.Count > 0)
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+                        else
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}", false);
+                    }
                 }
             }
         }

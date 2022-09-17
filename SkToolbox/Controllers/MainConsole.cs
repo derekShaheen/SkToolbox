@@ -138,9 +138,15 @@ namespace SkToolbox.Controllers
             {
                 Stylize();
 
-                GUI.Box(m_Fullscreen, "");
-
                 m_StyleWindow = GUI.skin.window;
+
+                if(Settings.Console.DarkenBackground)
+                {
+                    GUI.Box(m_Fullscreen, "");
+                }
+
+
+                GUI.Box(m_MainWindow, "", m_StyleWindow);
                 if (Console.ShowPanel)
                 {
                     m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, string.Empty, m_StyleWindow, new GUILayoutOption[]
@@ -378,7 +384,8 @@ namespace SkToolbox.Controllers
                     GUILayout.Label(line, m_StyleOutput);
                     if (GUILayout.Button(" ", GUI.skin.box, GUILayout.Width(22)))
                     {
-                        m_InputString = line;
+                        
+                        m_InputString = Util.StripTags(line).Trim();
                     };
                     GUILayout.EndHorizontal();
                     GUILayout.Space(m_LineMargin);
@@ -534,13 +541,14 @@ namespace SkToolbox.Controllers
                     if (!command.Value.data.category.Equals(m_currentCategory))
                     {
                         m_currentCategory = command.Value.data.category;
-                        if (m_currentCategory.Equals("zzzzz"))
+                        if (m_currentCategory.Equals("zzBottom"))
                         {
                             GUILayout.Label("");
                         }
                         else
                         {
-                            GUILayout.Label("[ " + m_currentCategory.Trim() + " ]", m_StyleCategoryBanner);
+                            string displayCategory = m_currentCategory.Substring(0, 1).ToUpper() + m_currentCategory.Substring(1);
+                            GUILayout.Label("[ " + displayCategory.Trim() + " ]", m_StyleCategoryBanner);
                         }
                     }
                     //Strip prefix '/' if the command contains one, then make it readable for display

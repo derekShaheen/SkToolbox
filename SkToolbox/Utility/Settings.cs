@@ -54,6 +54,14 @@ namespace SkToolbox.Settings
                 SkBepInExLoader.Console.HandlePositioning(-1, true);
             }
         }
+        public static bool DarkenBackground
+        {
+            get { return SettingsController.Get<bool>("ConsoleDarkenBackground"); }
+            set
+            {
+                SettingsController.Set("ConsoleDarkenBackground", value);
+            }
+        }
 
         // Console Controls
         public static KeyCode KeyToggleWindow = KeyCode.BackQuote;
