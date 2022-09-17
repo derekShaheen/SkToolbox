@@ -31,6 +31,7 @@ This console supports the following features:
 ### Examples
 Full game examples coming soon!
 [![Main](https://i.imgur.com/TF0oAnf.png "Main")](https://i.imgur.com/TF0oAnf.png "Main")
+[![gifexample](https://media3.giphy.com/media/FrUmT2jbaIFzhLWqro/giphy.gif "Click for higher resolution!")](https://streamable.com/grjcam "gifexample")
 
 ### How to Use Framework
 Here we will examine an example, made for the game Autonauts vs Pirates. In this example, we reference the SkToolbox.dll and we declare a command to be added to the left button panel and that can be run from the console.
