@@ -162,8 +162,7 @@ namespace SkToolbox
         }
 
         /// <summary>
-        /// Some of Valheim's prefabs are not listed in the ZNetScene manager. If you know the name of them,
-        /// use this function to find them in the scene hierarchy and instantiate them.
+        /// Use this function to find in the scene hierarchy and instantiate prefabs.
         /// </summary>
         /// <param name="name">Prefab name.</param>
         /// <returns>The prefab.</returns>
@@ -186,6 +185,19 @@ namespace SkToolbox
             }
 
             return null;
+        }
+
+        public static Texture2D MakeTex(int width, int height, Color col)
+        {
+            Color[] pix = new Color[width * height];
+            for (int i = 0; i < pix.Length; ++i)
+            {
+                pix[i] = col;
+            }
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+            return result;
         }
 
         /// <summary>

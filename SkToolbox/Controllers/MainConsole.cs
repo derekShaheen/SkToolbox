@@ -103,8 +103,18 @@ namespace SkToolbox.Controllers
             }
             if (isVisible)
             {
-                m_caretPos = m_Editor.cursorIndex;
-                UpdateCommandHint();
+                if(Settings.Console.ShowConsole)
+                {
+                    m_caretPos = m_Editor.cursorIndex;
+                    UpdateCommandHint();
+                }
+
+                if (m_InputString.EndsWith("`"))
+                {
+                    isVisible = false;
+                    m_InputString = string.Empty;
+                }
+
             }
             HandleKeys();
         }
@@ -145,7 +155,6 @@ namespace SkToolbox.Controllers
                     GUI.Box(m_Fullscreen, "");
                 }
 
-
                 GUI.Box(m_MainWindow, "", m_StyleWindow);
                 if (Console.ShowPanel)
                 {
@@ -164,24 +173,11 @@ namespace SkToolbox.Controllers
                 }
 
 
-                if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
-                {
+                //if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
+                //{
                     GUI.FocusControl("InputBar");
-                }
+                //}
             }
-        }
-
-        private Texture2D MakeTex(int width, int height, Color col)
-        {
-            Color[] pix = new Color[width * height];
-            for (int i = 0; i < pix.Length; ++i)
-            {
-                pix[i] = col;
-            }
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-            return result;
         }
 
         private void HandleKeys()
