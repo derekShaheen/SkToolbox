@@ -7,7 +7,7 @@ namespace SkToolbox.Utility
 {
     internal static class SkVersionChecker
     {
-        public static string VersionURL = "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Utility/SkVersionChecker.cs";
+        public static string VersionURL = "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Loaders/SkBepInExLoader.cs";
         private static readonly string HitTracker = "https://hits.dwyl.com/derekShaheen/SkToolbox.svg"; // 
         public static string ApplicationSource = "Github";
         public static Version currentVersion;
@@ -53,7 +53,7 @@ namespace SkToolbox.Utility
             String[] strSplit = result.Split('\n');
             foreach (string line in strSplit)
             {
-                if (line.Contains("currentVersion"))
+                if (line.Contains("VERSION"))
                 {
                     String versionExtract = line.Substring(line.IndexOf('\"') + 1, 7);
                     latestVersion = new Version(versionExtract);
