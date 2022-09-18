@@ -21,7 +21,9 @@ namespace SkToolbox.Controllers
         private GUIStyle m_StylePanelButtons;
         private GUIStyle m_StyleHint;
         public Font font;
-        private string bannerUrl = "https://github.com/derekShaheen/SkToolbox/blob/main/res/header.png";
+        private string bannerUrl = "https://raw.githubusercontent.com/derekShaheen/SkToolbox/main/res/header.png"; //https://github.com/derekShaheen/SkToolbox/blob/main
+
+
         private Texture2D bannerTexture;
 
         //Window
