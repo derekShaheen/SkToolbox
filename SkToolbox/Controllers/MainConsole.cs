@@ -545,14 +545,20 @@ namespace SkToolbox.Controllers
             {
                 if (GUILayout.Button(bannerTexture, m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName);
+                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
+                        "\n" + (SkVersionChecker.NewVersionAvailable ? 
+                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
+                                    "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
                 }
             } else
             {
                 if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName);
+                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
+                        "\n" + (SkVersionChecker.NewVersionAvailable ?
+                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
+                                    "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
                 }
             }

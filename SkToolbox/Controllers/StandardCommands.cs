@@ -188,7 +188,7 @@ namespace SkToolbox
             Logger.Submit(inputMessage);
         }
 
-        [Command("consetpos", "Set the position of the console. " +
+        [Command("con_setpos", "Set the position of the console. " +
             "TopCentered, LeftCentered, RightCentered, BottomCentered, " +
             "Centered, TopLeft, TopRight, BottomLeft, BottomRight", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConSetPosition(string consolePosition)
@@ -201,7 +201,7 @@ namespace SkToolbox
             Logger.Submit("Position set to " + Settings.Console.Position.ToString());
         }
 
-        [Command("consetsize", 
+        [Command("con_setsize", 
             "Set the size of the console. Positive in pixels. " +
             "Negative numbers will divide the screen by the number given. " +
             "Ex. -2 will divide the screen in half, -3 in thirds, etc..", "  Base", DisplayOptions.ConsoleOnly)]
@@ -214,16 +214,16 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
-        [Command("consetfontsize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("con_setfontsize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConFontSetSize(int fontSize = 16)
         {
-
+            fontSize = Mathf.Clamp(fontSize, 10, 24);
             Settings.Console.FontSize = fontSize;
             Loaders.SkBepInExLoader.Console.font = Font.CreateDynamicFontFromOSFont("Consolas", fontSize);
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
         }
 
-        [Command("consettheme", "Set the theme of the console. Accepts hex values and some color names or clear (ex. #RRGGBBAA or blue).", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("con_settheme", "Set the theme of the console. Accepts hex values and some color names or clear (ex. #RRGGBBAA or blue).", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConSetTheme(string color = "grey", bool darkenBackground = false)
         {
             Color setColor;
@@ -244,7 +244,7 @@ namespace SkToolbox
             Logger.Submit("Theme set to #" + ColorUtility.ToHtmlStringRGB(Settings.Console.Theme));
         }
 
-        [Command("condisplay", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("con_display", "Enable/disable the view of the panel or console.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConDisplay(bool displayPanel = true, bool displayConsole = true)
         {
 
