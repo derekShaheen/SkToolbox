@@ -13,7 +13,7 @@ namespace SkToolbox.Controllers
         public bool IsVisible { get => isVisible; }
 
         // Styles
-        public GUIStyle m_StyleOutput = new GUIStyle(GUIStyle.none);
+        private GUIStyle m_StyleOutput = new GUIStyle(GUIStyle.none);
         private GUIStyle m_StyleInput;
         private GUIStyle m_StyleWindow;
         private GUIStyle m_StyleBanner;
@@ -21,6 +21,8 @@ namespace SkToolbox.Controllers
         private GUIStyle m_StylePanelButtons;
         private GUIStyle m_StyleHint;
         public Font font;
+        private string bannerUrl = "https://i.imgur.com/ZRAoQg9.png";
+        private Texture2D bannerTexture;
 
         //Window
         private Rect m_MainWindow;
@@ -84,6 +86,10 @@ namespace SkToolbox.Controllers
             {
                 _instance = this;
             }
+
+            StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) => {
+                bannerTexture = response;
+            }));
 
             m_Fullscreen = new Rect(0, 0, Screen.width, Screen.height);
 
@@ -525,10 +531,20 @@ namespace SkToolbox.Controllers
                 GUILayout.MaxHeight(m_MainWindow.height),
             });
 
-            if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
+            if(bannerTexture != null)
             {
-                Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName);
-                ScrollToBottom();
+                if (GUILayout.Button(bannerTexture, m_StyleBanner))
+                {
+                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName);
+                    ScrollToBottom();
+                }
+            } else
+            {
+                if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
+                {
+                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName);
+                    ScrollToBottom();
+                }
             }
 
             m_LinesScrollPosition2 = GUILayout.BeginScrollView(m_LinesScrollPosition2);

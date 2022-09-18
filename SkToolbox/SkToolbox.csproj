@@ -91,6 +91,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\corlib\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\unstripped_corlib\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>..\..\unstripped_corlib\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>..\..\unstripped_corlib\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CommandHandler.cs" />
@@ -105,6 +114,7 @@
     <Compile Include="Utility\Util.cs" />
     <Compile Include="Utility\SkUtilities.cs" />
     <Compile Include="Utility\SkVersionChecker.cs" />
+    <Compile Include="Utility\WebHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
