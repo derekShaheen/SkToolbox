@@ -81,10 +81,6 @@ namespace SkToolbox.Loaders
             LoadBinds();
 
             Utility.SkVersionChecker.CheckVersion();
-            if(Utility.SkVersionChecker.currentVersion < Utility.SkVersionChecker.latestVersion)
-            {
-                Console.Submit($"New version of SkToolbox available! ({Utility.SkVersionChecker.currentVersion}) -> ({Utility.SkVersionChecker.latestVersion})");
-            }
         }
 
         public void ReInit()

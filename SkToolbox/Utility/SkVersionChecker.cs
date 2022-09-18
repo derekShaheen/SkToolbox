@@ -9,21 +9,22 @@ namespace SkToolbox.Utility
     {
         public static string VersionURL = "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Utility/SkVersionChecker.cs";
         private static readonly string HitTracker = "https://hits.dwyl.com/derekShaheen/SkToolbox.svg"; // 
-        public static string ApplicationName = "SkToolbox";
         public static string ApplicationSource = "Github";
-        public static Version currentVersion = new Version("2.0.0.0");
+        public static Version currentVersion;
         public static Version latestVersion = new Version("0.0.0.0");
+
         public static void CheckVersion()
         {
             try
             {
+                currentVersion = new Version(Loaders.SkBepInExLoader.VERSION);
                 WebClient wClient = new WebClient();
-                wClient.Headers.Add("User-Agent: SkToolboxUser" + UnityEngine.Random.Range(0, 999999).ToString());
+                wClient.Headers.Add("User-Agent: " + Loaders.SkBepInExLoader.MODNAME + "User");
 
                 wClient.DownloadStringAsync(new Uri(HitTracker)); // Log the hit (only 454 btyes)
                 
                 WebClient wClient2 = new WebClient();
-                wClient2.Headers.Add("User-Agent: SkToolboxUser" + UnityEngine.Random.Range(0, 999999).ToString());
+                wClient2.Headers.Add("User-Agent: " + Loaders.SkBepInExLoader.MODNAME + "User");
                 Uri uri = new Uri(VersionURL);
                 
 
@@ -62,7 +63,7 @@ namespace SkToolbox.Utility
                     {
                         SkUtilities.Logz(new string[] { "VERSION", "CHECK" },
                             //new string[] { "New version (" + latestVersion + ") of " + ApplicationName + "(" + currentVersion + ") available on " + ApplicationSource + "." });
-                            new string[] { "New version of " + ApplicationName + " (" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
+                            new string[] { "New version of " + Loaders.SkBepInExLoader.MODNAME + " (" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
                     }
 
                     break;
