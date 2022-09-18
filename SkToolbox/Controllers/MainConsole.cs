@@ -374,6 +374,14 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
+                if(SkVersionChecker.NewVersionAvailable)
+                {
+                    if(GUILayout.Button("New version (" + SkVersionChecker.latestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.currentVersion + ") available on " + SkVersionChecker.ApplicationSource + "!", m_StylePanelButtons))
+                    {
+                        Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
+                    }
+                }
+
                 m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
                     new GUILayoutOption[]
                     {

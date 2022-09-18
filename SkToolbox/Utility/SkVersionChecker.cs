@@ -12,6 +12,9 @@ namespace SkToolbox.Utility
         public static string ApplicationSource = "Github";
         public static Version currentVersion;
         public static Version latestVersion = new Version("0.0.0.0");
+        private static bool newVersionAvailable = false;
+
+        public static bool NewVersionAvailable { get => newVersionAvailable; }
 
         public static void CheckVersion()
         {
@@ -53,7 +56,7 @@ namespace SkToolbox.Utility
             String[] strSplit = result.Split('\n');
             foreach (string line in strSplit)
             {
-                if (line.Contains("VERSION"))
+                if (line.Contains("VERSION") && !line.Contains("BepInPlugin")) // Version line, but not plugin line
                 {
                     String versionExtract = line.Substring(line.IndexOf('\"') + 1, 7);
                     latestVersion = new Version(versionExtract);
@@ -61,9 +64,10 @@ namespace SkToolbox.Utility
                     if (latestVersion != null && currentVersion != null
                         && latestVersion > currentVersion)
                     {
-                        SkUtilities.Logz(new string[] { "VERSION", "CHECK" },
-                            //new string[] { "New version (" + latestVersion + ") of " + ApplicationName + "(" + currentVersion + ") available on " + ApplicationSource + "." });
-                            new string[] { "New version of " + Loaders.SkBepInExLoader.MODNAME + " (" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
+                        newVersionAvailable = true;
+                        //SkUtilities.Logz(new string[] { "VERSION", "CHECK" },
+                        //    //new string[] { "New version (" + latestVersion + ") of " + ApplicationName + "(" + currentVersion + ") available on " + ApplicationSource + "." });
+                        //    new string[] { "New version of " + Loaders.SkBepInExLoader.MODNAME + " (" + latestVersion + ") available on " + ApplicationSource + ". Current version: " + currentVersion });
                     }
 
                     break;
