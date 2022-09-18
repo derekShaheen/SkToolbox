@@ -173,10 +173,10 @@ namespace SkToolbox.Controllers
                 }
 
 
-                //if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
-                //{
+                if (Settings.Console.ShowConsole)
+                {
                     GUI.FocusControl("InputBar");
-                //}
+                }
             }
         }
 
