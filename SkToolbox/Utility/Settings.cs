@@ -6,6 +6,8 @@ namespace SkToolbox.Settings
 {
     public class Console
     {
+        private static KeyCode consoleToggleKey = KeyCode.None;
+
         //
         public static string OutputPrefix = "SkToolbox → "; // "(SkToolbox)"
         public static Color OutputPrefixColor = new Color(255, 51, 51);
@@ -64,7 +66,24 @@ namespace SkToolbox.Settings
         }
 
         // Console Controls
-        public static KeyCode KeyToggleWindow = KeyCode.BackQuote;
+        public static KeyCode KeyToggleWindow
+        {
+            get 
+            { 
+                if(consoleToggleKey == KeyCode.None)
+                {
+                    var configKey = SettingsController.Get<string>("DisplayToggleKey");
+                    consoleToggleKey = (KeyCode) System.Enum.Parse(typeof(KeyCode), configKey);
+                }
+                return consoleToggleKey; 
+            }
+            set
+            {
+                SettingsController.Set("DisplayToggleKey", value);
+                consoleToggleKey = value;
+            }
+        }
+
         public static KeyCode KeyAutoComplete = KeyCode.Tab;
 
         //Console Sizes

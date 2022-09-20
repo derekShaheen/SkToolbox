@@ -25,6 +25,7 @@ namespace SkToolbox.Controllers
                                                         // ...
                                                         "\n"));
 
+            s_config.Add("DisplayToggleKey", config.Bind(CategoryGeneral, "DisplayToggleKey", "BackQuote", "Key that toggles the on-screen display. BackQuote is also the tilde (` / ~) button."));
             s_config.Add("ConsoleEnabled", config.Bind(CategoryGeneral, "ConsoleEnabled", true, "Whether the console should be enabled or not. Defaults to true."));
             s_config.Add("PanelEnabled", config.Bind(CategoryGeneral, "PanelEnabled", true, "Whether the panel should be enabled or not. Defaults to true."));
 

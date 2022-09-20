@@ -181,9 +181,15 @@ namespace SkToolbox.Controllers
                 }
 
 
-                if (Settings.Console.ShowConsole)
+                if (Settings.Console.ShowConsole && Settings.Console.KeyToggleWindow == KeyCode.BackQuote)
                 {
                     GUI.FocusControl("InputBar");
+                } else
+                {
+                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
+                    {
+                        GUI.FocusControl("InputBar");
+                    }
                 }
             }
         }
