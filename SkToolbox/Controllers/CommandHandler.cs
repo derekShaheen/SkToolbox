@@ -18,12 +18,11 @@ namespace SkToolbox
     {
         public readonly string keyword;
         public readonly string description;
-        //public readonly string autoCompleteTarget;
         public readonly string category;
         public readonly Util.DisplayOptions displayOptions;
         public readonly int sortPriority;
 
-        public Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100) //string autoComplete = null)
+        public Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100)
         {
             this.keyword = keyword;
             this.description = description;
@@ -34,7 +33,6 @@ namespace SkToolbox
             this.category = category;
             this.displayOptions = displayOptions;
             this.sortPriority = sortPriority;
-            //this.autoCompleteTarget = autoComplete;
         }
     }
 
@@ -43,8 +41,6 @@ namespace SkToolbox
     /// </summary>
     public class CommandMeta
     {
-        //public delegate List<string> AutoCompleteDelegate();
-
         /// <summary>
         /// <see cref="Command"/> attribute data to access the command name and description.
         /// </summary>
@@ -71,12 +67,11 @@ namespace SkToolbox
         /// </summary>
         //public readonly AutoCompleteDelegate AutoComplete;
 
-        public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments)//, AutoCompleteDelegate autoCompleteDelegate = null)
+        public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments)
         {
             this.data = data;
             this.method = method;
             this.arguments = arguments;
-            //this.AutoComplete = autoCompleteDelegate;
 
             // If we have any arguments, attempt to build the argument hint string.
             if (arguments.Count > 0)
@@ -205,28 +200,6 @@ namespace SkToolbox
         }
 
         /// <summary>
-        /// Helper method to create a <see cref="CommandMeta.AutoCompleteDelegate"/> function for autocomplete handlers.
-        /// </summary>
-        /// <param name="method">Name of the method attached to the <see cref="CommandHandler"/> class that will provide autocomplete values.</param>
-        /// <returns>A <see cref="CommandMeta.AutoCompleteDelegate"/> if the <paramref name="method"/> exists, otherwise <see langword="null"/>.</returns>
-        //private static CommandMeta.AutoCompleteDelegate MakeAutoCompleteDelegate(string method)
-        //{
-        //    if (string.IsNullOrEmpty(method))
-        //        return null;
-
-        //    var query =
-        //        from assemblies in Assembly.GetExecutingAssembly().GetTypes()
-        //        from methods in assemblies.GetMethods(s_bindingFlags)
-        //        where methods.GetType().Name == method
-        //        select methods;
-
-        //    if (query.Count() > 0)
-        //        return query.First().CreateDelegate(typeof(CommandMeta.AutoCompleteDelegate)) as CommandMeta.AutoCompleteDelegate;
-
-        //    return null;
-        //}
-
-        /// <summary>
         /// Uses reflection to find all of the methods in this class annotated with the <see cref="Command"/> attribute
         /// and registers them for execution.
         /// </summary>
@@ -246,7 +219,6 @@ namespace SkToolbox
                         attribute,
                         method,
                         method.GetParameters().ToList()//,
-                        //MakeAutoCompleteDelegate(attribute.autoCompleteTarget)
                     );
 
                 Logger.Debug($"Registering {query.Count()} commands...");

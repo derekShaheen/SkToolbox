@@ -25,7 +25,7 @@ This console supports the following features:
 - Command key binding allows users to run any number of commands via key press when outside of the console.
 - Automatically generate on-screen buttons based on registered commands. As buttons are added, this will become a scrollable menu.
 - Supports color theme changes on the fly! Set the theme to any color via command or config!
-- Many options and preferences are found in the configuation file.
+- Many options and preferences are found in the configuration file.
 ------------
 
 ### Examples
