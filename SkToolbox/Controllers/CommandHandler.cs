@@ -62,10 +62,6 @@ namespace SkToolbox
         /// Number of required arguments for the command to run.
         /// </summary>
         public readonly int requiredArguments;
-        /// <summary>
-        /// Delegate to return potential autocomplete topics.
-        /// </summary>
-        //public readonly AutoCompleteDelegate AutoComplete;
 
         public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments)
         {
@@ -119,6 +115,9 @@ namespace SkToolbox
 
         private Controllers.MainConsole m_console = null;
 
+        private bool m_isSearching = false;
+        public bool IsSearching { get => m_isSearching; }
+
         private const BindingFlags s_bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
         internal Controllers.MainConsole Console { get => m_console; set => m_console = value; }
@@ -136,13 +135,14 @@ namespace SkToolbox
                 foreach (CommandMeta meta in cmds)
                 {
                     string fullCommand = meta.data.keyword;
-                    if(displayDescriptions)
+                    if (displayDescriptions)
                     {
                         if (meta.arguments.Count > 0)
                             Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
                         else
                             Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
-                    } else
+                    }
+                    else
                     {
                         if (meta.arguments.Count > 0)
                             Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
@@ -199,6 +199,8 @@ namespace SkToolbox
             Register();
         }
 
+        List<CommandMeta> query = new List<CommandMeta>();
+
         /// <summary>
         /// Uses reflection to find all of the methods in this class annotated with the <see cref="Command"/> attribute
         /// and registers them for execution.
@@ -206,53 +208,72 @@ namespace SkToolbox
         public System.Collections.IEnumerator Register()
         {
             m_actions.Clear();
-            try
+
+            Logger.Debug($"Searching for commands...");
+            m_isSearching = true;
+
+            //Break this into for loops to support the coroutine.
+            //IEnumerable<CommandMeta> query =
+            //    from assemblies in AppDomain.CurrentDomain.GetAssemblies()
+            //    from assembly in assemblies.GetTypes()
+            //    from method in assembly.GetMethods()
+            //    from attribute in method.GetCustomAttributes().OfType<Command>()
+            //    select new CommandMeta(
+            //        attribute,
+            //        method,
+            //        method.GetParameters().ToList()//,
+            //    );
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                Logger.Debug($"Searching for commands...");
 
-                IEnumerable<CommandMeta> query =
-                    from assemblies in AppDomain.CurrentDomain.GetAssemblies()
-                    from assembly in assemblies.GetTypes()
-                    from method in assembly.GetMethods()
-                    from attribute in method.GetCustomAttributes().OfType<Command>()
-                    select new CommandMeta(
-                        attribute,
-                        method,
-                        method.GetParameters().ToList()//,
-                    );
-
-                Logger.Debug($"Registering {query.Count()} commands...");
-
-                // Sort commands by category, sort priority, then keyword
-                foreach (CommandMeta command in query.OrderBy(m => m.data.category)
-                                                     .ThenBy(n => n.data.sortPriority)
-                                                     .ThenBy(o => o.data.keyword))
+                foreach (Type type in assembly.GetTypes())
                 {
-                    try
+                    foreach (MethodInfo method in type.GetMethods())
                     {
-                        m_actions.Add(command.data.keyword, command);
-                    } catch (ArgumentException)
-                    {
-                        Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
-                        continue;
+                        foreach (Attribute attribute in method.GetCustomAttributes().OfType<Command>())
+                        {
+                            try
+                            {
+                                query.Add(new CommandMeta((Command)attribute, method, method.GetParameters().ToList()));
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Debug("Failed to register a command.");
+                                Debug.LogWarning(ex.ToString());
+                            }
+                        }
                     }
+                }
+                yield return null; // Allow other processing to continue after each assembly is checked
+            }
 
-                    string helpText;
-
-                    if (command.arguments.Count > 0)
-                        helpText = $"{command.hint} - {command.data.description}";
-                    else
-                        helpText = command.data.description;
-
-                    //Debug.Log($"Registered command {command.data.keyword}");
+            // Sort commands by category, sort priority, then keyword
+            foreach (CommandMeta command in query.OrderBy(m => m.data.category)
+                                                 .ThenBy(n => n.data.sortPriority)
+                                                 .ThenBy(o => o.data.keyword))
+            {
+                try
+                {
+                    m_actions.Add(command.data.keyword, command);
+                }
+                catch (ArgumentException)
+                {
+                    Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
+                    continue;
                 }
 
-                Logger.Debug($"Finished registering commands!");
+                string helpText;
+
+                if (command.arguments.Count > 0)
+                    helpText = $"{command.hint} - {command.data.description}";
+                else
+                    helpText = command.data.description;
+
+                //Debug.Log($"Registered command {command.data.keyword}");
             }
-            catch (Exception ex)
-            {
-                Logger.Debug("Failed to register commands. \n\n" + ex.ToString());
-            }
+            Logger.Debug($"{query.Count()} commands have been registered!");
+            m_isSearching = false;
             yield return null;
         }
 
@@ -273,7 +294,7 @@ namespace SkToolbox
 
                 workLine = ReplaceAlias(workLine);
 
-                string[] workLineSplit = new string[] { workLine }; 
+                string[] workLineSplit = new string[] { workLine };
 
                 foreach (string distilledWorkLine in workLineSplit)
                 {

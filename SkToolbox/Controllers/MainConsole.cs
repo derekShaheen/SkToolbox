@@ -569,6 +569,10 @@ namespace SkToolbox.Controllers
                 }
             }
 
+            if(Handler.GetAllCommands().Count == 0 && Handler.IsSearching) {
+                GUILayout.Label("Searching...", m_StylePanelButtons);
+            }
+
             m_LinesScrollPosition2 = GUILayout.BeginScrollView(m_LinesScrollPosition2);
 
             foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
