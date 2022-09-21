@@ -99,7 +99,7 @@ namespace SkToolbox.Controllers
 
             HandlePositioning();
 
-            Logger.Submit("Welcome to SkToolbox " + SkVersionChecker.currentVersion + "!", false);
+            Logger.Submit("Welcome to SkToolbox " + Loaders.SkBepInExLoader.VERSION + "!", false);
             StartCoroutine(Handler.Register());
         }
 
