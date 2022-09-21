@@ -28,7 +28,7 @@ namespace SkToolbox.Loaders
             {
                 if (_skGameObject == null)
                 {
-                    _skGameObject = new GameObject("SkToolboxMain");
+                    _skGameObject = new GameObject("SkToolbox");
                 }
                 return _skGameObject;
             }
@@ -50,9 +50,6 @@ namespace SkToolbox.Loaders
                 Loader = this;
             }
 
-            base.name = "SkToolbox";
-            base.transform.parent = null;
-            UnityEngine.Object.DontDestroyOnLoad(this);
             Init();
         }
 
@@ -73,7 +70,8 @@ namespace SkToolbox.Loaders
             Application.runInBackground = true;
             SettingsController.Init(Config);
 
-            SkGameObject.transform.parent = transform;
+            SkGameObject.transform.parent = null;
+            UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
 
             Console = SkGameObject.AddComponent<Controllers.MainConsole>();
 

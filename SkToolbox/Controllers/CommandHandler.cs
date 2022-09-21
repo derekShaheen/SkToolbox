@@ -224,26 +224,37 @@ namespace SkToolbox
             //        method.GetParameters().ToList()//,
             //    );
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            var assembly = AppDomain.CurrentDomain.GetAssemblies();
+            int assemblyCount = AppDomain.CurrentDomain.GetAssemblies().Count();
+            for (int i = 0; i < assemblyCount; i++)
             {
-
-                foreach (Type type in assembly.GetTypes())
+                try
                 {
-                    foreach (MethodInfo method in type.GetMethods())
+                    foreach (Type type in assembly[i].GetTypes())
                     {
-                        foreach (Attribute attribute in method.GetCustomAttributes().OfType<Command>())
+                        foreach (MethodInfo method in type.GetMethods())
                         {
-                            try
+                            foreach (Attribute attribute in method.GetCustomAttributes().OfType<Command>())
                             {
-                                query.Add(new CommandMeta((Command)attribute, method, method.GetParameters().ToList()));
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Debug("Failed to register a command.");
-                                Debug.LogWarning(ex.ToString());
+                                try
+                                {
+                                    query.Add(new CommandMeta((Command)attribute, method, method.GetParameters().ToList()));
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Debug("Failed to register a command.");
+                                    Debug.LogWarning(ex.ToString());
+                                }
                             }
                         }
                     }
+                } catch (Exception ex)
+                {
+                    //if(ex.GetType() != typeof(IndexOutOfRangeException))
+                    //{
+                        Logger.Submit("An SkToolbox extension failed to load, one or more commands may not appear! Verify your SkToolbox extensions are up to date or notify the author of the failed extension.");
+                        Debug.LogWarning(ex.Message);
+                    //}
                 }
                 yield return null; // Allow other processing to continue after each assembly is checked
             }
