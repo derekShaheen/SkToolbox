@@ -409,9 +409,10 @@ namespace SkToolbox
                     {
                         command.method.Invoke(this, convertedArgs.ToArray());
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        Debug.Log($"Something happened while running {command.data.keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
+                        Logger.Submit($"Something happened while running {command.data.keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
+                        Debug.Log($"Make sure your command methods are both {"public".WithColor(Color.yellow)} and {"static".WithColor(Color.yellow)}, check the BepInEx console for more details.");
                         throw;
                     }
                 }
