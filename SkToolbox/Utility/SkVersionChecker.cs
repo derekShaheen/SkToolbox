@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkToolbox.Controllers;
+using System;
 using System.Linq;
 using System.Net;
 using UnityEngine;
@@ -18,6 +19,11 @@ namespace SkToolbox.Utility
 
         public static void CheckVersion()
         {
+            if (!SettingsController.Get<bool>("NetworkFunctions"))
+            {
+                return;
+            }
+
             try
             {
                 currentVersion = new Version(Loaders.SkBepInExLoader.VERSION);

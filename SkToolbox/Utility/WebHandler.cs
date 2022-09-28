@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkToolbox.Controllers;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -21,6 +22,11 @@ namespace SkToolbox.Utility
          */
         internal static IEnumerator GetTextureRequest(string url, System.Action<Texture2D> callback)
         {
+            if(!SettingsController.Get<bool>("NetworkFunctions"))
+            {
+                yield return null;
+            }
+
             using (var www = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return www.SendWebRequest();
@@ -60,6 +66,11 @@ namespace SkToolbox.Utility
          */
         static IEnumerator GetRequest(string url, Action<UnityWebRequest> callback)
         {
+            if (!SettingsController.Get<bool>("NetworkFunctions"))
+            {
+                yield return null;
+            }
+
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 // Send the request and wait for a response

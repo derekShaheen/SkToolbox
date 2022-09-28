@@ -28,6 +28,7 @@ namespace SkToolbox.Controllers
             s_config.Add("DisplayToggleKey", config.Bind(CategoryGeneral, "DisplayToggleKey", "BackQuote", "Key that toggles the on-screen display. BackQuote is also the tilde (` / ~) button."));
             s_config.Add("ConsoleEnabled", config.Bind(CategoryGeneral, "ConsoleEnabled", true, "Whether the console should be enabled or not."));
             s_config.Add("PanelEnabled", config.Bind(CategoryGeneral, "PanelEnabled", true, "Whether the panel should be enabled or not."));
+            s_config.Add("NetworkFunctions", config.Bind(CategoryGeneral, "NetworkFunctions", true, "Determines if networking functions are enabled."));
 
             s_config.Add("ConsoleTheme", config.Bind(CategoryConsoleDraw, "ConsoleTheme", Color.grey, "Sets the overall color theme. Accepts hex and some standard color words."));
             s_config.Add("ConsolePosition", config.Bind(CategoryConsoleDraw, "ConsolePosition", Settings.Console.ConsolePos.TopCentered));
