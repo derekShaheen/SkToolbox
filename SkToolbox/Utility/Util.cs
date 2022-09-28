@@ -372,12 +372,16 @@ namespace SkToolbox
             {
                 inputText = inputText.Substring(0, 1).ToUpper() + inputText.Substring(1);
             }
+            
             byte[] asciiBytes = System.Text.Encoding.ASCII.GetBytes(inputText);
-            for (int i = 1; i < asciiBytes.Length; i++)
+            int btyeOffset = 0;
+
+            for (int i = 1; i < asciiBytes.Length + btyeOffset; i++)
             {
                 if (asciiBytes[i] > 64 && asciiBytes[i] < 91)
                 {
-                    inputText = inputText.Insert(i, " ");
+                    inputText = inputText.Insert(i + btyeOffset, " "); // For each space insert, the remaining btyes will be offset.
+                    btyeOffset++; // Upon insert, keep track of the offset
                 }
             }
             return inputText;
