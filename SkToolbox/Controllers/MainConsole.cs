@@ -191,6 +191,7 @@ namespace SkToolbox.Controllers
                         GUI.FocusControl("InputBar");
                     }
                 }
+                EatInputInRect(m_MainWindow);
             }
         }
 
@@ -833,6 +834,13 @@ namespace SkToolbox.Controllers
         public CommandHandler GetCommandHandler()
         {
             return Handler;
+        }
+
+        private void EatInputInRect(Rect eatRect)
+        {
+            var mousePos = Input.mousePosition;
+            if (eatRect.Contains(new Vector2(mousePos.x, Screen.height - mousePos.y)))
+                Input.ResetInputAxes();
         }
 
         private class HistoryController
