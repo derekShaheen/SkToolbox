@@ -16,7 +16,7 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "2.0.1.0";
+            VERSION = "2.0.1.1";
 
         private static SkBepInExLoader _loader;
         public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
@@ -42,8 +42,12 @@ namespace SkToolbox.Loaders
         private Dictionary<KeyCode, string> m_binds = new Dictionary<KeyCode, string>();
         internal Dictionary<KeyCode, string> Binds { get => m_binds; set => m_binds = value; }
 
+        private static ConfigFile _configFile;
+        public static ConfigFile ConfigFile { get => _configFile; set => _configFile = value; }
+
         private void Start()
         {
+            ConfigFile = Config;
             SkToolbox.Logger.Debug("Initialization success!");
             if (Loader == null)
             {
@@ -68,7 +72,7 @@ namespace SkToolbox.Loaders
         private void Init()
         {
             Application.runInBackground = true;
-            SettingsController.Init(Config);
+            SettingsController.Init(ConfigFile);
 
             SkGameObject.transform.parent = null;
             UnityEngine.Object.DontDestroyOnLoad(SkGameObject);

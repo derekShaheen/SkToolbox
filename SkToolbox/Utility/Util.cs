@@ -376,7 +376,7 @@ namespace SkToolbox
             byte[] asciiBytes = System.Text.Encoding.ASCII.GetBytes(inputText);
             int btyeOffset = 0;
 
-            for (int i = 1; i < asciiBytes.Length + btyeOffset; i++)
+            for (int i = 1; i < asciiBytes.Length; i++)
             {
                 if (asciiBytes[i] > 64 && asciiBytes[i] < 91)
                 {

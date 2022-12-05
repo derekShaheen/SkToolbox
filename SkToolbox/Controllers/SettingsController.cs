@@ -13,12 +13,15 @@ namespace SkToolbox.Controllers
         public static string CategoryGeneral        = "0 - General";
         public static string CategoryConsoleDraw    = "1 - Console Specific";
 
+        private static ConfigFile _configFile;
+
         /// <summary>
         /// Initialize the config file and values.
         /// </summary>
         /// <param name="config">Reference to the global <see cref="ConfigFile"/> created by BepInEx for this plugin.</param>
         public static void Init(ConfigFile config)
         {
+            _configFile = config;
             s_config.Add("- Index", config.Bind("- Index", "ThisIsJustAnIndex-NotASetting", true, "Config sections:" +
                                                         "\n" + CategoryGeneral +
                                                         "\n" + CategoryConsoleDraw +
@@ -83,6 +86,24 @@ namespace SkToolbox.Controllers
 
             var converted = obj as ConfigEntry<T>;
             converted.Value = value;
+        }
+
+        /// <summary>
+        /// Return the active config file.
+        /// </summary>
+        /// <returns>Current config file for BepInEx</returns>
+        public static ConfigFile GetConfig()
+        {
+            return _configFile;
+        }
+
+        /// <summary>
+        /// Return the active config dictionary.
+        /// </summary>
+        /// <returns>Current config dictionary</returns>
+        public static Dictionary<string, ConfigEntryBase> GetConfigDictionary()
+        {
+            return s_config;
         }
     }
 }
