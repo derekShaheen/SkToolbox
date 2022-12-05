@@ -96,5 +96,14 @@ namespace SkToolbox.Controllers
         {
             return _configFile;
         }
+
+        /// <summary>
+        /// Return the active config dictionary.
+        /// </summary>
+        /// <returns>Current config dictionary</returns>
+        public static Dictionary<string, ConfigEntryBase> GetConfigDictionary()
+        {
+            return s_config;
+        }
     }
 }
