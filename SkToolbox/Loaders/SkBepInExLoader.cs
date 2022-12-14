@@ -16,7 +16,7 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "2.0.1.1";
+            VERSION = "2.0.1.2";
 
         private static SkBepInExLoader _loader;
         public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
@@ -83,6 +83,11 @@ namespace SkToolbox.Loaders
             LoadBinds();
 
             Utility.SkVersionChecker.CheckVersion();
+        }
+
+        public void Main()
+        {
+            Init();
         }
 
         public void ReInit()

@@ -12,6 +12,7 @@ namespace SkToolbox.Controllers
 
         public static string CategoryGeneral        = "0 - General";
         public static string CategoryConsoleDraw    = "1 - Console Specific";
+        public static string CategoryOther          = "2 - Other";
 
         private static ConfigFile _configFile;
 
@@ -25,6 +26,7 @@ namespace SkToolbox.Controllers
             s_config.Add("- Index", config.Bind("- Index", "ThisIsJustAnIndex-NotASetting", true, "Config sections:" +
                                                         "\n" + CategoryGeneral +
                                                         "\n" + CategoryConsoleDraw +
+                                                        "\n" + CategoryOther +
                                                         // ...
                                                         "\n"));
 
