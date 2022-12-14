@@ -110,8 +110,8 @@ namespace SkToolbox
     /// </summary>
     public class CommandHandler
     {
-        private Dictionary<string, CommandMeta> m_actions = new Dictionary<string, CommandMeta>();
-        private Dictionary<string, string> m_aliases = new Dictionary<string, string>();
+        private Dictionary<string, CommandMeta> m_actions = new Dictionary<string, CommandMeta>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, string> m_aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         private Controllers.MainConsole m_console = null;
 
