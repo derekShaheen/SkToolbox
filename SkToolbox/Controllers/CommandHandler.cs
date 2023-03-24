@@ -4,10 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-/// <summary>
-/// Based on the Gungnir code by Zambony. Accessed 9/11/22
-/// https://github.com/zambony/Gungnir/
-/// </summary>
 namespace SkToolbox
 {
     /// <summary>
@@ -16,23 +12,19 @@ namespace SkToolbox
     [AttributeUsage(AttributeTargets.Method)]
     public class Command : Attribute
     {
-        public readonly string keyword;
-        public readonly string description;
-        public readonly string category;
-        public readonly Util.DisplayOptions displayOptions;
-        public readonly int sortPriority;
+        public string Keyword { get; }
+        public string Description { get; }
+        public string Category { get; }
+        public Util.DisplayOptions DisplayOptions { get; }
+        public int SortPriority { get; }
 
         public Command(string keyword, string description, string category = "zzBottom", Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100)
         {
-            this.keyword = keyword;
-            this.description = description;
-            if (category == null)
-            {
-                category = string.Empty;
-            }
-            this.category = category;
-            this.displayOptions = displayOptions;
-            this.sortPriority = sortPriority;
+            Keyword = keyword;
+            Description = description;
+            Category = category ?? string.Empty;
+            DisplayOptions = displayOptions;
+            SortPriority = sortPriority;
         }
     }
 
@@ -69,38 +61,32 @@ namespace SkToolbox
             this.method = method;
             this.arguments = arguments;
 
-            // If we have any arguments, attempt to build the argument hint string.
-            if (arguments.Count > 0)
-            {
-                StringBuilder builder = new StringBuilder();
-
-                foreach (ParameterInfo info in arguments)
-                {
-                    bool optional = info.HasDefaultValue;
-
-                    requiredArguments += optional ? 0 : 1;
-
-                    // Required parameters use chevrons, and optionals use brackets.
-                    if (!optional)
-                    {
-                        builder.Append($"<{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}> ");
-                    }
-                    else
-                    {
-                        string defaultValue = info.DefaultValue == null ? "none" : info.DefaultValue.ToString();
-                        builder.Append($"[{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}={defaultValue}] ");
-                    }
-                }
-
-                // Remove trailing space.
-                builder.Remove(builder.Length - 1, 1);
-
-                hint = builder.ToString();
-            }
-            else
+            if (arguments.Count == 0)
             {
                 requiredArguments = 0;
+                return;
             }
+
+            requiredArguments = 0;
+            StringBuilder builder = new StringBuilder(arguments.Count * 30);
+
+            foreach (ParameterInfo info in arguments)
+            {
+                bool optional = info.HasDefaultValue;
+
+                if (!optional)
+                {
+                    requiredArguments++;
+                    builder.Append($"<{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}> ");
+                }
+                else
+                {
+                    string defaultValue = info.DefaultValue == null ? "none" : info.DefaultValue.ToString();
+                    builder.Append($"[{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}={defaultValue}] ");
+                }
+            }
+
+            hint = builder.ToString(0, builder.Length - 1);
         }
     }
 
@@ -130,17 +116,17 @@ namespace SkToolbox
             {
                 var cmds =
                     m_actions.Values.ToList()
-                    .OrderBy(m => m.data.keyword);
+                    .OrderBy(m => m.data.Keyword);
 
                 foreach (CommandMeta meta in cmds)
                 {
-                    string fullCommand = meta.data.keyword;
+                    string fullCommand = meta.data.Keyword;
                     if (displayDescriptions)
                     {
                         if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
                         else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
                     }
                     else
                     {
@@ -154,19 +140,19 @@ namespace SkToolbox
             else
             {
                 var cmds = m_actions.Values.Where(cmd =>
-                                            cmd.data.keyword.ToLower().StartsWith(command.ToLower())).ToList()
-                                            .OrderBy(cmd => cmd.data.keyword);
+                                            cmd.data.Keyword.ToLower().StartsWith(command.ToLower())).ToList()
+                                            .OrderBy(cmd => cmd.data.Keyword);
 
                 foreach (CommandMeta meta in cmds)
                 {
-                    string fullCommand = meta.data.keyword;
+                    string fullCommand = meta.data.Keyword;
 
                     if (displayDescriptions)
                     {
                         if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.description}", false);
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
                         else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.description}", false);
+                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
                     }
                     else
                     {
@@ -212,74 +198,62 @@ namespace SkToolbox
             Logger.Debug($"Searching for commands...");
             m_isSearching = true;
 
-            //Break this into for loops to support the coroutine.
-            //IEnumerable<CommandMeta> query =
-            //    from assemblies in AppDomain.CurrentDomain.GetAssemblies()
-            //    from assembly in assemblies.GetTypes()
-            //    from method in assembly.GetMethods()
-            //    from attribute in method.GetCustomAttributes().OfType<Command>()
-            //    select new CommandMeta(
-            //        attribute,
-            //        method,
-            //        method.GetParameters().ToList()//,
-            //    );
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            var assembly = AppDomain.CurrentDomain.GetAssemblies();
-            int assemblyCount = AppDomain.CurrentDomain.GetAssemblies().Count();
-            for (int i = 0; i < assemblyCount; i++)
+            foreach (var assembly in assemblies)
             {
                 try
                 {
-                    foreach (Type type in assembly[i].GetTypes())
+                    var typesWithCommands = assembly.GetTypes()
+                        .Where(type => type.GetMethods().Any(method => method.GetCustomAttribute<Command>() != null));
+                    foreach (var type in typesWithCommands)
                     {
-                        foreach (MethodInfo method in type.GetMethods())
+                        foreach (var method in type.GetMethods().Where(m => m.GetCustomAttribute<Command>() != null))
                         {
-                            foreach (Attribute attribute in method.GetCustomAttributes().OfType<Command>())
+                            try
                             {
-                                try
-                                {
-                                    query.Add(new CommandMeta((Command)attribute, method, method.GetParameters().ToList()));
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Debug("Failed to register a command.");
-                                    Debug.LogWarning(ex.ToString());
-                                }
+                                var commandAttribute = method.GetCustomAttribute<Command>();
+                                var parameters = method.GetParameters().ToList();
+                                var commandMeta = new CommandMeta(commandAttribute, method, parameters);
+                                query.Add(commandMeta);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Debug("Failed to register a command.");
+                                Debug.LogWarning(ex.ToString());
                             }
                         }
                     }
-                } catch (Exception ex)
-                {
-                    //if(ex.GetType() != typeof(IndexOutOfRangeException))
-                    //{
-                        Logger.Submit("An SkToolbox extension failed to load, one or more commands may not appear! Verify your SkToolbox extensions are up to date or notify the author of the failed extension.");
-                        Debug.LogWarning(ex.Message);
-                    //}
                 }
-                yield return null; // Allow other processing to continue after each assembly is checked
+                catch (Exception ex) when (!(ex is IndexOutOfRangeException))
+                {
+                    Logger.Submit($"An SkToolbox extension failed to load from assembly {assembly.FullName}. One or more commands may not appear! Verify your SkToolbox extensions are up to date or notify the author of the failed extension.");
+                    Debug.LogWarning(ex.Message);
+                }
+                yield return null;
             }
 
             // Sort commands by category, sort priority, then keyword
-            foreach (CommandMeta command in query.OrderBy(m => m.data.category)
-                                                 .ThenBy(n => n.data.sortPriority)
-                                                 .ThenBy(o => o.data.keyword))
+            foreach (CommandMeta command in query.OrderBy(m => m.data.Category)
+                                                 .ThenBy(n => n.data.SortPriority)
+                                                 .ThenBy(o => o.data.Keyword))
             {
                 try
                 {
-                    m_actions.Add(command.data.keyword, command);
+                    m_actions.Add(command.data.Keyword, command);
                 }
                 catch (ArgumentException)
                 {
-                    Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.keyword}'!");
+                    Logger.Debug($"WARNING: Duplicate command found. Only adding the first instance of '{command.data.Keyword}'!");
                     continue;
                 }
 
                 string helpText;
 
                 if (command.arguments.Count > 0)
-                    helpText = $"{command.hint} - {command.data.description}";
+                    helpText = $"{command.hint} - {command.data.Description}";
                 else
-                    helpText = command.data.description;
+                    helpText = command.data.Description;
 
                 //Debug.Log($"Registered command {command.data.keyword}");
             }
@@ -333,74 +307,62 @@ namespace SkToolbox
 
                     List<object> convertedArgs = new List<object>();
 
-                    // Loop through each argument type of the command object
-                    // and attempt to convert the corresponding text value to that type.
-                    // We'll unpack the converted args list into the function call which will automatically
-                    // cast from object -> the parameter type.
+                    /// Iterates through the arguments of a command and converts them to their expected types.
+                    /// If a required argument is missing, or an error occurs during conversion, logs an error message and returns.
+                    /// If an argument has a default value, it is filled in automatically.
+                    /// If an argument is marked with the ParamArray attribute, any remaining arguments are packed into an array of the expected type.
                     for (int i = 0; i < command.arguments.Count; ++i)
                     {
-                        // If there is a user supplied value, try to convert it.
-                        if (i < args.Count)
+                        var argument = command.arguments[i];
+                        var parameterType = argument.ParameterType;
+                        var isParamArray = argument.GetCustomAttribute(typeof(ParamArrayAttribute)) != null;
+
+                        if (i >= args.Count && !argument.HasDefaultValue)
                         {
-                            Type argType = command.arguments[i].ParameterType;
-
-                            string arg = args[i];
-
-                            object converted = null;
-
-                            try
-                            {
-                                if (command.arguments[i].GetCustomAttribute(typeof(ParamArrayAttribute)) != null)
-                                {
-                                    argType = argType.GetElementType();
-                                    converted = Util.StringsToObjects(args.Skip(i).ToArray(), argType);
-                                }
-                                else
-                                {
-                                    converted = Util.StringToObject(arg, argType);
-                                }
-                            }
-                            catch (SystemException e)
-                            {
-                                Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
-                                break;
-                            }
-                            catch (TooManyValuesException)
-                            {
-                                Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                                break;
-                            }
-                            catch (NoMatchFoundException)
-                            {
-                                Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                                break;
-                            }
-
-                            // Couldn't convert, oh well!
-                            if (converted == null)
-                            {
-                                Logger.Submit($"Error while converting arguments for command <color=#EEEEEE>{commandName}</color>.");
-                                break;
-                            }
-
-                            if (converted.GetType().IsArray)
-                            {
-                                object[] arr = converted as object[];
-                                var things = Array.CreateInstance(argType, arr.Length);
-                                Array.Copy(arr, things, arr.Length);
-                                convertedArgs.Add(things);
-                            }
-                            else
-                                convertedArgs.Add(converted);
+                            Logger.Submit($"Missing required argument for command <color=#EEEEEE>{commandName}</color>");
+                            return;
                         }
-                        // Otherwise, if we're still iterating, there's parameters they left unfilled.
-                        // This will only execute if they are optional parameters, due to our required arg count check earlier.
-                        else
+
+                        var arg = i < args.Count ? args[i] : argument.DefaultValue.ToString();
+                        object convertedArg = null;
+
+                        try
                         {
-                            // Since Invoke requires all parameters to be filled, we have to manually insert the function's default value.
-                            // Very silly.
-                            convertedArgs.Add(command.arguments[i].DefaultValue);
+                            convertedArg = isParamArray
+                                ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
+                                : Util.StringToObject(arg, parameterType);
                         }
+                        catch (SystemException e)
+                        {
+                            Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
+                            return;
+                        }
+                        catch (TooManyValuesException)
+                        {
+                            Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
+                        }
+                        catch (NoMatchFoundException)
+                        {
+                            Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
+                        }
+
+                        if (isParamArray)
+                        {
+                            var elementType = parameterType.GetElementType();
+                            var values = ((object[])convertedArg).Cast<object>().ToArray();
+                            var newArray = Array.CreateInstance(elementType, values.Length);
+
+                            for (int j = 0; j < values.Length; j++)
+                            {
+                                newArray.SetValue(values[j], j);
+                            }
+
+                            convertedArg = newArray;
+                        }
+
+                        convertedArgs.Add(convertedArg);
                     }
 
                     //Debug.Log("Running command " + command.data.keyword);
@@ -409,9 +371,9 @@ namespace SkToolbox
                     {
                         command.method.Invoke(this, convertedArgs.ToArray());
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Logger.Submit($"Something happened while running {command.data.keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
+                        Logger.Submit($"Something happened while running {command.data.Keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
                         Debug.Log($"Make sure your command methods are both {"public".WithColor(Color.yellow)} and {"static".WithColor(Color.yellow)}, check the BepInEx console for more details.");
                         throw;
                     }
@@ -466,13 +428,13 @@ namespace SkToolbox
 
         public IEnumerable<KeyValuePair<string, CommandMeta>> GetPossibleCommands(string commandPartial)
         {
-            return m_actions.Where(cmd => cmd.Value.data.keyword.ToLower().StartsWith(commandPartial.ToLower()
+            return m_actions.Where(cmd => cmd.Value.data.Keyword.ToLower().StartsWith(commandPartial.ToLower()
                         , StringComparison.InvariantCultureIgnoreCase));
         }
 
         public KeyValuePair<string, CommandMeta> GetLikelyCommand(string commandPartial, int skip = 0)
         {
-            return m_actions.Where(cmd => cmd.Value.data.keyword.ToLower().StartsWith(commandPartial.ToLower()
+            return m_actions.Where(cmd => cmd.Value.data.Keyword.ToLower().StartsWith(commandPartial.ToLower()
                         , StringComparison.InvariantCultureIgnoreCase)).Skip(skip).FirstOrDefault();
         }
 

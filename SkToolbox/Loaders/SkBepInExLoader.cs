@@ -16,7 +16,7 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "2.0.1.2";
+            VERSION = "2.0.2.0";
 
         private static SkBepInExLoader _loader;
         public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
@@ -98,91 +98,77 @@ namespace SkToolbox.Loaders
             Init();
         }
 
-        //
-        /// <summary>
-        /// Based on the Gungnir code by Zambony. Accessed 9/15/22
-        /// Save all of the user's console keybinds to a file in the BepInEx config folder.
-        /// </summary>
         public void SaveBinds()
         {
-            StringBuilder builder = new StringBuilder();
+            string path = Path.Combine(Paths.ConfigPath, $"{GUID}_binds.txt");
 
-            foreach (KeyValuePair<KeyCode, string> pair in m_binds)
-                builder.AppendLine($"{pair.Key}={pair.Value}");
-
-            string output = builder.ToString();
-
-            string path = Path.Combine(Paths.ConfigPath, GUID + "_binds.txt");
-            File.WriteAllText(path, output);
-        }
-
-        /// <summary>
-        /// Save the user's custom command aliases.
-        /// Based on the Gungnir code by Zambony. Accessed 9/15/22
-        /// </summary>
-        public void SaveAliases()
-        {
-            StringBuilder builder = new StringBuilder();
-
-            foreach (KeyValuePair<string, string> pair in Console.GetCommandHandler().Aliases)
-                builder.AppendLine($"{pair.Key}={pair.Value}");
-
-            string output = builder.ToString();
-
-            string path = Path.Combine(Paths.ConfigPath, GUID + "_aliases.txt");
-            File.WriteAllText(path, output);
-        }
-
-        /// <summary>
-        /// Load the user's console keybinds from the file in the BepInEx config folder.
-        /// Based on the Gungnir code by Zambony. Accessed 9/15/22
-        /// </summary>
-        public void LoadBinds()
-        {
-            string path = Path.Combine(Paths.ConfigPath, GUID + "_binds.txt");
-
-            if (!File.Exists(path))
-                return;
-
-            string[] lines = File.ReadAllLines(path);
-
-            foreach (string line in lines)
+            StreamWriter writer = null;
+            try
             {
-                // Only split by the first instance of equals.
-                string[] info = line.Trim().Split(new char[] { '=' }, 2);
+                writer = new StreamWriter(path);
 
-                if (info.Length != 2)
-                    continue;
-
-                if (!Enum.TryParse(info[0].Trim(), true, out KeyCode key))
-                    continue;
-
-                m_binds.Add(key, info[1].Trim());
+                foreach (var pair in m_binds)
+                    writer.WriteLine($"{pair.Key}={pair.Value}");
+            }
+            finally
+            {
+                if (writer != null)
+                    writer.Close();
             }
         }
 
-        /// <summary>
-        /// Load the user's custom command aliases.
-        /// Based on the Gungnir code by Zambony. Accessed 9/15/22
-        /// </summary>
-        public void LoadAliases()
+        public void SaveAliases()
         {
-            string path = Path.Combine(Paths.ConfigPath, GUID + "_aliases.txt");
+            string path = Path.Combine(Paths.ConfigPath, $"{GUID}_aliases.txt");
+
+            StreamWriter writer = null;
+            try
+            {
+                writer = new StreamWriter(path);
+
+                foreach (var pair in Console.GetCommandHandler().Aliases)
+                    writer.WriteLine($"{pair.Key}={pair.Value}");
+            }
+            finally
+            {
+                if (writer != null)
+                    writer.Close();
+            }
+        }
+
+        public void LoadBinds()
+        {
+            string path = Path.Combine(Paths.ConfigPath, $"{GUID}_binds.txt");
 
             if (!File.Exists(path))
                 return;
 
-            string[] lines = File.ReadAllLines(path);
-
-            foreach (string line in lines)
+            foreach (var line in File.ReadLines(path))
             {
-                // Only split by the first instance of equals.
-                string[] info = line.Trim().Split(new char[] { '=' }, 2);
+                var parts = line.Split(new[] { '=' }, 2);
 
-                if (info.Length != 2)
+                if (parts.Length != 2 || !Enum.TryParse(parts[0], out KeyCode key))
                     continue;
 
-                Console.GetCommandHandler().Aliases.Add(info[0], info[1].Trim());
+                m_binds[key] = parts[1].Trim();
+            }
+        }
+
+        public void LoadAliases()
+        {
+            string path = Path.Combine(Paths.ConfigPath, $"{GUID}_aliases.txt");
+
+            if (!File.Exists(path))
+                return;
+
+            foreach (var line in File.ReadLines(path))
+            {
+                var parts = line.Split(new[] { '=' }, 2);
+
+                if (parts.Length != 2)
+                    continue;
+
+                Console.GetCommandHandler().Aliases[parts[0]] = parts[1].Trim();
             }
         }
     }

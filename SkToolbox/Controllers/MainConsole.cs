@@ -1,6 +1,8 @@
 using SkToolbox.Settings;
 using SkToolbox.Utility;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace SkToolbox.Controllers
@@ -136,7 +138,7 @@ namespace SkToolbox.Controllers
                     foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
                     {
 
-                        GUIContent textItem = new GUIContent(command.Value.data.keyword);
+                        GUIContent textItem = new GUIContent(command.Value.data.Keyword);
                         Vector2 tempSize = GUI.skin.button.CalcSize(textItem);
                         if (tempSize.x + 50 > m_PanelXSize)
                         {
@@ -303,14 +305,17 @@ namespace SkToolbox.Controllers
                     string command = commands[commands.Length - 1].Simplified().Split()[0];
                     var matchCommand = Handler.GetLikelyCommand(command);
 
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
                     {
                         m_InputString = string.Empty;
-                        for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
+
+                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
+                        foreach(string cmd in commands.Take(commands.Length -1 ))
                         {
-                            m_InputString = m_InputString + commands[i].Simplified() + "; ";
+                            sb.Append(cmd.Simplified()).Append("; ");
                         }
-                        m_InputString = m_InputString + matchCommand.Value.data.keyword;
+                        sb.Append(matchCommand.Value.data.Keyword);
+                        m_InputString = sb.ToString();
                     }
                     m_MoveCursorOnNextFrame = true;
                 }
@@ -329,7 +334,7 @@ namespace SkToolbox.Controllers
                     {
                         m_CurrentSkip++;
                         matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                        if (string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                        if (string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
                         { // Did we loop the whole list? Go back to the start
                             m_CurrentSkip = 0;
                             matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
@@ -352,14 +357,17 @@ namespace SkToolbox.Controllers
                         m_MoveCursorOnNextFrame = true;
                     }
 
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.keyword))
+                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
                     {
                         m_InputString = string.Empty;
-                        for (int i = 0; i < commands.Length - 1; i++) // Select the whole length other than the last command
+
+                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
+                        foreach (string cmd in commands.Take(commands.Length - 1))
                         {
-                            m_InputString = m_InputString + commands[i].Simplified() + "; ";
+                            sb.Append(cmd.Simplified()).Append("; ");
                         }
-                        m_InputString = m_InputString + matchCommand.Value.data.keyword;
+                        sb.Append(matchCommand.Value.data.Keyword);
+                        m_InputString = sb.ToString();
                     }
                 }
             }
@@ -459,7 +467,7 @@ namespace SkToolbox.Controllers
 
                 if (string.IsNullOrEmpty(m_currentCommand.hint))
                 {
-                    m_currentHint = $"{(m_currentCommand.data.keyword).WithColor(Color.cyan)}\n{m_currentCommand.data.description}";
+                    m_currentHint = $"{(m_currentCommand.data.Keyword).WithColor(Color.cyan)}\n{m_currentCommand.data.Description}";
                     return;
                 }
 
@@ -513,7 +521,7 @@ namespace SkToolbox.Controllers
                         final += hint.WithColor(new Color(0.8f, 0.8f, 0.8f)) + " ";
                 }
 
-                m_currentHint = $"{(m_currentCommand.data.keyword).WithColor(Color.cyan)} {final.Trim()}\n{m_currentCommand.data.description}";
+                m_currentHint = $"{(m_currentCommand.data.Keyword).WithColor(Color.cyan)} {final.Trim()}\n{m_currentCommand.data.Description}";
             }
             else // List commands by input name
             {
@@ -525,7 +533,7 @@ namespace SkToolbox.Controllers
                 {
                     foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(command))
                     {
-                        m_currentHint = m_currentHint + kv.Value.data.keyword + ", ";
+                        m_currentHint = m_currentHint + kv.Value.data.Keyword + ", ";
                     }
                     foreach (KeyValuePair<string, string> kv in Handler.GetPossibleAliasCommands(command))
                     {
@@ -578,11 +586,11 @@ namespace SkToolbox.Controllers
 
             foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
             {
-                if (command.Value.data.displayOptions == Util.DisplayOptions.All || command.Value.data.displayOptions == Util.DisplayOptions.PanelOnly)
+                if (command.Value.data.DisplayOptions == Util.DisplayOptions.All || command.Value.data.DisplayOptions == Util.DisplayOptions.PanelOnly)
                 {
-                    if (!command.Value.data.category.Equals(m_currentCategory))
+                    if (!command.Value.data.Category.Equals(m_currentCategory))
                     {
-                        m_currentCategory = command.Value.data.category;
+                        m_currentCategory = command.Value.data.Category;
                         if (m_currentCategory.Equals("zzBottom"))
                         {
                             GUILayout.Label("");
@@ -594,7 +602,7 @@ namespace SkToolbox.Controllers
                         }
                     }
                     //Strip prefix '/' if the command contains one, then make it readable for display
-                    string buttonText = command.Value.data.keyword;
+                    string buttonText = command.Value.data.Keyword;
                     buttonText = Util.CleanInput(buttonText); // Remove symbols
                     buttonText = Util.ConvertCamelToHuman(buttonText); // Convert to readable
 
@@ -602,8 +610,8 @@ namespace SkToolbox.Controllers
                     {
                         if (GUILayout.Button(buttonText, m_StylePanelButtons))
                         {
-                            Logger.Submit(command.Value.data.keyword, false);
-                            Handler.Run(command.Value.data.keyword);
+                            Logger.Submit(command.Value.data.Keyword, false);
+                            Handler.Run(command.Value.data.Keyword);
                             ScrollToBottom();
                         }
                     }
@@ -611,7 +619,7 @@ namespace SkToolbox.Controllers
                     {
                         if (GUILayout.Button(buttonText, m_StylePanelButtons))
                         {
-                            m_InputString = command.Value.data.keyword + " ";
+                            m_InputString = command.Value.data.Keyword + " ";
                             m_Editor.SelectNone();
                             m_MoveCursorOnNextFrame = true;
                             ScrollToBottom();
@@ -622,11 +630,11 @@ namespace SkToolbox.Controllers
                 { // These buttons normally do not show
                     if (!Console.ShowConsole)
                     {
-                        if (command.Value.data.keyword.Equals("OpenConsole"))
+                        if (command.Value.data.Keyword.Equals("OpenConsole"))
                         { // Allow the user to open the console if it's disabled
                             if (GUILayout.Button("Open Console", m_StylePanelButtons))
                             {
-                                Handler.Run(command.Value.data.keyword);
+                                Handler.Run(command.Value.data.Keyword);
                                 ScrollToBottom();
                             }
                         }
@@ -643,17 +651,17 @@ namespace SkToolbox.Controllers
         {
             get
             {
-                if (!m_CurrentString.Equals(m_InputString))
+                if (m_InputString.Equals(m_CurrentString))
                 {
-                    m_CurrentString = m_InputString;
-                    string[] commands = m_InputString.Split(';');
-                    string command = commands[commands.Length - 1].Simplified().Split()[0];
-
-                    m_currentCommand = Handler.GetCommand(command);
-
-                    return true;
+                    return false;
                 }
-                return false;
+
+                m_CurrentString = m_InputString;
+                string[] commands = m_InputString.Split(';');
+                string command = commands[commands.Length - 1].Simplified().Split()[0];
+
+                m_currentCommand = Handler.GetCommand(command);
+                return true;
             }
         }
 
@@ -843,35 +851,42 @@ namespace SkToolbox.Controllers
                 Input.ResetInputAxes();
         }
 
+        /// <summary>
+        /// A history controller that stores a list of items and allows fetching the previous and next item in the list.
+        /// </summary>
         private class HistoryController
         {
-            public List<string> history = new List<string>();
-            private int index;
-            private string current;
+            // Use a LinkedList instead of a List for better performance when adding and removing items
+            private LinkedList<string> history = new LinkedList<string>();
+            private LinkedListNode<string> currentNode;
 
+            // Add new item to the history and set the current node to the end of the list
             public void Add(string item)
             {
-                history.Add(item);
-                index = 0;
+                history.AddLast(item);
+                currentNode = history.Last;
             }
 
+            // Fetch the previous or next item in the history based on the "next" parameter
+            // Return the current item if there is no history or if the index is out of range
             public string Fetch(string current, bool next)
             {
-                if (index == 0)
-                {
-                    this.current = current;
-                }
-                if (history.Count == 0)
+                if (currentNode == null)
                 {
                     return current;
                 }
-                index += ((!next) ? 1 : -1);
-                if (history.Count + index < 0 || history.Count + index > history.Count - 1)
+
+                // Move to the previous or next node in the linked list
+                currentNode = next ? currentNode.Previous : currentNode.Next;
+
+                if (currentNode == null)
                 {
-                    this.index = 0;
-                    return this.current;
+                    // If we've reached the beginning or end of the list, reset to the current node
+                    currentNode = next ? null : history.Last;
+                    return current;
                 }
-                return history[history.Count + index];
+
+                return currentNode.Value;
             }
         }
     }

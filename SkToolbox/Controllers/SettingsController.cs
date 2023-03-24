@@ -1,9 +1,7 @@
 ﻿using BepInEx.Configuration;
 using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// Settings manager with code based on https://github.com/zambony/Gungnir/blob/master/src/ConfigManager.cs. Accessed 9/13/22
-/// </summary>
+
 namespace SkToolbox.Controllers
 {
     public class SettingsController
