@@ -110,7 +110,7 @@ namespace SkToolbox
         public Dictionary<string, string> Aliases { get => m_aliases; set => m_aliases = value; }
 
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
-        public void Help(string command = null, bool displayDescriptions = true)
+        public void Help(string command = "", bool displayDescriptions = true)
         {
             if (string.IsNullOrEmpty(command) || command.Equals("\"\""))
             {

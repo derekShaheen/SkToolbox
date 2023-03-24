@@ -3,6 +3,7 @@ using SkToolbox.Utility;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace SkToolbox.Controllers
@@ -292,7 +293,6 @@ namespace SkToolbox.Controllers
                 default:
                     break;
             }
-
         }
 
         private void HandleAutoComplete()
@@ -450,7 +450,6 @@ namespace SkToolbox.Controllers
             }
         }
 
-        // Code based on from https://github.com/zambony/Gungnir
         private void UpdateCommandHint()
         {
             if (!NewInput)
@@ -464,86 +463,99 @@ namespace SkToolbox.Controllers
 
             if (m_currentCommand != null)
             {
-
-                if (string.IsNullOrEmpty(m_currentCommand.hint))
-                {
-                    m_currentHint = $"{(m_currentCommand.data.Keyword).WithColor(Color.cyan)}\n{m_currentCommand.data.Description}";
-                    return;
-                }
-
-                // Split the hint string into pieces so we can add color or boldness to each one.
-                var splitHints = Util.SplitByPattern(m_currentCommand.hint, s_argPattern);
-                // Split each argument manually, because we SplitByQuotes does not preserve the quotations, or return the match list.
-                // We want the quotation marks so we can see exactly where in the string an argument starts/ends.
-                var splitArgs = Util.SplitArgs(m_InputString);
-
-                int currentArg = 0;
-
-                string final = "";
-
-                for (int i = 0; i < splitArgs.Length; ++i)
-                {
-                    var match = splitArgs[i];
-                    var group = match.Groups[0];
-                    int groupEnd = group.Index + group.Length;
-
-                    // If our caret is before the end of this argument, and the argument the caret is touching
-                    // is not beyond the number of argument hints we have, select this argument as the one to highlight.
-                    if (m_caretPos <= groupEnd && i < splitHints.Count)
-                    {
-                        currentArg = i;
-                        break;
-                    }
-                    // If our caret is past the last character of our current argument (e.g. the user inserted a space
-                    // after the argument), assume the next argument is what we're targeting, but only if there is a next argument to
-                    // use.
-                    else if (m_caretPos > groupEnd && i + 1 < splitHints.Count)
-                    {
-                        currentArg = i + 1;
-                    }
-                    // Otherwise, we're probably entering an array argument and typing multiple things, so mark the last argument
-                    // as the current one.
-                    else if (i >= splitHints.Count)
-                    {
-                        currentArg = splitHints.Count - 1;
-                        break;
-                    }
-                }
-
-                // Apply coloring/highlighting to each hint.
-                for (int i = 0; i < splitHints.Count; ++i)
-                {
-                    var hint = splitHints[i];
-
-                    if (i == currentArg)
-                        final += "<b>" + hint.WithColor(Color.yellow) + "</b> ";
-                    else
-                        final += hint.WithColor(new Color(0.8f, 0.8f, 0.8f)) + " ";
-                }
-
-                m_currentHint = $"{(m_currentCommand.data.Keyword).WithColor(Color.cyan)} {final.Trim()}\n{m_currentCommand.data.Description}";
+                UpdateCommandHintForCurrentCommand();
             }
-            else // List commands by input name
+            else
             {
-                m_currentCommand = null;
-                m_currentHint = string.Empty;
-                string[] commands = m_InputString.Split(';');
-                string command = commands[commands.Length - 1].Simplified().Split()[0];
-                if (!string.IsNullOrEmpty(command))
+                UpdateCommandHintForInputName();
+            }
+        }
+
+        private void UpdateCommandHintForCurrentCommand()
+        {
+            if (string.IsNullOrEmpty(m_currentCommand.hint))
+            {
+                m_currentHint = $"{m_currentCommand.data.Keyword.WithColor(Color.cyan)}\n{m_currentCommand.data.Description}";
+                return;
+            }
+
+            var splitHints = Util.SplitByPattern(m_currentCommand.hint, s_argPattern);
+            var splitArgs = Util.SplitArgs(m_InputString);
+
+            int currentArg = GetCurrentArgumentIndex(splitArgs, splitHints);
+
+            var final = new StringBuilder();
+            for (int i = 0; i < splitHints.Count; ++i)
+            {
+                var hint = splitHints[i];
+                if (i == currentArg)
                 {
-                    foreach (KeyValuePair<string, CommandMeta> kv in Handler.GetPossibleCommands(command))
-                    {
-                        m_currentHint = m_currentHint + kv.Value.data.Keyword + ", ";
-                    }
-                    foreach (KeyValuePair<string, string> kv in Handler.GetPossibleAliasCommands(command))
-                    {
-                        m_currentHint = m_currentHint + kv.Key + " [Alias], ";
-                    }
-                    if (m_currentHint.EndsWith(", "))
-                    {
-                        m_currentHint = m_currentHint.Substring(0, m_currentHint.Length - 2);
-                    }
+                    final.Append("<b>").Append(hint.WithColor(Color.yellow)).Append("</b> ");
                 }
+                else
+                {
+                    final.Append(hint.WithColor(new Color(0.8f, 0.8f, 0.8f))).Append(" ");
+                }
+            }
+
+            m_currentHint = $"{m_currentCommand.data.Keyword.WithColor(Color.cyan)} {final.ToString().Trim()}\n{m_currentCommand.data.Description}";
+        }
+
+        private int GetCurrentArgumentIndex(Match[] splitArgs, List<string> splitHints)
+        {
+            int currentArg = 0;
+            for (int i = 0; i < splitArgs.Length; ++i)
+            {
+                var match = splitArgs[i];
+                var group = match.Groups[0];
+                int groupEnd = group.Index + group.Length;
+
+                if (m_caretPos <= groupEnd && i < splitHints.Count)
+                {
+                    currentArg = i;
+                    break;
+                }
+                else if (m_caretPos > groupEnd && i + 1 < splitHints.Count)
+                {
+                    currentArg = i + 1;
+                }
+                else if (i >= splitHints.Count)
+                {
+                    currentArg = splitHints.Count - 1;
+                    break;
+                }
+            }
+            return currentArg;
+        }
+
+        private void UpdateCommandHintForInputName()
+        {
+            m_currentCommand = null;
+            m_currentHint = string.Empty;
+
+            string[] commands = m_InputString.Split(';');
+            string command = commands[commands.Length - 1].Simplified().Split()[0];
+            if (string.IsNullOrEmpty(command))
+            {
+                return;
+            }
+
+            var possibleCommands = Handler.GetPossibleCommands(command);
+            var possibleAliasCommands = Handler.GetPossibleAliasCommands(command);
+
+            var hints = new List<string>();
+            foreach (var kv in possibleCommands)
+            {
+                hints.Add(kv.Value.data.Keyword);
+            }
+            foreach (var kv in possibleAliasCommands)
+            {
+                hints.Add($"{kv.Key} [Alias]");
+            }
+
+            if (hints.Count > 0)
+            {
+                m_currentHint = string.Join(", ", hints);
             }
         }
 
@@ -856,37 +868,33 @@ namespace SkToolbox.Controllers
         /// </summary>
         private class HistoryController
         {
-            // Use a LinkedList instead of a List for better performance when adding and removing items
-            private LinkedList<string> history = new LinkedList<string>();
-            private LinkedListNode<string> currentNode;
+            public List<string> history = new List<string>();
+            private int index;
+            private string current;
 
-            // Add new item to the history and set the current node to the end of the list
             public void Add(string item)
             {
-                history.AddLast(item);
-                currentNode = history.Last;
+                history.Add(item);
+                index = 0;
             }
 
-            // Fetch the previous or next item in the history based on the "next" parameter
-            // Return the current item if there is no history or if the index is out of range
             public string Fetch(string current, bool next)
             {
-                if (currentNode == null)
+                if (index == 0)
+                {
+                    this.current = current;
+                }
+                if (history.Count == 0)
                 {
                     return current;
                 }
-
-                // Move to the previous or next node in the linked list
-                currentNode = next ? currentNode.Previous : currentNode.Next;
-
-                if (currentNode == null)
+                index += ((!next) ? 1 : -1);
+                if (history.Count + index < 0 || history.Count + index > history.Count - 1)
                 {
-                    // If we've reached the beginning or end of the list, reset to the current node
-                    currentNode = next ? null : history.Last;
-                    return current;
+                    this.index = 0;
+                    return this.current;
                 }
-
-                return currentNode.Value;
+                return history[history.Count + index];
             }
         }
     }
