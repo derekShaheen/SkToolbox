@@ -310,7 +310,7 @@ namespace SkToolbox.Controllers
                         m_InputString = string.Empty;
 
                         StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
-                        foreach(string cmd in commands.Take(commands.Length -1 ))
+                        foreach (string cmd in commands.Take(commands.Length - 1))
                         {
                             sb.Append(cmd.Simplified()).Append("; ");
                         }
