@@ -67,6 +67,41 @@ namespace SkToolboxAvPB
 }
 ```
 
+The following is a generic template in the same format as shown above.
+```csharp
+using BepInEx;
+using SkToolbox;
+
+/// <summary>
+/// Plugin for SkToolbox, intended for running on [Game Name]
+/// </summary>
+namespace SkToolbox[Game Name]
+{
+    [BepInPlugin(GUID, ModName, Version)]
+    [BepInDependency("com.Skrip.SkToolbox")] // Set the dependency
+    class SkBepInExLoader : BaseUnityPlugin
+    {
+        public const string // Declare plugin information
+            ModName = "SkToolbox[Game Name]",
+            Author = "[Your Name]",
+            GUID = "com." + Author + "." + ModName,
+            Version = "1.0.0.0";
+
+        /// <summary>
+        /// An example command for SkToolbox.
+        /// </summary>
+        /// <param name="category">The category of the command.</param>
+        [Command("ExampleCommand", "An example command for SkToolbox.", "[Category]")]
+        // Declare a custom command for SkToolbox
+        public static void ExampleCommand(string category)
+        {
+            // Write your code here to execute the command
+            Console.WriteLine($"This is an example command in {category}.");
+        }
+    }
+}
+```
+
 ##### What is a Command and how is it defined?
 The following is the signature for a command. Simply apply these attributes to a method as shown in the example above, and it will be automatically detected upon injection. Only the keyword and description are required parameters.
 Note: 
