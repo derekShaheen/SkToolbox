@@ -68,7 +68,7 @@ namespace SkToolbox
             }
 
             requiredArguments = 0;
-            StringBuilder builder = new StringBuilder(arguments.Count * 30);
+            StringBuilder builder = new StringBuilder(arguments.Count);
 
             foreach (ParameterInfo info in arguments)
             {
@@ -383,7 +383,7 @@ namespace SkToolbox
                     {
                         command.method.Invoke(this, convertedArgs.ToArray());
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         Logger.Submit($"Something happened while running {command.data.Keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
                         Debug.Log($"Make sure your command methods are both {"public".WithColor(Color.yellow)} and {"static".WithColor(Color.yellow)}, check the BepInEx console for more details.");
