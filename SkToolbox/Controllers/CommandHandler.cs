@@ -307,74 +307,62 @@ namespace SkToolbox
 
                     List<object> convertedArgs = new List<object>();
 
-                    // Loop through each argument type of the command object
-                    // and attempt to convert the corresponding text value to that type.
-                    // We'll unpack the converted args list into the function call which will automatically
-                    // cast from object -> the parameter type.
+                    /// Iterates through the arguments of a command and converts them to their expected types.
+                    /// If a required argument is missing, or an error occurs during conversion, logs an error message and returns.
+                    /// If an argument has a default value, it is filled in automatically.
+                    /// If an argument is marked with the ParamArray attribute, any remaining arguments are packed into an array of the expected type.
                     for (int i = 0; i < command.arguments.Count; ++i)
                     {
-                        // If there is a user supplied value, try to convert it.
-                        if (i < args.Count)
+                        var argument = command.arguments[i];
+                        var parameterType = argument.ParameterType;
+                        var isParamArray = argument.GetCustomAttribute(typeof(ParamArrayAttribute)) != null;
+
+                        if (i >= args.Count && !argument.HasDefaultValue)
                         {
-                            Type argType = command.arguments[i].ParameterType;
-
-                            string arg = args[i];
-
-                            object converted = null;
-
-                            try
-                            {
-                                if (command.arguments[i].GetCustomAttribute(typeof(ParamArrayAttribute)) != null)
-                                {
-                                    argType = argType.GetElementType();
-                                    converted = Util.StringsToObjects(args.Skip(i).ToArray(), argType);
-                                }
-                                else
-                                {
-                                    converted = Util.StringToObject(arg, argType);
-                                }
-                            }
-                            catch (SystemException e)
-                            {
-                                Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{argType.Name}</color>: {e.Message}");
-                                break;
-                            }
-                            catch (TooManyValuesException)
-                            {
-                                Logger.Submit($"Found more than one {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                                break;
-                            }
-                            catch (NoMatchFoundException)
-                            {
-                                Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(argType)} with the text <color=#EEEEEE>{arg}</color>.");
-                                break;
-                            }
-
-                            // Couldn't convert, oh well!
-                            if (converted == null)
-                            {
-                                Logger.Submit($"Error while converting arguments for command <color=#EEEEEE>{commandName}</color>.");
-                                break;
-                            }
-
-                            if (converted.GetType().IsArray)
-                            {
-                                object[] arr = converted as object[];
-                                var things = Array.CreateInstance(argType, arr.Length);
-                                Array.Copy(arr, things, arr.Length);
-                                convertedArgs.Add(things);
-                            }
-                            else
-                                convertedArgs.Add(converted);
+                            Logger.Submit($"Missing required argument for command <color=#EEEEEE>{commandName}</color>");
+                            return;
                         }
-                        // Otherwise, if we're still iterating, there's parameters they left unfilled.
-                        // This will only execute if they are optional parameters, due to our required arg count check earlier.
-                        else
+
+                        var arg = i < args.Count ? args[i] : argument.DefaultValue;
+                        object convertedArg = null;
+
+                        try
                         {
-                            // Since Invoke requires all parameters to be filled, we have to manually insert the function's default value.
-                            // Very silly.
-                            convertedArgs.Add(command.arguments[i].DefaultValue);
+                            convertedArg = isParamArray
+                                ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
+                                : arg;
                         }
+                        catch (SystemException e)
+                        {
+                            Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
+                            return;
+                        }
+                        catch (TooManyValuesException)
+                        {
+                            Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
+                        }
+                        catch (NoMatchFoundException)
+                        {
+                            Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                            return;
+                        }
+
+                        if (isParamArray)
+                        {
+                            var elementType = parameterType.GetElementType();
+                            var values = ((object[])convertedArg).Cast<object>().ToArray();
+                            var newArray = Array.CreateInstance(elementType, values.Length);
+
+                            for (int j = 0; j < values.Length; j++)
+                            {
+                                newArray.SetValue(values[j], j);
+                            }
+
+                            convertedArg = newArray;
+                        }
+
+                        convertedArgs.Add(convertedArg);
                     }
 
                     //Debug.Log("Running command " + command.data.keyword);
