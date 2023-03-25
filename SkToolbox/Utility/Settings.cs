@@ -131,5 +131,56 @@ namespace SkToolbox.Settings
             BottomLeft = 7,
             BottomRight = 8,
         }
+
+        public static void SetDefault(string key)
+        {
+            switch (key)
+            {
+                case "ConsoleMaxOutput":
+                    MaxOutputEntries = 999;
+                    break;
+                case "ConsoleFontSize":
+                    FontSize = 16;
+                    break;
+                case "ConsoleTheme":
+                    Theme = Color.grey;
+                    break;
+                case "ConsoleDarkenBackground":
+                    DarkenBackground = false;
+                    break;
+                case "ConsolePosition":
+                    Position = ConsolePos.TopCentered;
+                    break;
+                case "ConsoleWidth":
+                    Width = -1;
+                    break;
+                case "ConsoleHeight":
+                    Height = -2;
+                    break;
+                case "DisplayToggleKey":
+                    KeyToggleWindow = KeyCode.BackQuote;
+                    break;
+                case "PanelEnabled":
+                    ShowPanel = true;
+                    break;
+                case "ConsoleEnabled":
+                    ShowConsole = true;
+                    break;
+            }
+        }
+
+        public static void SetDefaultAll()
+        {
+            SetDefault("ConsoleMaxOutput");
+            SetDefault("ConsoleFontSize");
+            SetDefault("ConsoleTheme");
+            SetDefault("ConsoleDarkenBackground");
+            SetDefault("ConsolePosition");
+            SetDefault("ConsoleWidth");
+            SetDefault("ConsoleHeight");
+            SetDefault("DisplayToggleKey");
+            SetDefault("PanelEnabled");
+            SetDefault("ConsoleEnabled");
+        }
     }
 }
