@@ -27,6 +27,95 @@ namespace SkToolbox
             DisplayOptions = displayOptions;
             SortPriority = sortPriority;
         }
+
+        public Command(string keyword, string description, Util.DisplayOptions displayOptions, int sortPriority = 100)
+        {
+            Keyword = keyword;
+            Description = description;
+            Category = "zzBottom";
+            DisplayOptions = displayOptions;
+            SortPriority = sortPriority;
+        }
+
+        public Command(string keyword, string description, string category, int sortPriority)
+        {
+            Keyword = keyword;
+            Description = description;
+            Category = category ?? string.Empty;
+            DisplayOptions = Util.DisplayOptions.All;
+            SortPriority = sortPriority;
+        }
+
+        public Command(string keyword, string description, string category)
+        {
+            Keyword = keyword;
+            Description = description;
+            Category = category ?? string.Empty;
+            DisplayOptions = Util.DisplayOptions.All;
+            SortPriority = 100;
+        }
+
+        public Command(string keyword, string description)
+        {
+            Keyword = keyword;
+            Description = description;
+            Category = "zzBottom";
+            DisplayOptions = Util.DisplayOptions.All;
+            SortPriority = 100;
+        }
+
+        public Command(string keyword)
+        {
+            Keyword = keyword;
+            Description = string.Empty;
+            Category = "zzBottom";
+            DisplayOptions = Util.DisplayOptions.All;
+            SortPriority = 100;
+        }
+
+        public Command()
+        {
+            Keyword = string.Empty;
+            Description = string.Empty;
+            Category = "zzBottom";
+            DisplayOptions = Util.DisplayOptions.All;
+            SortPriority = 100;
+        }
+
+        public override string ToString()
+        {
+            return $"Command: {Keyword} - {Description}";
+        }
+
+        public static string GetKeyword(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault()?.Keyword;
+        }
+
+        public static string GetDescription(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault()?.Description;
+        }
+
+        public static string GetCategory(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault()?.Category;
+        }
+
+        public static Util.DisplayOptions GetDisplayOptions(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault()?.DisplayOptions ?? Util.DisplayOptions.All;
+        }
+
+        public static int GetSortPriority(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault()?.SortPriority ?? 100;
+        }
+
+        public static bool IsCommand(MethodBase method)
+        {
+            return method.GetCustomAttributes(typeof(Command), false).Length > 0;
+        }
     }
 
     /// <summary>
@@ -88,6 +177,11 @@ namespace SkToolbox
             }
 
             hint = builder.ToString(0, builder.Length - 1);
+        }
+
+        public override string ToString()
+        {
+            return $"{data.Keyword} {hint}";
         }
     }
 
