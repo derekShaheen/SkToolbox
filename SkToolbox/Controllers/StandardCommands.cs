@@ -273,10 +273,42 @@ namespace SkToolbox
                 Time.timeScale = timeScale;
 
                 Logger.Submit("Timescale set: " + Time.timeScale);
-            } else
+            }
+            else
             {
                 Logger.Submit("Timescale is currently: " + Time.timeScale);
             }
+        }
+
+        [Command("fps", "Sets or gets the target framerate. 0 unlocks the framerate. [0 - 300]", "  Base", DisplayOptions.ConsoleOnly)]
+        public static void SetFPS(int fps = 0)
+        {
+            if (fps > 0)
+            {
+                Application.targetFrameRate = fps;
+                Logger.Submit("Target framerate set: " + Application.targetFrameRate);
+            }
+            else
+            {
+                QualitySettings.vSyncCount = 0;
+                if(Application.targetFrameRate == -1)
+                {
+                    Logger.Submit("Currently: " + Application.targetFrameRate);
+                } else
+                {
+                    Application.targetFrameRate = -1;
+                    Logger.Submit("Framerate unlocked. Currently: " + Application.targetFrameRate);
+                }
+                
+            }
+        }
+
+        [Command("fpslockvsync", "Locks the framerate to the current framerate.", "  Base", DisplayOptions.ConsoleOnly)]
+        public static void LockFPSVSync()
+        {
+            QualitySettings.vSyncCount = 1;
+            Application.targetFrameRate = (int)(1f / Time.unscaledDeltaTime);
+            Logger.Submit("Framerate locked to: " + Application.targetFrameRate);
         }
     }
 }
