@@ -64,24 +64,6 @@ namespace SkToolbox
             SortPriority = 100;
         }
 
-        public Command(string keyword)
-        {
-            Keyword = keyword;
-            Description = string.Empty;
-            Category = "zzBottom";
-            DisplayOptions = Util.DisplayOptions.All;
-            SortPriority = 100;
-        }
-
-        public Command()
-        {
-            Keyword = string.Empty;
-            Description = string.Empty;
-            Category = "zzBottom";
-            DisplayOptions = Util.DisplayOptions.All;
-            SortPriority = 100;
-        }
-
         public override string ToString()
         {
             return $"Command: {Keyword} - {Description}";
