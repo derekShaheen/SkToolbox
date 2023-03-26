@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 /// <summary>
@@ -48,7 +49,7 @@ namespace SkToolbox
 
         private static readonly Regex s_tagStripPattern = new Regex(@"<((?:b)|(?:i)|(?:size)|(?:color)|(?:quad)|(?:material)).*?>(.*?)<\/\1>");
         private static readonly Regex s_colorTagPattern = new Regex(@"<color=#(\w{6})(\w{2})?>");
-        private const string s_commandPattern = @"[^\s""']+|""([^""]*)""|'([^']*)'";
+        private const string s_commandPattern = @"(?:[^\s""']+|""(?<dq>.*?)""|'(?<sq>.*?)')+";
         private static Dictionary<string, GameObject> s_cachedPrefabs = new Dictionary<string, GameObject>();
 
         public static string CommandPattern => s_commandPattern;
@@ -268,23 +269,17 @@ namespace SkToolbox
             if (type.IsArray)
                 return GetSimpleTypeName(type.GetElementType()) + "[]";
 
-            switch (type.Name)
+            switch (Type.GetTypeCode(type))
             {
-                case nameof(Int32):
-                case nameof(Int64):
-                    {
-                        return "Number";
-                    }
-                case nameof(UInt32):
-                case nameof(UInt64):
-                    {
-                        return "(+)Number";
-                    }
-                case nameof(Single):
-                case nameof(Double):
-                    {
-                        return "Decimal";
-                    }
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                    return "Number";
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    return "(+)Number";
+                case TypeCode.Single:
+                case TypeCode.Double:
+                    return "Decimal";
                 default:
                     return type.Name;
             }
@@ -311,15 +306,20 @@ namespace SkToolbox
         /// <returns>A formatted <see langword="string"/> of the list's contents and type.</returns>
         public static string AsText<T>(this List<T> input)
         {
-            string value = $"List<{typeof(T).Name}>(";
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"List<{nameof(T)}> (");
 
-            foreach (var item in input)
-                value += item.ToString() + ",";
+            for (int i = 0; i < input.Count; i++)
+            {
+                sb.Append(input[i].ToString());
+                if (i < input.Count - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
 
-            value = value.Remove(value.Length - 1);
-            value += ")";
-
-            return value;
+            sb.Append(")");
+            return sb.ToString();
         }
 
         /// <summary>
@@ -361,30 +361,32 @@ namespace SkToolbox
         }
 
         /// <summary>
-        /// Convert text from something like "testCommand" to "Test Command"
+        /// Converts a string of camelCase text to a human-readable format ex. "testCommand" to "Test Command"
         /// </summary>
-        /// <param name="inputText"></param>
-        /// <returns></returns>
+        /// <param name="inputText">The input string in camelCase format</param>
+        /// <returns>A human-readable string</returns>
         public static string ConvertCamelToHuman(string inputText)
         {
+            // Simplify the input string by removing any extra whitespaces
             inputText = inputText.Simplified();
-            if (inputText.Substring(0, 1).Equals(inputText.Substring(0, 1).ToLower()))
-            {
-                inputText = inputText.Substring(0, 1).ToUpper() + inputText.Substring(1);
-            }
-            
-            byte[] asciiBytes = System.Text.Encoding.ASCII.GetBytes(inputText);
-            int btyeOffset = 0;
 
-            for (int i = 1; i < asciiBytes.Length; i++)
+            // Capitalize the first letter if it is lowercase
+            if (char.IsLower(inputText[0]))
             {
-                if (asciiBytes[i] > 64 && asciiBytes[i] < 91)
+                inputText = char.ToUpper(inputText[0]) + inputText.Substring(1);
+            }
+
+            // Insert spaces before each uppercase letter
+            StringBuilder sb = new StringBuilder(inputText);
+            for (int i = 1; i < sb.Length - 1; i++)
+            {
+                if (char.IsUpper(sb[i]) && !char.IsWhiteSpace(sb[i - 1]) && char.IsLower(sb[i + 1]))
                 {
-                    inputText = inputText.Insert(i + btyeOffset, " "); // For each space insert, the remaining btyes will be offset.
-                    btyeOffset++; // Upon insert, keep track of the offset
+                    sb.Insert(i, ' ');
+                    i++;
                 }
             }
-            return inputText;
+            return sb.ToString();
         }
 
         /// <summary>

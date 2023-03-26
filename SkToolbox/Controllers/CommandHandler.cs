@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 using UnityEngine;
 namespace SkToolbox
@@ -323,43 +324,51 @@ namespace SkToolbox
                             return;
                         }
 
-                        var arg = i < args.Count ? args[i] : argument.DefaultValue;
                         object convertedArg = null;
 
-                        try
+                        if (i < args.Count)
                         {
-                            convertedArg = isParamArray
-                                ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
-                                : arg;
-                        }
-                        catch (SystemException e)
-                        {
-                            Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
-                            return;
-                        }
-                        catch (TooManyValuesException)
-                        {
-                            Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            return;
-                        }
-                        catch (NoMatchFoundException)
-                        {
-                            Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
-                            return;
-                        }
+                            object arg;
+                            arg = args[i];
 
-                        if (isParamArray)
-                        {
-                            var elementType = parameterType.GetElementType();
-                            var values = ((object[])convertedArg).Cast<object>().ToArray();
-                            var newArray = Array.CreateInstance(elementType, values.Length);
-
-                            for (int j = 0; j < values.Length; j++)
+                            try
                             {
-                                newArray.SetValue(values[j], j);
+                                convertedArg = isParamArray
+                                    ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
+                                    : Util.StringToObject(args[i], parameterType);
+                            }
+                            catch (SystemException e)
+                            {
+                                Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
+                                return;
+                            }
+                            catch (TooManyValuesException)
+                            {
+                                Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                return;
+                            }
+                            catch (NoMatchFoundException)
+                            {
+                                Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                return;
                             }
 
-                            convertedArg = newArray;
+                            if (isParamArray)
+                            {
+                                var elementType = parameterType.GetElementType();
+                                var values = ((object[])convertedArg).Cast<object>().ToArray();
+                                var newArray = Array.CreateInstance(elementType, values.Length);
+
+                                for (int j = 0; j < values.Length; j++)
+                                {
+                                    newArray.SetValue(values[j], j);
+                                }
+
+                                convertedArg = newArray;
+                            }
+                        } else
+                        {
+                            convertedArg = argument.DefaultValue;
                         }
 
                         convertedArgs.Add(convertedArg);
@@ -371,10 +380,12 @@ namespace SkToolbox
                     {
                         command.method.Invoke(this, convertedArgs.ToArray());
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Logger.Debug(ex.Message);
+                        Logger.Debug(ex.Source);
+                        Logger.Debug(ex.StackTrace);
                         Logger.Submit($"Something happened while running {command.data.Keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
-                        Debug.Log($"Make sure your command methods are both {"public".WithColor(Color.yellow)} and {"static".WithColor(Color.yellow)}, check the BepInEx console for more details.");
                         throw;
                     }
                 }
