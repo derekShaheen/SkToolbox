@@ -28,7 +28,7 @@ namespace SkToolbox
             SortPriority = sortPriority;
         }
 
-        public Command(string keyword, string description, Util.DisplayOptions displayOptions, int sortPriority = 100)
+        public Command(string keyword, string description, Util.DisplayOptions displayOptions = Util.DisplayOptions.All, int sortPriority = 100)
         {
             Keyword = keyword;
             Description = description;
@@ -37,11 +37,11 @@ namespace SkToolbox
             SortPriority = sortPriority;
         }
 
-        public Command(string keyword, string description, string category, int sortPriority)
+        public Command(string keyword, string description, string category, int sortPriority = 100)
         {
             Keyword = keyword;
             Description = description;
-            Category = category ?? string.Empty;
+            Category = category ?? "zzBottom";
             DisplayOptions = Util.DisplayOptions.All;
             SortPriority = sortPriority;
         }
@@ -50,7 +50,7 @@ namespace SkToolbox
         {
             Keyword = keyword;
             Description = description;
-            Category = category ?? string.Empty;
+            Category = category ?? "zzBottom";
             DisplayOptions = Util.DisplayOptions.All;
             SortPriority = 100;
         }
@@ -97,6 +97,28 @@ namespace SkToolbox
         public static bool IsCommand(MethodBase method)
         {
             return method.GetCustomAttributes(typeof(Command), false).Length > 0;
+        }
+
+        public static string GetHelpText(MethodBase method)
+        {
+            Command command = method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault();
+            if (command == null)
+                return string.Empty;
+            string arguments = string.Empty;
+            foreach (ParameterInfo info in method.GetParameters())
+            {
+                bool optional = info.HasDefaultValue;
+                if (!optional)
+                    arguments += $"<{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}> ";
+                else
+                {
+                    string defaultValue = info.DefaultValue == null ? "none" : info.DefaultValue.ToString();
+                    arguments += $"[{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}={defaultValue}] ";
+                }
+            }
+            if (!string.IsNullOrEmpty(arguments))
+                arguments = arguments.Substring(0, arguments.Length - 1);
+            return $"{command.Keyword} {arguments} - {command.Description}";
         }
     }
 
