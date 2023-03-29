@@ -209,6 +209,8 @@ namespace SkToolbox
         internal Controllers.MainConsole Console { get => m_console; set => m_console = value; }
         public Dictionary<string, string> Aliases { get => m_aliases; set => m_aliases = value; }
 
+        List<CommandMeta> query = new List<CommandMeta>();
+
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
         public void Help(string command = null, bool displayDescriptions = true)
         {
@@ -257,8 +259,6 @@ namespace SkToolbox
             Console = mainConsole;
             Register();
         }
-
-        List<CommandMeta> query = new List<CommandMeta>();
 
         /// <summary>
         /// Uses reflection to find all of the methods in this class annotated with the <see cref="Command"/> attribute
