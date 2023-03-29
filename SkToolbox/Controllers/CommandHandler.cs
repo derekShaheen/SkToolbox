@@ -148,6 +148,7 @@ namespace SkToolbox
         /// Number of required arguments for the command to run.
         /// </summary>
         public readonly int requiredArguments;
+        public bool isStandard = false;
 
         public CommandMeta(Command data, MethodBase method, List<ParameterInfo> arguments)
         {
@@ -211,58 +212,153 @@ namespace SkToolbox
         [Command("help", "Prints the command list, looks up the syntax of a specific command, or by partial command name.", "  Base")]
         public void Help(string command = null, bool displayDescriptions = true)
         {
-            if (string.IsNullOrEmpty(command) || command.Equals("\"\""))
+            IReadOnlyCollection<CommandMeta> cmds = m_actions.Values
+                .Where(cmd => string.IsNullOrEmpty(command) || cmd.data.Keyword.StartsWith(command, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(cmd => cmd.data.Keyword)
+                .ToList();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (CommandMeta meta in cmds)
             {
-                var cmds =
-                    m_actions.Values.ToList()
-                    .OrderBy(m => m.data.Keyword);
+                string fullCommand = meta.data.Keyword;
+                string hint = meta.arguments.Count > 0 ? $" {meta.hint.WithColor(Color.cyan)}" : "";
 
-                foreach (CommandMeta meta in cmds)
+                //sb.Append(meta.isStandard ? "[Standard] " : "")
+                    sb.Append(meta.isStandard ? fullCommand.WithColor(Color.blue + Color.yellow / 2f) : fullCommand.WithColor(Color.yellow))
+                    .Append(hint);
+
+                if (displayDescriptions && !string.IsNullOrEmpty(meta.data.Description))
                 {
-                    string fullCommand = meta.data.Keyword;
-                    if (displayDescriptions)
-                    {
-                        if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
-                        else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
-                    }
-                    else
-                    {
-                        if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
-                        else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}", false);
-                    }
+                    sb.AppendLine().Append(meta.data.Description);
                 }
-            }
-            else
-            {
-                var cmds = m_actions.Values.Where(cmd =>
-                                            cmd.data.Keyword.ToLower().StartsWith(command.ToLower())).ToList()
-                                            .OrderBy(cmd => cmd.data.Keyword);
 
-                foreach (CommandMeta meta in cmds)
-                {
-                    string fullCommand = meta.data.Keyword;
-
-                    if (displayDescriptions)
-                    {
-                        if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
-                        else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
-                    }
-                    else
-                    {
-                        if (meta.arguments.Count > 0)
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
-                        else
-                            Console.Submit($"{fullCommand.WithColor(Color.yellow)}", false);
-                    }
-                }
+                Console.Submit(sb.ToString(), false);
+                sb.Clear();
             }
         }
+        //public void Help(string command = null, bool displayDescriptions = true)
+        //{
+        //    if (string.IsNullOrEmpty(command) || command.Equals("\"\"") || command.Equals("*"))
+        //    {
+        //        var cmds =
+        //            m_actions.Values.ToList()
+        //            .OrderBy(m => m.data.Keyword);
+
+        //        foreach (CommandMeta meta in cmds)
+        //        {
+        //            string fullCommand = meta.data.Keyword;
+        //            if (displayDescriptions)
+        //            {
+        //                if (meta.arguments.Count > 0)
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
+        //                    }
+        //                else
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (meta.arguments.Count > 0)
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}", false);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var cmds = m_actions.Values.Where(cmd =>
+        //                                    cmd.data.Keyword.ToLower().StartsWith(command.ToLower())).ToList()
+        //                                    .OrderBy(cmd => cmd.data.Keyword);
+
+        //        foreach (CommandMeta meta in cmds)
+        //        {
+        //            string fullCommand = meta.data.Keyword;
+
+        //            if (displayDescriptions)
+        //            {
+        //                if (meta.arguments.Count > 0)
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}\n{meta.data.Description}", false);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
+        //                    } else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)}\n{meta.data.Description}", false);
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (meta.arguments.Count > 0)
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+        //                    } else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (meta.isStandard)
+        //                    {
+        //                        Console.Submit($"[Standard] {fullCommand.WithColor(Color.yellow)}", false);
+        //                    }
+        //                    else
+        //                    {
+        //                        Console.Submit($"{fullCommand.WithColor(Color.yellow)} {meta.hint.WithColor(Color.cyan)}", false);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         [Command("cls", "Clears the screen", "  Base", Util.DisplayOptions.ConsoleOnly)]
         public void ClearScreen()
@@ -314,6 +410,11 @@ namespace SkToolbox
                                 var commandAttribute = method.GetCustomAttribute<Command>();
                                 var parameters = method.GetParameters().ToList();
                                 var commandMeta = new CommandMeta(commandAttribute, method, parameters);
+
+                                if (assembly == Assembly.GetExecutingAssembly())
+                                {
+                                    commandMeta.isStandard = true;
+                                }
                                 query.Add(commandMeta);
                             }
                             catch (Exception ex)
@@ -464,7 +565,8 @@ namespace SkToolbox
 
                                 convertedArg = newArray;
                             }
-                        } else
+                        }
+                        else
                         {
                             convertedArg = argument.DefaultValue;
                         }
