@@ -104,22 +104,21 @@ namespace SkToolbox
             Command command = method.GetCustomAttributes(typeof(Command), false).Cast<Command>().FirstOrDefault();
             if (command == null)
                 return string.Empty;
-            string arguments = string.Empty;
-            foreach (ParameterInfo info in method.GetParameters())
+
+            string arguments = string.Join(" ", method.GetParameters().Select(info =>
             {
                 bool optional = info.HasDefaultValue;
-                if (!optional)
-                    arguments += $"<{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}> ";
-                else
-                {
-                    string defaultValue = info.DefaultValue == null ? "none" : info.DefaultValue.ToString();
-                    arguments += $"[{Util.GetSimpleTypeName(info.ParameterType)} {info.Name}={defaultValue}] ";
-                }
-            }
-            if (!string.IsNullOrEmpty(arguments))
-                arguments = arguments.Substring(0, arguments.Length - 1);
+                string typeName = Util.GetSimpleTypeName(info.ParameterType);
+                string defaultValue = info.DefaultValue == null ? "none" : info.DefaultValue.ToString();
+
+                return optional
+                    ? $"[{typeName} {info.Name}={defaultValue}]"
+                    : $"<{typeName} {info.Name}>";
+            }));
+
             return $"{command.Keyword} {arguments} - {command.Description}";
         }
+
     }
 
     /// <summary>
