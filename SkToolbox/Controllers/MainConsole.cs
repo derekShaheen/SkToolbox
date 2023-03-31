@@ -132,70 +132,72 @@ namespace SkToolbox.Controllers
 
         private void OnGUI()
         {
-            if (m_NeedsXAdjustment) // Run once
-            {
-                if (Handler.GetAllCommands().Count > 0)
-                {
-                    foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
-                    {
-
-                        GUIContent textItem = new GUIContent(command.Value.data.Keyword);
-                        Vector2 tempSize = GUI.skin.button.CalcSize(textItem);
-                        if (tempSize.x + 50 > m_PanelXSize)
-                        {
-                            m_PanelXSize = (int)tempSize.x + 50;
-                        }
-                    }
-                    if (!Console.ShowConsole)
-                    {
-                        HandlePositioning(m_PanelXSize);
-                    }
-                    m_NeedsXAdjustment = false;
-                }
-            }
-
+            AdjustPanelXSizeIfNeeded();
             HandleGUIEvents();
+
             if (isVisible)
             {
                 Stylize();
-
                 m_StyleWindow = GUI.skin.window;
 
-                if(Settings.Console.DarkenBackground)
+                if (Settings.Console.DarkenBackground)
                 {
                     GUI.Box(m_Fullscreen, "");
                 }
 
                 GUI.Box(m_MainWindow, "", m_StyleWindow);
-                if (Console.ShowPanel)
-                {
-                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, string.Empty, m_StyleWindow, new GUILayoutOption[]
-                    {
-                        GUILayout.MinWidth(m_Width),
-                        GUILayout.MaxWidth(m_Width),
-                    });
-                } else
-                {
-                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, "SkToolbox", m_StyleWindow, new GUILayoutOption[]
-                    {
-                        GUILayout.MinWidth(m_Width),
-                        GUILayout.MaxWidth(m_Width),
-                    });
-                }
+                m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, GetWindowTitle(), m_StyleWindow, GetWindowSizeOptions());
 
-
-                if (Settings.Console.ShowConsole && Settings.Console.KeyToggleWindow == KeyCode.BackQuote)
+                if (ShouldFocusInputBar())
                 {
                     GUI.FocusControl("InputBar");
-                } else
-                {
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
-                    {
-                        GUI.FocusControl("InputBar");
-                    }
                 }
+
                 EatInputInRect(m_MainWindow);
             }
+        }
+
+        private void AdjustPanelXSizeIfNeeded()
+        {
+            if (!m_NeedsXAdjustment || Handler.GetAllCommands().Count == 0) return;
+
+            foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
+            {
+                GUIContent textItem = new GUIContent(command.Value.data.Keyword);
+                Vector2 tempSize = GUI.skin.button.CalcSize(textItem);
+
+                if (tempSize.x + 50 > m_PanelXSize)
+                {
+                    m_PanelXSize = (int)tempSize.x + 50;
+                }
+            }
+
+            if (!Console.ShowConsole)
+            {
+                HandlePositioning(m_PanelXSize);
+            }
+
+            m_NeedsXAdjustment = false;
+        }
+
+        private string GetWindowTitle()
+        {
+            return Console.ShowPanel ? string.Empty : "SkToolbox";
+        }
+
+        private GUILayoutOption[] GetWindowSizeOptions()
+        {
+            return new GUILayoutOption[]
+            {
+        GUILayout.MinWidth(m_Width),
+        GUILayout.MaxWidth(m_Width),
+            };
+        }
+
+        private bool ShouldFocusInputBar()
+        {
+            return (Settings.Console.ShowConsole && Settings.Console.KeyToggleWindow == KeyCode.BackQuote)
+                    || IsPointerOnGUI(Event.current.mousePosition, m_MainWindow);
         }
 
         private void HandleKeys()
@@ -229,66 +231,69 @@ namespace SkToolbox.Controllers
                 return;
             }
 
-            // Prevent pressthroughs
-            if (Event.current.type == EventType.KeyDown
-                && (
-                   Event.current.keyCode == Console.KeyAutoComplete
-                || Event.current.keyCode == KeyCode.UpArrow
-                || Event.current.keyCode == KeyCode.DownArrow
-                || Event.current.keyCode == KeyCode.KeypadEnter
-                || Event.current.keyCode == KeyCode.Return))
-            {
-                Event.current.Use();
-            }
+            PreventKeyPassthroughs(evt);
 
             if (evt.isKey)
             {
-                switch (evt.keyCode)
-                {
-                    case KeyCode.Return:
-                        if (!m_InputString.Equals(string.Empty))
-                        {
-                            HandleInput(m_InputString);
-                        }
-                        break;
-                    case KeyCode.KeypadEnter:
-                        if (!m_InputString.Equals(string.Empty))
-                        {
-                            HandleInput(m_InputString);
-                        }
-                        break;
-
-                    case KeyCode.UpArrow:
-                        m_InputString = m_InputHistory.Fetch(m_InputString, true);
-                        m_MoveCursorOnNextFrame = true;
-                        break;
-                    case KeyCode.DownArrow:
-                        m_InputString = m_InputHistory.Fetch(m_InputString, false);
-                        m_MoveCursorOnNextFrame = true;
-                        break;
-                    case KeyCode.Tab:
-                        HandleAutoComplete();
-                        break;
-                    default:
-                        break;
-                }
+                HandleKeyEvent(evt);
             }
 
-            switch (Event.current.button)
+            PreventClickPassthroughs(evt);
+        }
+
+        private void PreventKeyPassthroughs(Event evt)
+        {
+            if (evt.type == EventType.KeyDown
+                && (
+                   evt.keyCode == Console.KeyAutoComplete
+                || evt.keyCode == KeyCode.UpArrow
+                || evt.keyCode == KeyCode.DownArrow
+                || evt.keyCode == KeyCode.KeypadEnter
+                || evt.keyCode == KeyCode.Return))
             {
-                case 0: // Left mouse button // Prevent clickthroughs
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow) && (Event.current.type == EventType.MouseDown
-                                                                                    || Event.current.type == EventType.MouseUp))
+                evt.Use();
+            }
+        }
+
+        private void HandleKeyEvent(Event evt)
+        {
+            switch (evt.keyCode)
+            {
+                case KeyCode.Return:
+                case KeyCode.KeypadEnter:
+                    if (!m_InputString.Equals(string.Empty))
                     {
-                        Event.current.Use(); // Consume the event
+                        HandleInput(m_InputString);
                     }
                     break;
-                case 1://Right mouse button // Prevent clickthroughs
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow) && (Event.current.type == EventType.MouseDown
-                                                                                    || Event.current.type == EventType.MouseUp))
-                    {
-                        Event.current.Use(); // Consume the event
-                    }
+
+                case KeyCode.UpArrow:
+                    m_InputString = m_InputHistory.Fetch(m_InputString, true);
+                    m_MoveCursorOnNextFrame = true;
+                    break;
+                case KeyCode.DownArrow:
+                    m_InputString = m_InputHistory.Fetch(m_InputString, false);
+                    m_MoveCursorOnNextFrame = true;
+                    break;
+                case KeyCode.Tab:
+                    HandleAutoComplete();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void PreventClickPassthroughs(Event evt)
+        {
+            bool isMouseClick = evt.type == EventType.MouseDown || evt.type == EventType.MouseUp;
+
+            if (!IsPointerOnGUI(evt.mousePosition, m_MainWindow) || !isMouseClick) return;
+
+            switch (evt.button)
+            {
+                case 0: // Left mouse button
+                case 1: // Right mouse button
+                    evt.Use(); // Consume the event
                     break;
                 default:
                     break;
