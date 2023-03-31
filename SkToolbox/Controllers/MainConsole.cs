@@ -711,31 +711,54 @@ namespace SkToolbox.Controllers
             {
                 font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
             }
+
+            UpdateWindowStyle();
+            UpdateStyleOutput();
+            UpdateStyleHint();
+            UpdateStyleInput();
+            UpdateStyleBanner();
+            UpdateStyleCategoryBanner();
+            UpdateStylePanelButtons();
+        }
+
+        private void UpdateWindowStyle()
+        {
             GUI.color = Console.Theme;
             GUI.skin.window.font = font;
             GUI.skin.window.fontStyle = FontStyle.Bold;
+        }
 
+        private void UpdateStyleOutput()
+        {
             m_StyleOutput.font = font;
             m_StyleOutput.fontSize = font.fontSize;
             m_StyleOutput.richText = true;
             m_StyleOutput.normal.textColor = Color.white;
             m_StyleOutput.wordWrap = true;
             m_StyleOutput.alignment = TextAnchor.UpperLeft;
+        }
 
+        private void UpdateStyleHint()
+        {
             if (m_StyleHint == null)
             {
                 m_StyleHint = new GUIStyle(m_StyleOutput);
                 m_StyleHint.fontSize = 13;
             }
+        }
 
+        private void UpdateStyleInput()
+        {
             if (m_StyleInput == null)
             {
                 m_StyleInput = new GUIStyle(GUI.skin.box);
                 m_StyleInput.alignment = TextAnchor.LowerLeft;
                 m_StyleInput.normal.textColor = Color.white;
-                //m_StyleInput.fontSize = font.fontSize;
             }
+        }
 
+        private void UpdateStyleBanner()
+        {
             if (m_StyleBanner == null)
             {
                 m_StyleBanner = new GUIStyle(m_StyleInput);
@@ -743,7 +766,10 @@ namespace SkToolbox.Controllers
                 m_StyleBanner.fontStyle = FontStyle.BoldAndItalic;
                 m_StyleBanner.alignment = TextAnchor.MiddleCenter;
             }
+        }
 
+        private void UpdateStyleCategoryBanner()
+        {
             if (m_StyleCategoryBanner == null)
             {
                 m_StyleCategoryBanner = new GUIStyle(m_StyleInput);
@@ -751,7 +777,10 @@ namespace SkToolbox.Controllers
                 m_StyleCategoryBanner.alignment = TextAnchor.MiddleCenter;
                 m_StyleCategoryBanner.fontStyle = FontStyle.Bold;
             }
+        }
 
+        private void UpdateStylePanelButtons()
+        {
             if (m_StylePanelButtons == null)
             {
                 m_StylePanelButtons = new GUIStyle(GUI.skin.textArea);
@@ -759,6 +788,7 @@ namespace SkToolbox.Controllers
             }
             m_StylePanelButtons.fontSize = font.fontSize;
         }
+
 
         public void HandlePositioning(int xOverride = -1, bool panelNeedsXAdjustment = false)
         {
