@@ -302,84 +302,65 @@ namespace SkToolbox.Controllers
 
         private void HandleAutoComplete()
         {
-            if (!string.IsNullOrEmpty(m_InputString))
+            if (string.IsNullOrEmpty(m_InputString)) return;
+
+            string[] commands = m_InputString.Split(';');
+
+            if (commands.Length > 1)
             {
-                string[] commands = m_InputString.Split(';');
-                if (commands.Length > 1) // Are there multiple commands found?
-                {
-                    string command = commands[commands.Length - 1].Simplified().Split()[0];
-                    var matchCommand = Handler.GetLikelyCommand(command);
-
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                    {
-                        m_InputString = string.Empty;
-
-                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
-                        foreach (string cmd in commands.Take(commands.Length - 1))
-                        {
-                            sb.Append(cmd.Simplified()).Append("; ");
-                        }
-                        sb.Append(matchCommand.Value.data.Keyword);
-                        m_InputString = sb.ToString();
-                    }
-                    m_MoveCursorOnNextFrame = true;
-                }
-                else // Only one found
-                {
-                    string strToCursor = m_InputString.Substring(0, m_caretPos);
-                    string command = strToCursor.Simplified().Split()[0];
-                    KeyValuePair<string, CommandMeta> matchCommand = new KeyValuePair<string, CommandMeta>();
-                    if (m_caretPosStored != m_caretPos)
-                    {
-                        m_caretPosStored = m_caretPos;
-                        m_CurrentSkip = 0;
-                        matchCommand = Handler.GetLikelyCommand(command);
-                    }
-                    else
-                    {
-                        m_CurrentSkip++;
-                        matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                        if (string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                        { // Did we loop the whole list? Go back to the start
-                            m_CurrentSkip = 0;
-                            matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                        }
-                    }
-
-                    int tempCounter = 0;
-                    // Are there more than 1 possible commands found?
-                    foreach (var possibleCommands in Handler.GetPossibleCommands(command))
-                    {
-                        tempCounter++;
-                        if (tempCounter > 1)
-                        {
-                            break;
-                        }
-                    }
-                    // If there's only one command, then move the cursor to the end 
-                    if (tempCounter == 1)
-                    {
-                        m_MoveCursorOnNextFrame = true;
-                    }
-
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                    {
-                        m_InputString = string.Empty;
-
-                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
-                        foreach (string cmd in commands.Take(commands.Length - 1))
-                        {
-                            sb.Append(cmd.Simplified()).Append("; ");
-                        }
-                        sb.Append(matchCommand.Value.data.Keyword);
-                        m_InputString = sb.ToString();
-                    }
-                }
+                HandleAutoCompleteForMultipleCommands(commands);
             }
             else
             {
-                m_InputString = m_InputHistory.Fetch(m_InputString, true).Split()[0] + " ";
+                HandleAutoCompleteForSingleCommand(commands);
+            }
+        }
+
+        private void HandleAutoCompleteForMultipleCommands(string[] commands)
+        {
+            string lastCommand = commands[commands.Length - 1].Simplified().Split()[0];
+            var matchCommand = Handler.GetLikelyCommand(lastCommand);
+
+            if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+            {
+                m_InputString = string.Join("; ", commands.Take(commands.Length - 1).Select(cmd => cmd.Simplified())) + "; " + matchCommand.Value.data.Keyword;
+            }
+
+            m_MoveCursorOnNextFrame = true;
+        }
+
+        private void HandleAutoCompleteForSingleCommand(string[] commands)
+        {
+            string strToCursor = m_InputString.Substring(0, m_caretPos);
+            string command = strToCursor.Simplified().Split()[0];
+            KeyValuePair<string, CommandMeta> matchCommand;
+
+            if (m_caretPosStored != m_caretPos)
+            {
+                m_caretPosStored = m_caretPos;
+                m_CurrentSkip = 0;
+                matchCommand = Handler.GetLikelyCommand(command);
+            }
+            else
+            {
+                m_CurrentSkip++;
+                matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                if (string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+                {
+                    m_CurrentSkip = 0;
+                    matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                }
+            }
+
+            bool hasMultiplePossibleCommands = Handler.GetPossibleCommands(command).Skip(1).Any();
+            if (!hasMultiplePossibleCommands)
+            {
                 m_MoveCursorOnNextFrame = true;
+            }
+
+            if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+            {
+                m_InputString = matchCommand.Value.data.Keyword;
             }
         }
 
