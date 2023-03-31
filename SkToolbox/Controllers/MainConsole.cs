@@ -763,73 +763,61 @@ namespace SkToolbox.Controllers
         public void HandlePositioning(int xOverride = -1, bool panelNeedsXAdjustment = false)
         {
             // Setup sizing
-            if (Console.Width == 0) Console.Width = -1;
-            if (Console.Height == 0) Console.Height = -1;
+            int margin = Console.Margin * 2;
+            m_Width = Console.Width >= 0 ? Console.Width - margin : (Screen.width / Mathf.Abs(Console.Width)) - margin;
+            m_Height = Console.Height >= 0 ? Console.Height : (Screen.height / Mathf.Abs(Console.Height) - 125);
 
-            if (Console.Width >= 0)
-            {
-                m_Width = Console.Width - (Console.Margin * 2);
-
-            }
-            else
-            {
-                m_Width = (Screen.width / Mathf.Abs(Console.Width)) - (Console.Margin * 2);
-            }
-
-            if (Console.Height >= 0)
-            {
-                m_Height = Console.Height;
-            }
-            else
-            {
-                m_Height = (Screen.height / Mathf.Abs(Console.Height) - 125);
-            }
             // Set min/max sizing
             m_Width = Mathf.Clamp(m_Width, 320, Screen.width);
             m_Height = Mathf.Clamp(m_Height, 240, Screen.height);
 
             // Setup positioning
+            int centerX = (Screen.width / 2) - (m_Width / 2);
+            int centerY = (Screen.height / 2) - (m_Height / 2);
+            int bottomY = Screen.height - m_Height - Console.Margin - 125;
+
             switch (Console.Position)
             {
                 case Console.ConsolePos.TopCentered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
+                    m_Xpos = centerX;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.LeftCentered:
                     m_Xpos = Console.Margin;
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.RightCentered:
                     m_Xpos = Screen.width - m_Width - Console.Margin;
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.Centered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Xpos = centerX;
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.TopLeft:
                     m_Xpos = Console.Margin;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.TopRight:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
+                    m_Xpos = Screen.width - m_Width - Console.Margin;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.BottomLeft:
                     m_Xpos = Console.Margin;
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Ypos = bottomY;
                     break;
                 case Console.ConsolePos.BottomRight:
                     m_Xpos = Screen.width - m_Width - Console.Margin;
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Ypos = bottomY;
                     break;
                 case Console.ConsolePos.BottomCentered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Xpos = centerX;
+                    m_Ypos = bottomY;
                     break;
                 default:
                     break;
             }
+
             if (xOverride > 0)
             {
                 m_Width = xOverride;
