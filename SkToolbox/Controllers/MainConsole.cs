@@ -68,9 +68,9 @@ namespace SkToolbox.Controllers
         private CommandHandler m_handler;
         public CommandHandler Handler
         {
-            get 
-            { 
-                if(m_handler == null)
+            get
+            {
+                if (m_handler == null)
                 {
                     m_handler = new CommandHandler(this);
                 }
@@ -92,7 +92,8 @@ namespace SkToolbox.Controllers
                 _instance = this;
             }
 
-            StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) => {
+            StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) =>
+            {
                 bannerTexture = response;
             }));
 
@@ -114,7 +115,7 @@ namespace SkToolbox.Controllers
             }
             if (isVisible)
             {
-                if(Settings.Console.ShowConsole)
+                if (Settings.Console.ShowConsole)
                 {
                     m_caretPos = m_Editor.cursorIndex;
                     UpdateCommandHint();
@@ -375,9 +376,9 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
-                if(SkVersionChecker.NewVersionAvailable)
+                if (SkVersionChecker.NewVersionAvailable)
                 {
-                    if(GUILayout.Button("New version (" + SkVersionChecker.latestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.currentVersion + ") available on " + SkVersionChecker.ApplicationSource + "!", m_StylePanelButtons))
+                    if (GUILayout.Button("New version (" + SkVersionChecker.latestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.currentVersion + ") available on " + SkVersionChecker.ApplicationSource + "!", m_StylePanelButtons))
                     {
                         Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
                     }
@@ -397,7 +398,7 @@ namespace SkToolbox.Controllers
                     GUILayout.Label(line, m_StyleOutput);
                     if (GUILayout.Button(" ", GUI.skin.box, GUILayout.Width(22)))
                     {
-                        
+
                         m_InputString = Util.StripTags(line).Trim();
                         m_MoveCursorOnNextFrame = true;
                     };
@@ -554,17 +555,18 @@ namespace SkToolbox.Controllers
                 GUILayout.MaxHeight(m_MainWindow.height),
             });
 
-            if(bannerTexture != null)
+            if (bannerTexture != null)
             {
                 if (GUILayout.Button(bannerTexture, m_StyleBanner))
                 {
                     Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (SkVersionChecker.NewVersionAvailable ? 
+                        "\n" + (SkVersionChecker.NewVersionAvailable ?
                                     ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
                                     "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
                 }
-            } else
+            }
+            else
             {
                 if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
                 {
@@ -576,7 +578,8 @@ namespace SkToolbox.Controllers
                 }
             }
 
-            if(Handler.GetAllCommands().Count == 0 && Handler.IsSearching) {
+            if (Handler.GetAllCommands().Count == 0 && Handler.IsSearching)
+            {
                 GUILayout.Label("Searching...", m_StylePanelButtons);
             }
 
