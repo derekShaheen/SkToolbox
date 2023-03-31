@@ -658,13 +658,13 @@ namespace SkToolbox.Controllers
                 }
 
                 m_CurrentString = m_InputString;
-                string[] commands = m_InputString.Split(';');
-                string command = commands[commands.Length - 1].Simplified().Split()[0];
+                string lastCommand = m_InputString.Split(';').Last().Simplified().Split().FirstOrDefault();
 
-                m_currentCommand = Handler.GetCommand(command);
+                m_currentCommand = lastCommand != null ? Handler.GetCommand(lastCommand) : null;
                 return true;
             }
         }
+
 
         public void Submit(string entry, bool prefix = true)
         {
