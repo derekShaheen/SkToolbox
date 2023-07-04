@@ -79,7 +79,7 @@ namespace SkToolbox.Loaders
             SkGameObject.transform.parent = null;
             UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
 
-            Console = SkGameObject.AddComponent<Controllers.MainConsole>();
+            Console = SkGameObject.AddComponent<MainConsole>();
 
             LoadAliases();
             LoadBinds();
