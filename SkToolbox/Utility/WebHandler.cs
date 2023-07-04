@@ -64,7 +64,7 @@ namespace SkToolbox.Utility
                 }
             }));
          */
-        static IEnumerator GetRequest(string url, Action<UnityWebRequest> callback)
+        internal static IEnumerator GetRequest(string url, Action<UnityWebRequest> callback)
         {
             if (!SettingsController.Get<bool>("NetworkFunctions"))
             {
@@ -73,6 +73,7 @@ namespace SkToolbox.Utility
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
+                request.SetRequestHeader("User-Agent", "SkToolbox User");
                 // Send the request and wait for a response
                 yield return request.SendWebRequest();
                 callback(request);

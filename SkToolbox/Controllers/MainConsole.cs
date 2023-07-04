@@ -376,9 +376,9 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
-                if (SkVersionChecker.NewVersionAvailable)
+                if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).HasNewerVersion)
                 {
-                    if (GUILayout.Button("New version (" + SkVersionChecker.latestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.currentVersion + ") available on " + SkVersionChecker.ApplicationSource + "!", m_StylePanelButtons))
+                    if (GUILayout.Button("New version (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).LatestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).CurrentVersion + ")!", m_StylePanelButtons))
                     {
                         Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
                     }
@@ -559,9 +559,11 @@ namespace SkToolbox.Controllers
             {
                 if (GUILayout.Button(bannerTexture, m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (SkVersionChecker.NewVersionAvailable ?
-                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
+                    SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+
+                    Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                        "\n" + (checkRequest.HasNewerVersion ?
+                                    ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
                                     "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
                 }
@@ -570,9 +572,11 @@ namespace SkToolbox.Controllers
             {
                 if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (SkVersionChecker.NewVersionAvailable ?
-                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
+                    SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+
+                    Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                        "\n" + (checkRequest.HasNewerVersion ?
+                                    ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
                                     "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
                 }

@@ -1,11 +1,13 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using SkToolbox.Controllers;
+using SkToolbox.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SkToolbox.Loaders
 {
@@ -16,7 +18,7 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "2.0.2.3";
+            VERSION = "1.0.2.3";
 
         private static SkBepInExLoader _loader;
         public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
@@ -82,7 +84,8 @@ namespace SkToolbox.Loaders
             LoadAliases();
             LoadBinds();
 
-            Utility.SkVersionChecker.CheckVersion();
+            Utility.SkVersionChecker.RegisterCheckRequest(MODNAME,  new Version(VERSION), "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Loaders/SkBepInExLoader.cs", false);
+            Utility.SkVersionChecker.RegisterCheckRequest("Hit",    new Version(VERSION), "https://hits.dwyl.com/derekShaheen/SkToolbox.svg", false);
         }
 
         public void Main()
