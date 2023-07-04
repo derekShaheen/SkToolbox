@@ -84,8 +84,8 @@ namespace SkToolbox.Loaders
             LoadAliases();
             LoadBinds();
 
-            Utility.SkVersionChecker.RegisterCheckRequest(MODNAME,  new Version(VERSION), "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Loaders/SkBepInExLoader.cs", false);
-            Utility.SkVersionChecker.RegisterCheckRequest("Hit",    new Version(VERSION), "https://hits.dwyl.com/derekShaheen/SkToolbox.svg", false);
+            SkVersionChecker.RegisterCheckRequest(MODNAME,  new Version(VERSION), "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Loaders/SkBepInExLoader.cs", false);
+            SkVersionChecker.RegisterCheckRequest("Hit",    new Version(VERSION), "https://hits.dwyl.com/derekShaheen/SkToolbox.svg", false);
         }
 
         public void Main()
