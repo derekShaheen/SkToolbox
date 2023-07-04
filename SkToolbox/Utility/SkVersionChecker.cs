@@ -161,7 +161,7 @@ namespace SkToolbox.Utility
             request.LatestVersion = latestVersion;
             request.NewerVersionAvailable = latestVersion > request.CurrentVersion;
             request.HasProcessed = true;
-            Console.WriteLine("Processed:" + request.ToString());
+
             if (request.NewerVersionAvailable)
             {
                 Console.WriteLine("New version of " + request.ModuleName + " available! Current version: " + request.CurrentVersion.ToString() + ", Latest version: " + request.LatestVersion.ToString());
