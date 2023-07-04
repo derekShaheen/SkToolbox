@@ -376,7 +376,7 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
-                if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).HasNewerVersion)
+                if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).NewerVersionAvailable)
                 {
                     if (GUILayout.Button("New version (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).LatestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).CurrentVersion + ")!", m_StylePanelButtons))
                     {
@@ -562,7 +562,7 @@ namespace SkToolbox.Controllers
                     SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
 
                     Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (checkRequest.HasNewerVersion ?
+                        "\n" + (checkRequest.NewerVersionAvailable ?
                                     ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
                                     "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();
@@ -575,7 +575,7 @@ namespace SkToolbox.Controllers
                     SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
 
                     Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (checkRequest.HasNewerVersion ?
+                        "\n" + (checkRequest.NewerVersionAvailable ?
                                     ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
                                     "\tUp to date!".WithColor(Color.green)));
                     ScrollToBottom();

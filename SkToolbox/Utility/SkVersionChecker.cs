@@ -7,6 +7,8 @@ namespace SkToolbox.Utility
 {
     /// <summary>
     /// Provides methods to check for new versions of registered modules.
+    /// Intended to be provided with a page that provides a raw text response containing the latest version number.
+    /// OR a bepinex plugin header can be linked.
     /// </summary>
     public static class SkVersionChecker
     {
@@ -39,7 +41,7 @@ namespace SkToolbox.Utility
             /// <summary>
             /// Indicates whether there is a newer version available for the module.
             /// </summary>
-            public bool HasNewerVersion { get; set; }
+            public bool NewerVersionAvailable { get; set; }
 
             /// <summary>
             /// Indicates whether there is a newer version available for the module.
@@ -53,7 +55,7 @@ namespace SkToolbox.Utility
 
             public override string ToString()
             {
-                return $"CheckRequest: {ModuleName} {CurrentVersion} {EndpointUrl} {LatestVersion} {HasNewerVersion} {HasProcessed} {Announce}";
+                return $"CheckRequest: {ModuleName} {CurrentVersion} {EndpointUrl} {LatestVersion} {NewerVersionAvailable} {HasProcessed} {Announce}";
 
             }
         }
@@ -72,6 +74,11 @@ namespace SkToolbox.Utility
         /// <param name="announce">Indicates whether to announce the result of the version check.</param>
         public static void RegisterCheckRequest(string moduleName, Version currentVersion, string endpointUrl, bool announce = true)
         {
+            if(!Controllers.SettingsController.Get<bool>("NetworkFunctions"))
+            {
+                return;
+            }
+
             // Check if the module is already in the check list
             var existingRequest = _checkRequests.Find(req => req.ModuleName.Equals(moduleName));
             if (existingRequest.HasProcessed)
@@ -86,7 +93,7 @@ namespace SkToolbox.Utility
                     ModuleName = moduleName,
                     CurrentVersion = currentVersion,
                     EndpointUrl = endpointUrl,
-                    HasNewerVersion = false,
+                    NewerVersionAvailable = false,
                     Announce = announce,
                     HasProcessed = false
                 });
@@ -152,10 +159,10 @@ namespace SkToolbox.Utility
             }   
 
             request.LatestVersion = latestVersion;
-            request.HasNewerVersion = latestVersion > request.CurrentVersion;
+            request.NewerVersionAvailable = latestVersion > request.CurrentVersion;
             request.HasProcessed = true;
             Console.WriteLine("Processed:" + request.ToString());
-            if (request.HasNewerVersion)
+            if (request.NewerVersionAvailable)
             {
                 Console.WriteLine("New version of " + request.ModuleName + " available! Current version: " + request.CurrentVersion.ToString() + ", Latest version: " + request.LatestVersion.ToString());
                 if (request.Announce)
