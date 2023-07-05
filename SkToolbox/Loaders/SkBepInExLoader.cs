@@ -30,7 +30,7 @@ namespace SkToolbox.Loaders
             {
                 if (_skGameObject == null)
                 {
-                    _skGameObject = new GameObject("SkToolbox");
+                    _skGameObject = new GameObject(MODNAME);
                 }
                 return _skGameObject;
             }
