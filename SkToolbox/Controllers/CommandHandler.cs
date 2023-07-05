@@ -355,115 +355,123 @@ namespace SkToolbox
                 string workLine = line.Simplified();
 
                 workLine = ReplaceAlias(workLine);
-
-                string[] workLineSplit = new string[] { workLine };
-
-                foreach (string distilledWorkLine in workLineSplit)
+                // It's possible the alias was replaced with another alias, so we need to check again.
+                Logger.Debug("Initial work line:" + workLine);
+                List<string> workLineVerify = workLine.SplitEscaped(';');
+                foreach (string workLineSplitStr in workLineVerify)
                 {
-                    // Split the text using our pattern. Splits by spaces but preserves quote groups.
-                    List<string> args = Util.SplitByQuotes(distilledWorkLine);
+                    string workLineNew = ReplaceAlias(workLineSplitStr.Simplified());
+                    Logger.Debug("Work line New:" + workLineNew);
+                    string[] workLineSplit = new string[] { workLineNew };
 
-                    // Store command ID and remove it from our arguments list.
-                    string commandName = args[0];
-                    args.RemoveAt(0);
-
-                    // Look up the command value, fail if it doesn't exist.
-                    if (!m_actions.TryGetValue(commandName, out CommandMeta command))
+                    foreach (string distilledWorkLine in workLineSplit)
                     {
-                        Console.Submit($"Unknown command <color=yellow>{commandName}</color>.");
-                        continue;
-                        //return;
-                    }
+                        Logger.Debug("Dist Work line:" + workLineNew);
+                        // Split the text using our pattern. Splits by spaces but preserves quote groups.
+                        List<string> args = Util.SplitByQuotes(distilledWorkLine);
 
-                    if (args.Count < command.requiredArguments)
-                    {
-                        Console.Submit($"Missing required number of arguments for <color=yellow>{commandName}</color>.");
-                        continue;
-                        //return;
-                    }
+                        // Store command ID and remove it from our arguments list.
+                        string commandName = args[0];
+                        args.RemoveAt(0);
 
-                    List<object> convertedArgs = new List<object>();
-
-                    /// Iterates through the arguments of a command and converts them to their expected types.
-                    /// If a required argument is missing, or an error occurs during conversion, logs an error message and returns.
-                    /// If an argument has a default value, it is filled in automatically.
-                    /// If an argument is marked with the ParamArray attribute, any remaining arguments are packed into an array of the expected type.
-                    for (int i = 0; i < command.arguments.Count; ++i)
-                    {
-                        var argument = command.arguments[i];
-                        var parameterType = argument.ParameterType;
-                        var isParamArray = argument.GetCustomAttribute(typeof(ParamArrayAttribute)) != null;
-
-                        if (i >= args.Count && !argument.HasDefaultValue)
+                        // Look up the command value, fail if it doesn't exist.
+                        if (!m_actions.TryGetValue(commandName, out CommandMeta command))
                         {
-                            Logger.Submit($"Missing required argument for command <color=#EEEEEE>{commandName}</color>");
-                            return;
+                            Console.Submit($"Unknown command <color=yellow>{commandName}</color>.");
+                            continue;
+                            //return;
                         }
 
-                        object convertedArg = null;
-
-                        if (i < args.Count)
+                        if (args.Count < command.requiredArguments)
                         {
-                            object arg;
-                            arg = args[i];
+                            Console.Submit($"Missing required number of arguments for <color=yellow>{commandName}</color>.");
+                            continue;
+                            //return;
+                        }
 
-                            try
+                        List<object> convertedArgs = new List<object>();
+
+                        /// Iterates through the arguments of a command and converts them to their expected types.
+                        /// If a required argument is missing, or an error occurs during conversion, logs an error message and returns.
+                        /// If an argument has a default value, it is filled in automatically.
+                        /// If an argument is marked with the ParamArray attribute, any remaining arguments are packed into an array of the expected type.
+                        for (int i = 0; i < command.arguments.Count; ++i)
+                        {
+                            var argument = command.arguments[i];
+                            var parameterType = argument.ParameterType;
+                            var isParamArray = argument.GetCustomAttribute(typeof(ParamArrayAttribute)) != null;
+
+                            if (i >= args.Count && !argument.HasDefaultValue)
                             {
-                                convertedArg = isParamArray
-                                    ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
-                                    : Util.StringToObject(args[i], parameterType);
-                            }
-                            catch (SystemException e)
-                            {
-                                Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
-                                return;
-                            }
-                            catch (TooManyValuesException)
-                            {
-                                Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
-                                return;
-                            }
-                            catch (NoMatchFoundException)
-                            {
-                                Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                Logger.Submit($"Missing required argument for command <color=#EEEEEE>{commandName}</color>");
                                 return;
                             }
 
-                            if (isParamArray)
-                            {
-                                var elementType = parameterType.GetElementType();
-                                var values = ((object[])convertedArg).Cast<object>().ToArray();
-                                var newArray = Array.CreateInstance(elementType, values.Length);
+                            object convertedArg = null;
 
-                                for (int j = 0; j < values.Length; j++)
+                            if (i < args.Count)
+                            {
+                                object arg;
+                                arg = args[i];
+
+                                try
                                 {
-                                    newArray.SetValue(values[j], j);
+                                    convertedArg = isParamArray
+                                        ? Util.StringsToObjects(args.Skip(i).ToArray(), parameterType.GetElementType())
+                                        : Util.StringToObject(args[i], parameterType);
+                                }
+                                catch (SystemException e)
+                                {
+                                    Logger.Submit($"System error while converting <color=#EEEEEE>{arg}</color> to <color=#EEEEEE>{parameterType.Name}</color>: {e.Message}");
+                                    return;
+                                }
+                                catch (TooManyValuesException)
+                                {
+                                    Logger.Submit($"Found more than one {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                    return;
+                                }
+                                catch (NoMatchFoundException)
+                                {
+                                    Logger.Submit($"Couldn't find a {Util.GetSimpleTypeName(parameterType)} with the text <color=#EEEEEE>{arg}</color>.");
+                                    return;
                                 }
 
-                                convertedArg = newArray;
+                                if (isParamArray)
+                                {
+                                    var elementType = parameterType.GetElementType();
+                                    var values = ((object[])convertedArg).Cast<object>().ToArray();
+                                    var newArray = Array.CreateInstance(elementType, values.Length);
+
+                                    for (int j = 0; j < values.Length; j++)
+                                    {
+                                        newArray.SetValue(values[j], j);
+                                    }
+
+                                    convertedArg = newArray;
+                                }
                             }
+                            else
+                            {
+                                convertedArg = argument.DefaultValue;
+                            }
+
+                            convertedArgs.Add(convertedArg);
                         }
-                        else
+
+                        //Debug.Log("Running command " + command.data.keyword);
+                        // Invoke the method, which will expand all the arguments automagically.
+                        try
                         {
-                            convertedArg = argument.DefaultValue;
+                            command.method.Invoke(this, convertedArgs.ToArray());
                         }
-
-                        convertedArgs.Add(convertedArg);
-                    }
-
-                    //Debug.Log("Running command " + command.data.keyword);
-                    // Invoke the method, which will expand all the arguments automagically.
-                    try
-                    {
-                        command.method.Invoke(this, convertedArgs.ToArray());
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Debug(ex.Message);
-                        Logger.Debug(ex.Source);
-                        Logger.Debug(ex.StackTrace);
-                        Logger.Submit($"Something happened while running {command.data.Keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
-                        throw;
+                        catch (Exception ex)
+                        {
+                            Logger.Debug(ex.Message);
+                            Logger.Debug(ex.Source);
+                            Logger.Debug(ex.StackTrace);
+                            Logger.Submit($"Something happened while running {command.data.Keyword.WithColor(Color.white)}, check the BepInEx console for more details.");
+                            throw;
+                        }
                     }
                 }
             }
@@ -479,19 +487,39 @@ namespace SkToolbox
 
         public string ReplaceAlias(string input)
         {
+            int infiniteLoopCounter = 0;
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            string[] split = input.Split();
+            string[] split;
+            string alias;
 
-            string alias = GetAlias(split[0]);
-
-            if (!string.IsNullOrEmpty(alias))
+            do
             {
-                split[0] = alias;
+                infiniteLoopCounter++;
 
-                return string.Join(" ", split);
-            }
+                if (infiniteLoopCounter > 100)
+                {
+                    Console.Submit("Infinite loop detected! Breaking out of command execution.");
+                    break;
+                }
+                split = input.Split();
+                string potentialAlias = split[0];
+
+                // Check if the last character is a semicolon, and remove it if it is
+                if (potentialAlias.EndsWith(";"))
+                {
+                    potentialAlias = potentialAlias.Substring(0, potentialAlias.Length - 1);
+                }
+
+                alias = GetAlias(potentialAlias);
+                if (!string.IsNullOrEmpty(alias))
+                {
+                    split[0] = alias;
+                    input = string.Join(" ", split);
+                }
+
+            } while (!string.IsNullOrEmpty(alias));
 
             return input;
         }

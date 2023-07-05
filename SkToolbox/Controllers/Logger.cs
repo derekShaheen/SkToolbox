@@ -1,4 +1,5 @@
 ﻿using SkToolbox.Controllers;
+using System;
 using UnityEngine;
 
 namespace SkToolbox
@@ -19,7 +20,8 @@ namespace SkToolbox
             {
                 inputString = Settings.Console.OutputPrefix + inputString;
             }
-            UnityEngine.Debug.Log(inputString);
+            //UnityEngine.Debug.Log(inputString);
+            Console.WriteLine(inputString);
         }
     }
 }
