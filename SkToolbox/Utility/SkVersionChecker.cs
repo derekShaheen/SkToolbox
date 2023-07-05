@@ -16,7 +16,7 @@ namespace SkToolbox.Utility
         /// <summary>
         /// Struct representing a version check request.
         /// </summary>
-        public struct CheckRequest
+        public class CheckRequest
         {
             /// <summary>
             /// The name of the module.
@@ -81,7 +81,7 @@ namespace SkToolbox.Utility
 
             // Check if the module is already in the check list
             var existingRequest = _checkRequests.Find(req => req.ModuleName.Equals(moduleName));
-            if (existingRequest.HasProcessed)
+            if (existingRequest != null && existingRequest.HasProcessed)
             {
                 existingRequest.CurrentVersion = currentVersion;
                 _checkQueue.Enqueue(existingRequest);
