@@ -356,17 +356,14 @@ namespace SkToolbox
 
                 workLine = ReplaceAlias(workLine);
                 // It's possible the alias was replaced with another alias, so we need to check again.
-                Logger.Debug("Initial work line:" + workLine);
                 List<string> workLineVerify = workLine.SplitEscaped(';');
                 foreach (string workLineSplitStr in workLineVerify)
                 {
                     string workLineNew = ReplaceAlias(workLineSplitStr.Simplified());
-                    Logger.Debug("Work line New:" + workLineNew);
                     string[] workLineSplit = new string[] { workLineNew };
 
                     foreach (string distilledWorkLine in workLineSplit)
                     {
-                        Logger.Debug("Dist Work line:" + workLineNew);
                         // Split the text using our pattern. Splits by spaces but preserves quote groups.
                         List<string> args = Util.SplitByQuotes(distilledWorkLine);
 
