@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -80,6 +81,7 @@ namespace SkToolbox.Loaders
             UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
 
             Console = SkGameObject.AddComponent<MainConsole>();
+            SkPatcher.InitPatch();
 
             LoadAliases();
             LoadBinds();

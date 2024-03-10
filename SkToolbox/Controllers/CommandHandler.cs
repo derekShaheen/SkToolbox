@@ -455,8 +455,6 @@ namespace SkToolbox
                             convertedArgs.Add(convertedArg);
                         }
 
-                        //Debug.Log("Running command " + command.data.keyword);
-                        // Invoke the method, which will expand all the arguments automagically.
                         try
                         {
                             command.method.Invoke(this, convertedArgs.ToArray());

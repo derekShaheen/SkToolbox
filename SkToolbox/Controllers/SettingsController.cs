@@ -50,6 +50,36 @@ namespace SkToolbox.Controllers
         }
 
         /// <summary>
+        /// Bind a new configuration entry to the existing config file.
+        /// </summary>
+        /// <typeparam name="T">The type of the configuration value.</typeparam>
+        /// <param name="section">The section under which the configuration should be placed.</param>
+        /// <param name="key">The key for the configuration entry.</param>
+        /// <param name="defaultValue">The default value for the configuration entry.</param>
+        /// <param name="description">The description of the configuration entry.</param>
+        public static void NewBind<T>(string section, string key, T defaultValue, string description = "")
+        {
+            if (_configFile == null)
+            {
+                Debug.Log("Config file not initialized.");
+                return;
+            }
+
+            // Create the configuration entry
+            var configEntry = _configFile.Bind(section, key, defaultValue, description);
+
+            // Add or update the configuration entry in the dictionary
+            if (s_config.ContainsKey(key))
+            {
+                s_config[key] = configEntry;
+            }
+            else
+            {
+                s_config.Add(key, configEntry);
+            }
+        }
+
+        /// <summary>
         /// Retrieve a specific config value by name.
         /// </summary>
         /// <typeparam name="T">Type of value stored at the given <paramref name="key"/></typeparam>
