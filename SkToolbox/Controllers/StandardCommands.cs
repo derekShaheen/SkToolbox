@@ -1,7 +1,9 @@
-﻿using System;
+﻿using SkToolbox.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static SkToolbox.Util;
 
 namespace SkToolbox
@@ -37,7 +39,7 @@ namespace SkToolbox
         [Command("bind", "Bind a console command to a key. See the Unity documentation for KeyCode names.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Bind(string keyCode, params string[] commandText)
         {
-            if (!Enum.TryParse(keyCode, true, out KeyCode result))
+            if (!Enum.TryParse(keyCode, true, out Key result))
             {
                 Logger.Submit($"Couldn't find a key code named {keyCode.WithColor(Color.white)}.", true);
                 return;
@@ -126,7 +128,7 @@ namespace SkToolbox
                 return;
             }
 
-            if (!Enum.TryParse(keyCode, true, out KeyCode result))
+            if (!Enum.TryParse(keyCode, true, out Key result))
             {
                 Logger.Submit($"Couldn't find a key code named {keyCode.WithColor(Color.white)}.", true);
                 return;
@@ -144,7 +146,7 @@ namespace SkToolbox
         [Command("unbind", "Removes a custom keybind.", "  Base", DisplayOptions.ConsoleOnly)]
         public static void Unbind(string keyCode)
         {
-            if (!Enum.TryParse(keyCode, true, out KeyCode result))
+            if (!Enum.TryParse(keyCode, true, out Key result))
             {
                 Logger.Submit($"Couldn't find a key code named {keyCode.WithColor(Color.white)}.", true);
                 return;
@@ -215,10 +217,10 @@ namespace SkToolbox
             Logger.Submit("Size set to " + Settings.Console.Width.ToString() + "x" + Settings.Console.Height);
         }
 
-        [Command("con_setfontsize", "Set the size of the font in the console. [10 - 24]", "  Base", DisplayOptions.ConsoleOnly)]
+        [Command("con_setfontsize", "Set the size of the font in the console. [10 - 36]", "  Base", DisplayOptions.ConsoleOnly)]
         public static void ConFontSetSize(int fontSize = 16)
         {
-            fontSize = Mathf.Clamp(fontSize, 10, 24);
+            fontSize = Mathf.Clamp(fontSize, 10, 36);
             Settings.Console.FontSize = fontSize;
             Loaders.SkBepInExLoader.Console.font = Font.CreateDynamicFontFromOSFont("Consolas", fontSize);
             Logger.Submit("Font size set to " + Settings.Console.FontSize);
@@ -263,6 +265,12 @@ namespace SkToolbox
             Settings.Console.ShowConsole = true;
 
             Logger.Submit("Console set: " + Settings.Console.ShowConsole);
+        }
+
+        [Command("con", "Toggles the visibility of the console / panel.", "  Base", DisplayOptions.ConsoleOnly, 0)]
+        public static void ConToggle()
+        {
+            MainConsole._instance.ToggleVisibility();
         }
 
         [Command("time", "Sets or gets the timescale. [Set or Get] [0.1f - 10.0f]", "  Base", DisplayOptions.ConsoleOnly)]

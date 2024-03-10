@@ -1,4 +1,5 @@
-﻿using SkToolbox.Controllers;
+﻿
+using SkToolbox.Controllers;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace SkToolbox.Utility
          */
         internal static IEnumerator GetTextureRequest(string url, System.Action<Texture2D> callback)
         {
-            if(!SettingsController.Get<bool>("NetworkFunctions"))
+            if (!SettingsController.Get<bool>("NetworkFunctions"))
             {
                 yield return null;
             }

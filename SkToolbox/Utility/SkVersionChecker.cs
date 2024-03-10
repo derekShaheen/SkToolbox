@@ -74,7 +74,7 @@ namespace SkToolbox.Utility
         /// <param name="announce">Indicates whether to announce the result of the version check.</param>
         public static void RegisterCheckRequest(string moduleName, Version currentVersion, string endpointUrl, bool announce = true)
         {
-            if(!Controllers.SettingsController.Get<bool>("NetworkFunctions"))
+            if (!Controllers.SettingsController.Get<bool>("NetworkFunctions"))
             {
                 return;
             }
@@ -138,7 +138,7 @@ namespace SkToolbox.Utility
             Version latestVersion = null;
             Version.TryParse(result, out latestVersion);
 
-            if(latestVersion == null)
+            if (latestVersion == null)
             {
                 String[] strSplit = result.Split('\n');
                 foreach (string line in strSplit)
@@ -149,14 +149,15 @@ namespace SkToolbox.Utility
                         {
                             String versionExtract = line.Substring(line.IndexOf('"') + 1, 7);
                             Version.TryParse(versionExtract, out latestVersion);
-                        } else
+                        }
+                        else
                         {
                             Version.TryParse(line, out latestVersion);
                         }
                         break;
                     }
                 }
-            }   
+            }
 
             request.LatestVersion = latestVersion;
             request.NewerVersionAvailable = latestVersion > request.CurrentVersion;

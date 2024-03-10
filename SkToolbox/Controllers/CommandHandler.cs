@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BepInEx.Unity.Mono;
+using BepInEx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -219,13 +221,14 @@ namespace SkToolbox
                 .ToList();
 
             StringBuilder sb = new StringBuilder();
-
+            sb.AppendLine("Command Syntax: command <requiredArg> [optionalArg=default]");
+            sb.AppendLine("<requiredArg>: A required argument. Must be provided for the command to work.");
+            sb.AppendLine("[optionalArg=default]: An optional argument with a default value. If not provided, it defaults to the value after '='.");
             foreach (CommandMeta meta in cmds)
             {
                 string fullCommand = meta.data.Keyword;
                 string hint = meta.arguments.Count > 0 ? $" {meta.hint.WithColor(Color.cyan)}" : "";
 
-                //sb.Append(meta.isStandard ? "[Standard] " : "")
                     sb.Append(meta.isStandard ? fullCommand.WithColor(Color.blue + Color.yellow / 2f) : fullCommand.WithColor(Color.yellow))
                     .Append(hint);
 
@@ -278,6 +281,7 @@ namespace SkToolbox
                 {
                     var typesWithCommands = assembly.GetTypes()
                         .Where(type => type.GetMethods().Any(method => method.GetCustomAttribute<Command>() != null));
+                    bool assemblyHasCommands = false;
                     foreach (var type in typesWithCommands)
                     {
                         foreach (var method in type.GetMethods().Where(m => m.GetCustomAttribute<Command>() != null))
@@ -293,6 +297,7 @@ namespace SkToolbox
                                     commandMeta.isStandard = true;
                                 }
                                 query.Add(commandMeta);
+                                assemblyHasCommands = true;
                             }
                             catch (Exception ex)
                             {
@@ -300,6 +305,32 @@ namespace SkToolbox
                                 Debug.LogWarning(ex.ToString());
                             }
                         }
+                    }
+
+                    if (assemblyHasCommands && assembly != this.GetType().Assembly)
+                    {
+                        var pluginTypes = assembly.GetTypes()
+                            .Where(type => typeof(BaseUnityPlugin).IsAssignableFrom(type) && type.GetCustomAttribute<BepInPlugin>() != null);
+
+                        foreach (var pluginType in pluginTypes)
+                        {
+                            // Extract the MODNAME and VERSION information using case-insensitive search.
+                            var modNameField = pluginType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                                .FirstOrDefault(field => string.Equals(field.Name, "MODNAME", StringComparison.OrdinalIgnoreCase));
+                            var versionField = pluginType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                                .FirstOrDefault(field => string.Equals(field.Name, "VERSION", StringComparison.OrdinalIgnoreCase));
+
+                            if (modNameField != null && versionField != null)
+                            {
+                                var modName = (string)modNameField.GetValue(null);
+                                var version = (string)versionField.GetValue(null);
+
+                                Loaders.SkBepInExLoader.Loader.pluginInfo.Add(modName, version);
+
+                                Logger.Debug($"Found module: {modName}, Version: {version}");
+                            }
+                        }
+                        assemblyHasCommands = false;
                     }
                 }
                 catch (Exception ex) when (!(ex is IndexOutOfRangeException))

@@ -92,10 +92,10 @@ namespace SkToolbox.Controllers
                 _instance = this;
             }
 
-            StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) =>
-            {
-                bannerTexture = response;
-            }));
+            //StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) =>
+            //{
+            //    bannerTexture = response;
+            //}));
 
             m_Fullscreen = new Rect(0, 0, Screen.width, Screen.height);
 
@@ -128,7 +128,7 @@ namespace SkToolbox.Controllers
                 }
 
             }
-            HandleKeys();
+            //HandleKeys();
         }
 
         private void OnGUI()
@@ -154,7 +154,7 @@ namespace SkToolbox.Controllers
                     GUI.FocusControl("InputBar");
                 }
 
-                EatInputInRect(m_MainWindow);
+                //EatInputInRect(m_MainWindow);
             }
         }
 
@@ -201,22 +201,22 @@ namespace SkToolbox.Controllers
                     || IsPointerOnGUI(Event.current.mousePosition, m_MainWindow);
         }
 
-        private void HandleKeys()
-        {
-            if (Input.GetKeyDown(Console.KeyToggleWindow))
-            {
-                isVisible = !isVisible;
+        //private void HandleKeys()
+        //{
+        //    if (Input.GetKeyDown(Console.KeyToggleWindow))
+        //    {
+        //        isVisible = !isVisible;
 
-                if (!isVisible)
-                {
-                    m_InputString = string.Empty;
-                }
-                else
-                {
-                    ScrollToBottom();
-                }
-            }
-        }
+        //        if (!isVisible)
+        //        {
+        //            m_InputString = string.Empty;
+        //        }
+        //        else
+        //        {
+        //            ScrollToBottom();
+        //        }
+        //    }
+        //}
 
         private bool IsPointerOnGUI(Vector2 vector, Rect rect)
         {
@@ -227,19 +227,61 @@ namespace SkToolbox.Controllers
         {
             Event evt = Event.current;
 
+            // Handle visibility toggle regardless of current visibility state
+            if (evt.type == EventType.KeyDown && evt.keyCode == Settings.Console.KeyToggleWindow)
+            {
+                ToggleVisibility(evt);
+            }
+
+            if (evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            {
+                if (!m_InputString.Equals(string.Empty))
+                {
+                    HandleInput(m_InputString);
+                }
+            }
+
+            // If the console is visible, process key events and prevent passthrough
+            if (IsVisible)
+            {
+                if (evt.isKey)
+                {
+                    HandleKeyEvent(evt);
+                    //PreventKeyPassthroughs(evt);
+                }
+
+                //PreventClickPassthroughs(evt);
+            }
+        }
+
+        private void ToggleVisibility(Event evt)
+        {
+            isVisible = !isVisible;
+
             if (!isVisible)
             {
-                return;
+                m_InputString = string.Empty;
             }
-
-            PreventKeyPassthroughs(evt);
-
-            if (evt.isKey)
+            else
             {
-                HandleKeyEvent(evt);
+                ScrollToBottom();
             }
 
-            PreventClickPassthroughs(evt);
+            evt.Use(); // Consume the event to prevent further processing
+        }
+
+        public void ToggleVisibility()
+        {
+            isVisible = !isVisible;
+
+            if (!isVisible)
+            {
+                m_InputString = string.Empty;
+            }
+            else
+            {
+                ScrollToBottom();
+            }
         }
 
         private void PreventKeyPassthroughs(Event evt)
@@ -258,30 +300,55 @@ namespace SkToolbox.Controllers
 
         private void HandleKeyEvent(Event evt)
         {
-            switch (evt.keyCode)
+            // Check if the event is a key press event
+            if (evt.type == EventType.KeyDown)
             {
-                case KeyCode.Return:
-                case KeyCode.KeypadEnter:
-                    if (!m_InputString.Equals(string.Empty))
-                    {
-                        HandleInput(m_InputString);
-                    }
-                    break;
-
-                case KeyCode.UpArrow:
-                    m_InputString = m_InputHistory.Fetch(m_InputString, true);
-                    m_MoveCursorOnNextFrame = true;
-                    break;
-                case KeyCode.DownArrow:
-                    m_InputString = m_InputHistory.Fetch(m_InputString, false);
-                    m_MoveCursorOnNextFrame = true;
-                    break;
-                case KeyCode.Tab:
-                    HandleAutoComplete();
-                    break;
-                default:
-                    break;
+                switch (evt.keyCode)
+                {
+                    //case KeyCode.Return:
+                    //    if (!m_InputString.Equals(string.Empty))
+                    //    {
+                    //        HandleInput(m_InputString);
+                    //    }
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.KeypadEnter:
+                    //    if (!m_InputString.Equals(string.Empty))
+                    //    {
+                    //        HandleInput(m_InputString);
+                    //    }
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.UpArrow:
+                    //    m_InputString = m_InputHistory.Fetch(m_InputString, true);
+                    //    m_MoveCursorOnNextFrame = true;
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.DownArrow:
+                    //    m_InputString = m_InputHistory.Fetch(m_InputString, false);
+                    //    m_MoveCursorOnNextFrame = true;
+                    //    evt.Use();
+                    //    break;
+                    case KeyCode.Tab:
+                        HandleAutoComplete();
+                        evt.Use();
+                        break;
+                    default:
+                        break;
+                }
             }
+        }
+
+        internal void KeyUp()
+        {
+            m_InputString = m_InputHistory.Fetch(m_InputString, true);
+            m_MoveCursorOnNextFrame = true;
+        }
+
+        internal void KeyDown()
+        {
+            m_InputString = m_InputHistory.Fetch(m_InputString, false);
+            m_MoveCursorOnNextFrame = true;
         }
 
         private void PreventClickPassthroughs(Event evt)
@@ -376,13 +443,13 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
-                if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).NewerVersionAvailable)
-                {
-                    if (GUILayout.Button("New version (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).LatestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).CurrentVersion + ")!", m_StylePanelButtons))
-                    {
-                        Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
-                    }
-                }
+                //if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).NewerVersionAvailable)
+                //{
+                //    if (GUILayout.Button("New version (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).LatestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).CurrentVersion + ")!", m_StylePanelButtons))
+                //    {
+                //        Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
+                //    }
+                //}
 
                 m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
                     new GUILayoutOption[]
@@ -559,25 +626,38 @@ namespace SkToolbox.Controllers
             {
                 if (GUILayout.Button(bannerTexture, m_StyleBanner))
                 {
-                    SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+                    if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
+                    {
+                        //SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
 
-                    Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (checkRequest.NewerVersionAvailable ?
-                                    ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
-                                    "\tUp to date!".WithColor(Color.green)));
-                    ScrollToBottom();
+                        //Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                        //    "\n" + (checkRequest.NewerVersionAvailable ?
+                        //                ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
+                        //                "\tUp to date!".WithColor(Color.green)));
+                        Logger.Submit("SkToolbox " + Loaders.SkBepInExLoader.VERSION + " on " + Application.productName);
+                        foreach (var plugin in Loaders.SkBepInExLoader.Loader.pluginInfo)
+                        {
+                            Logger.Submit($"Plugin: {plugin.Key}, Version: {plugin.Value}");
+                        }
+                        ScrollToBottom();
+                    }
                 }
             }
             else
             {
                 if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
                 {
-                    SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+                    //SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
 
-                    Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (checkRequest.NewerVersionAvailable ?
-                                    ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
-                                    "\tUp to date!".WithColor(Color.green)));
+                    //Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                    //    "\n" + (checkRequest.NewerVersionAvailable ?
+                    //                ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
+                    //                "\tUp to date!".WithColor(Color.green)));
+                    Logger.Submit("SkToolbox " + Loaders.SkBepInExLoader.VERSION + " on " + Application.productName);
+                    foreach (var plugin in Loaders.SkBepInExLoader.Loader.pluginInfo)
+                    {
+                        Logger.Submit($"Plugin: {plugin.Key}, Version: {plugin.Value}");
+                    }
                     ScrollToBottom();
                 }
             }
@@ -704,7 +784,12 @@ namespace SkToolbox.Controllers
             }
         }
 
-        private void ScrollToBottom()
+        public void HandleInput()
+        {
+            HandleInput(m_InputString);
+        }
+
+        public void ScrollToBottom()
         {
             m_LinesScrollPosition.y = Mathf.Infinity;
         }
@@ -867,12 +952,12 @@ namespace SkToolbox.Controllers
             return Handler;
         }
 
-        private void EatInputInRect(Rect eatRect)
-        {
-            var mousePos = Input.mousePosition;
-            if (eatRect.Contains(new Vector2(mousePos.x, Screen.height - mousePos.y)))
-                Input.ResetInputAxes();
-        }
+        //private void EatInputInRect(Rect eatRect)
+        //{
+        //    var mousePos = Input.mousePosition;
+        //    if (eatRect.Contains(new Vector2(mousePos.x, Screen.height - mousePos.y)))
+        //        Input.ResetInputAxes();
+        //}
 
         /// <summary>
         /// A history controller that stores a list of items and allows fetching the previous and next item in the list.
