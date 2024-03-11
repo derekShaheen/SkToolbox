@@ -30,7 +30,7 @@ namespace SkToolbox.Controllers
                 {
                     //Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
                     harmony = Harmony.CreateAndPatchAll(assembly);
-                    //SkUtilities.Logz(new string[] { "SkCommandPatcher", "INJECT" }, new string[] { "INJECT => COMPLETE" });
+                    SkUtilities.Logz(new string[] { "SkCommandPatcher", "INJECT" }, new string[] { "INJECT => COMPLETE" });
                 }
                 catch (Exception ex)
                 {

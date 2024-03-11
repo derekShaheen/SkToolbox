@@ -1,11 +1,15 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Unity.Mono;
 using SkToolbox.Controllers;
+using SkToolbox.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Networking;
 
 namespace SkToolbox.Loaders
 {
@@ -16,10 +20,11 @@ namespace SkToolbox.Loaders
             MODNAME = "SkToolbox",
             AUTHOR = "Skrip",
             GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "2.0.2.2";
+            VERSION = "2.6.3.0";
 
         private static SkBepInExLoader _loader;
         public static SkBepInExLoader Loader { get => _loader; set => _loader = value; }
+        public Dictionary<string, string> pluginInfo = new Dictionary<string, string>();
 
         private static GameObject _skGameObject;
         public static GameObject SkGameObject
@@ -28,7 +33,7 @@ namespace SkToolbox.Loaders
             {
                 if (_skGameObject == null)
                 {
-                    _skGameObject = new GameObject("SkToolbox");
+                    _skGameObject = new GameObject(MODNAME);
                 }
                 return _skGameObject;
             }
@@ -39,14 +44,15 @@ namespace SkToolbox.Loaders
         public static MainConsole Console { get => _console; set => _console = value; }
 
 
-        private Dictionary<KeyCode, string> m_binds = new Dictionary<KeyCode, string>();
-        internal Dictionary<KeyCode, string> Binds { get => m_binds; set => m_binds = value; }
+        private Dictionary<Key, string> m_binds = new Dictionary<Key, string>();
+        internal Dictionary<Key, string> Binds { get => m_binds; set => m_binds = value; }
 
         private static ConfigFile _configFile;
         public static ConfigFile ConfigFile { get => _configFile; set => _configFile = value; }
 
         private void Start()
         {
+            pluginInfo = new Dictionary<string, string>();
             ConfigFile = Config;
             SkToolbox.Logger.Debug("Initialization success!");
             if (Loader == null)
@@ -59,14 +65,46 @@ namespace SkToolbox.Loaders
 
         private void Update()
         {
-            if (!Console.IsVisible)
+            //if (!Console.IsVisible)
+            //{
+            //    foreach (KeyValuePair<KeyCode, string> pair in m_binds)
+            //    {
+            //        if (Input.GetKeyDown(pair.Key))
+            //            Console.HandleInput(pair.Value, false);
+            //    }
+            //}
+
+            // Check if any key was pressed this frame
+            if (Keyboard.current.anyKey.wasPressedThisFrame)
             {
-                foreach (KeyValuePair<KeyCode, string> pair in m_binds)
+                // Iterate over all keys to find the one that was pressed
+                foreach (var key in Keyboard.current.allKeys)
                 {
-                    if (Input.GetKeyDown(pair.Key))
-                        Console.HandleInput(pair.Value, false);
+                    if (key.wasPressedThisFrame)
+                    {
+                        // If the key that was pressed is in the binds dictionary, send to handle input
+                        if (m_binds.TryGetValue(key.keyCode, out string value))
+                        {
+                            Console.HandleInput(value, false);
+                            break; // Exit the loop if we found the key
+                        }
+                        if (key.keyCode == Key.Enter || key.keyCode == Key.NumpadEnter)
+                        {
+                            Console.HandleInput();
+                            break; // Exit the loop if we found the key
+                        }
+                        if (key.keyCode == Key.UpArrow)
+                        {
+                            Console.KeyUp();
+                        }
+                        if (key.keyCode == Key.DownArrow)
+                        {
+                            Console.KeyDown();
+                        }
+                    }
                 }
             }
+
         }
 
         private void Init()
@@ -77,12 +115,13 @@ namespace SkToolbox.Loaders
             SkGameObject.transform.parent = null;
             UnityEngine.Object.DontDestroyOnLoad(SkGameObject);
 
-            Console = SkGameObject.AddComponent<Controllers.MainConsole>();
-
+            Console = SkGameObject.AddComponent<MainConsole>();
+            SkPatcher.InitPatch();
             LoadAliases();
             LoadBinds();
 
-            Utility.SkVersionChecker.CheckVersion();
+            SkVersionChecker.RegisterCheckRequest(MODNAME,  new Version(VERSION), "https://raw.githubusercontent.com/derekShaheen/SkToolbox/release/SkToolbox/Loaders/SkBepInExLoader.cs", false);
+            SkVersionChecker.RegisterCheckRequest("Hit",    new Version(VERSION), "https://hits.dwyl.com/derekShaheen/SkToolbox.svg", false);
         }
 
         public void Main()
@@ -92,7 +131,7 @@ namespace SkToolbox.Loaders
 
         public void ReInit()
         {
-            Destroy(SkGameObject, 0f);
+            GameObject.Destroy(SkGameObject, 0f);
             SkGameObject = null;
 
             Init();
@@ -147,7 +186,7 @@ namespace SkToolbox.Loaders
             {
                 var parts = line.Split(new[] { '=' }, 2);
 
-                if (parts.Length != 2 || !Enum.TryParse(parts[0], out KeyCode key))
+                if (parts.Length != 2 || !Enum.TryParse(parts[0], out Key key))
                     continue;
 
                 m_binds[key] = parts[1].Trim();

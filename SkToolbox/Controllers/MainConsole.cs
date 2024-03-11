@@ -68,9 +68,9 @@ namespace SkToolbox.Controllers
         private CommandHandler m_handler;
         public CommandHandler Handler
         {
-            get 
-            { 
-                if(m_handler == null)
+            get
+            {
+                if (m_handler == null)
                 {
                     m_handler = new CommandHandler(this);
                 }
@@ -92,9 +92,10 @@ namespace SkToolbox.Controllers
                 _instance = this;
             }
 
-            StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) => {
-                bannerTexture = response;
-            }));
+            //StartCoroutine(WebHandler.GetTextureRequest(bannerUrl, (response) =>
+            //{
+            //    bannerTexture = response;
+            //}));
 
             m_Fullscreen = new Rect(0, 0, Screen.width, Screen.height);
 
@@ -114,7 +115,7 @@ namespace SkToolbox.Controllers
             }
             if (isVisible)
             {
-                if(Settings.Console.ShowConsole)
+                if (Settings.Console.ShowConsole)
                 {
                     m_caretPos = m_Editor.cursorIndex;
                     UpdateCommandHint();
@@ -127,93 +128,95 @@ namespace SkToolbox.Controllers
                 }
 
             }
-            HandleKeys();
+            //HandleKeys();
         }
 
         private void OnGUI()
         {
-            if (m_NeedsXAdjustment) // Run once
-            {
-                if (Handler.GetAllCommands().Count > 0)
-                {
-                    foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
-                    {
-
-                        GUIContent textItem = new GUIContent(command.Value.data.Keyword);
-                        Vector2 tempSize = GUI.skin.button.CalcSize(textItem);
-                        if (tempSize.x + 50 > m_PanelXSize)
-                        {
-                            m_PanelXSize = (int)tempSize.x + 50;
-                        }
-                    }
-                    if (!Console.ShowConsole)
-                    {
-                        HandlePositioning(m_PanelXSize);
-                    }
-                    m_NeedsXAdjustment = false;
-                }
-            }
-
+            AdjustPanelXSizeIfNeeded();
             HandleGUIEvents();
+
             if (isVisible)
             {
                 Stylize();
-
                 m_StyleWindow = GUI.skin.window;
 
-                if(Settings.Console.DarkenBackground)
+                if (Settings.Console.DarkenBackground)
                 {
                     GUI.Box(m_Fullscreen, "");
                 }
 
                 GUI.Box(m_MainWindow, "", m_StyleWindow);
-                if (Console.ShowPanel)
-                {
-                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, string.Empty, m_StyleWindow, new GUILayoutOption[]
-                    {
-                        GUILayout.MinWidth(m_Width),
-                        GUILayout.MaxWidth(m_Width),
-                    });
-                } else
-                {
-                    m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, "SkToolbox", m_StyleWindow, new GUILayoutOption[]
-                    {
-                        GUILayout.MinWidth(m_Width),
-                        GUILayout.MaxWidth(m_Width),
-                    });
-                }
+                m_MainWindow = GUILayout.Window(24950, m_MainWindow, DrawWindow, GetWindowTitle(), m_StyleWindow, GetWindowSizeOptions());
 
-
-                if (Settings.Console.ShowConsole && Settings.Console.KeyToggleWindow == KeyCode.BackQuote)
+                if (ShouldFocusInputBar())
                 {
                     GUI.FocusControl("InputBar");
-                } else
-                {
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow))
-                    {
-                        GUI.FocusControl("InputBar");
-                    }
                 }
-                EatInputInRect(m_MainWindow);
+
+                //EatInputInRect(m_MainWindow);
             }
         }
 
-        private void HandleKeys()
+        private void AdjustPanelXSizeIfNeeded()
         {
-            if (Input.GetKeyDown(Console.KeyToggleWindow))
-            {
-                isVisible = !isVisible;
+            if (!m_NeedsXAdjustment || Handler.GetAllCommands().Count == 0) return;
 
-                if (!isVisible)
+            foreach (KeyValuePair<string, CommandMeta> command in Handler.GetAllCommands())
+            {
+                GUIContent textItem = new GUIContent(command.Value.data.Keyword);
+                Vector2 tempSize = GUI.skin.button.CalcSize(textItem);
+
+                if (tempSize.x + 50 > m_PanelXSize)
                 {
-                    m_InputString = string.Empty;
-                }
-                else
-                {
-                    ScrollToBottom();
+                    m_PanelXSize = (int)tempSize.x + 50;
                 }
             }
+
+            if (!Console.ShowConsole)
+            {
+                HandlePositioning(m_PanelXSize);
+            }
+
+            m_NeedsXAdjustment = false;
         }
+
+        private string GetWindowTitle()
+        {
+            return Console.ShowPanel ? string.Empty : "SkToolbox";
+        }
+
+        private GUILayoutOption[] GetWindowSizeOptions()
+        {
+            return new GUILayoutOption[]
+            {
+        GUILayout.MinWidth(m_Width),
+        GUILayout.MaxWidth(m_Width),
+            };
+        }
+
+        private bool ShouldFocusInputBar()
+        {
+            return (Settings.Console.ShowConsole && Settings.Console.KeyToggleWindow == KeyCode.BackQuote)
+                    || IsPointerOnGUI(Event.current.mousePosition, m_MainWindow);
+        }
+
+        //private void HandleKeys()
+        //{
+        //    if (Input.GetKeyDown(Console.KeyToggleWindow))
+        //    {
+        //        isVisible = !isVisible;
+
+        //        if (!isVisible)
+        //        {
+        //            m_InputString = string.Empty;
+        //        }
+        //        else
+        //        {
+        //            ScrollToBottom();
+        //        }
+        //    }
+        //}
 
         private bool IsPointerOnGUI(Vector2 vector, Rect rect)
         {
@@ -224,71 +227,141 @@ namespace SkToolbox.Controllers
         {
             Event evt = Event.current;
 
+            // Handle visibility toggle regardless of current visibility state
+            if (evt.type == EventType.KeyDown && evt.keyCode == Settings.Console.KeyToggleWindow)
+            {
+                ToggleVisibility(evt);
+            }
+
+            if (evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            {
+                if (!m_InputString.Equals(string.Empty))
+                {
+                    HandleInput(m_InputString);
+                }
+            }
+
+            // If the console is visible, process key events and prevent passthrough
+            if (IsVisible)
+            {
+                if (evt.isKey)
+                {
+                    HandleKeyEvent(evt);
+                    //PreventKeyPassthroughs(evt);
+                }
+
+                //PreventClickPassthroughs(evt);
+            }
+        }
+
+        private void ToggleVisibility(Event evt)
+        {
+            isVisible = !isVisible;
+
             if (!isVisible)
             {
-                return;
+                m_InputString = string.Empty;
             }
-
-            // Prevent pressthroughs
-            if (Event.current.type == EventType.KeyDown
-                && (
-                   Event.current.keyCode == Console.KeyAutoComplete
-                || Event.current.keyCode == KeyCode.UpArrow
-                || Event.current.keyCode == KeyCode.DownArrow
-                || Event.current.keyCode == KeyCode.KeypadEnter
-                || Event.current.keyCode == KeyCode.Return))
+            else
             {
-                Event.current.Use();
+                ScrollToBottom();
             }
 
-            if (evt.isKey)
+            evt.Use(); // Consume the event to prevent further processing
+        }
+
+        public void ToggleVisibility()
+        {
+            isVisible = !isVisible;
+
+            if (!isVisible)
+            {
+                m_InputString = string.Empty;
+            }
+            else
+            {
+                ScrollToBottom();
+            }
+        }
+
+        private void PreventKeyPassthroughs(Event evt)
+        {
+            if (evt.type == EventType.KeyDown
+                && (
+                   evt.keyCode == Console.KeyAutoComplete
+                || evt.keyCode == KeyCode.UpArrow
+                || evt.keyCode == KeyCode.DownArrow
+                || evt.keyCode == KeyCode.KeypadEnter
+                || evt.keyCode == KeyCode.Return))
+            {
+                evt.Use();
+            }
+        }
+
+        private void HandleKeyEvent(Event evt)
+        {
+            // Check if the event is a key press event
+            if (evt.type == EventType.KeyDown)
             {
                 switch (evt.keyCode)
                 {
-                    case KeyCode.Return:
-                        if (!m_InputString.Equals(string.Empty))
-                        {
-                            HandleInput(m_InputString);
-                        }
-                        break;
-                    case KeyCode.KeypadEnter:
-                        if (!m_InputString.Equals(string.Empty))
-                        {
-                            HandleInput(m_InputString);
-                        }
-                        break;
-
-                    case KeyCode.UpArrow:
-                        m_InputString = m_InputHistory.Fetch(m_InputString, true);
-                        m_MoveCursorOnNextFrame = true;
-                        break;
-                    case KeyCode.DownArrow:
-                        m_InputString = m_InputHistory.Fetch(m_InputString, false);
-                        m_MoveCursorOnNextFrame = true;
-                        break;
+                    //case KeyCode.Return:
+                    //    if (!m_InputString.Equals(string.Empty))
+                    //    {
+                    //        HandleInput(m_InputString);
+                    //    }
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.KeypadEnter:
+                    //    if (!m_InputString.Equals(string.Empty))
+                    //    {
+                    //        HandleInput(m_InputString);
+                    //    }
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.UpArrow:
+                    //    m_InputString = m_InputHistory.Fetch(m_InputString, true);
+                    //    m_MoveCursorOnNextFrame = true;
+                    //    evt.Use();
+                    //    break;
+                    //case KeyCode.DownArrow:
+                    //    m_InputString = m_InputHistory.Fetch(m_InputString, false);
+                    //    m_MoveCursorOnNextFrame = true;
+                    //    evt.Use();
+                    //    break;
                     case KeyCode.Tab:
                         HandleAutoComplete();
+                        evt.Use();
                         break;
                     default:
                         break;
                 }
             }
+        }
 
-            switch (Event.current.button)
+        internal void KeyUp()
+        {
+            m_InputString = m_InputHistory.Fetch(m_InputString, true);
+            m_MoveCursorOnNextFrame = true;
+        }
+
+        internal void KeyDown()
+        {
+            m_InputString = m_InputHistory.Fetch(m_InputString, false);
+            m_MoveCursorOnNextFrame = true;
+        }
+
+        private void PreventClickPassthroughs(Event evt)
+        {
+            bool isMouseClick = evt.type == EventType.MouseDown || evt.type == EventType.MouseUp;
+
+            if (!IsPointerOnGUI(evt.mousePosition, m_MainWindow) || !isMouseClick) return;
+
+            switch (evt.button)
             {
-                case 0: // Left mouse button // Prevent clickthroughs
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow) && (Event.current.type == EventType.MouseDown
-                                                                                    || Event.current.type == EventType.MouseUp))
-                    {
-                        Event.current.Use(); // Consume the event
-                    }
-                    break;
-                case 1://Right mouse button // Prevent clickthroughs
-                    if (IsPointerOnGUI(Event.current.mousePosition, m_MainWindow) && (Event.current.type == EventType.MouseDown
-                                                                                    || Event.current.type == EventType.MouseUp))
-                    {
-                        Event.current.Use(); // Consume the event
-                    }
+                case 0: // Left mouse button
+                case 1: // Right mouse button
+                    evt.Use(); // Consume the event
                     break;
                 default:
                     break;
@@ -297,84 +370,65 @@ namespace SkToolbox.Controllers
 
         private void HandleAutoComplete()
         {
-            if (!string.IsNullOrEmpty(m_InputString))
+            if (string.IsNullOrEmpty(m_InputString)) return;
+
+            string[] commands = m_InputString.Split(';');
+
+            if (commands.Length > 1)
             {
-                string[] commands = m_InputString.Split(';');
-                if (commands.Length > 1) // Are there multiple commands found?
-                {
-                    string command = commands[commands.Length - 1].Simplified().Split()[0];
-                    var matchCommand = Handler.GetLikelyCommand(command);
-
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                    {
-                        m_InputString = string.Empty;
-
-                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
-                        foreach (string cmd in commands.Take(commands.Length - 1))
-                        {
-                            sb.Append(cmd.Simplified()).Append("; ");
-                        }
-                        sb.Append(matchCommand.Value.data.Keyword);
-                        m_InputString = sb.ToString();
-                    }
-                    m_MoveCursorOnNextFrame = true;
-                }
-                else // Only one found
-                {
-                    string strToCursor = m_InputString.Substring(0, m_caretPos);
-                    string command = strToCursor.Simplified().Split()[0];
-                    KeyValuePair<string, CommandMeta> matchCommand = new KeyValuePair<string, CommandMeta>();
-                    if (m_caretPosStored != m_caretPos)
-                    {
-                        m_caretPosStored = m_caretPos;
-                        m_CurrentSkip = 0;
-                        matchCommand = Handler.GetLikelyCommand(command);
-                    }
-                    else
-                    {
-                        m_CurrentSkip++;
-                        matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                        if (string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                        { // Did we loop the whole list? Go back to the start
-                            m_CurrentSkip = 0;
-                            matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
-                        }
-                    }
-
-                    int tempCounter = 0;
-                    // Are there more than 1 possible commands found?
-                    foreach (var possibleCommands in Handler.GetPossibleCommands(command))
-                    {
-                        tempCounter++;
-                        if (tempCounter > 1)
-                        {
-                            break;
-                        }
-                    }
-                    // If there's only one command, then move the cursor to the end 
-                    if (tempCounter == 1)
-                    {
-                        m_MoveCursorOnNextFrame = true;
-                    }
-
-                    if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
-                    {
-                        m_InputString = string.Empty;
-
-                        StringBuilder sb = new StringBuilder(); // Select entire length other than the last command
-                        foreach (string cmd in commands.Take(commands.Length - 1))
-                        {
-                            sb.Append(cmd.Simplified()).Append("; ");
-                        }
-                        sb.Append(matchCommand.Value.data.Keyword);
-                        m_InputString = sb.ToString();
-                    }
-                }
+                HandleAutoCompleteForMultipleCommands(commands);
             }
             else
             {
-                m_InputString = m_InputHistory.Fetch(m_InputString, true).Split()[0] + " ";
+                HandleAutoCompleteForSingleCommand(commands);
+            }
+        }
+
+        private void HandleAutoCompleteForMultipleCommands(string[] commands)
+        {
+            string lastCommand = commands[commands.Length - 1].Simplified().Split()[0];
+            var matchCommand = Handler.GetLikelyCommand(lastCommand);
+
+            if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+            {
+                m_InputString = string.Join("; ", commands.Take(commands.Length - 1).Select(cmd => cmd.Simplified())) + "; " + matchCommand.Value.data.Keyword;
+            }
+
+            m_MoveCursorOnNextFrame = true;
+        }
+
+        private void HandleAutoCompleteForSingleCommand(string[] commands)
+        {
+            string strToCursor = m_InputString.Substring(0, m_caretPos);
+            string command = strToCursor.Simplified().Split()[0];
+            KeyValuePair<string, CommandMeta> matchCommand;
+
+            if (m_caretPosStored != m_caretPos)
+            {
+                m_caretPosStored = m_caretPos;
+                m_CurrentSkip = 0;
+                matchCommand = Handler.GetLikelyCommand(command);
+            }
+            else
+            {
+                m_CurrentSkip++;
+                matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                if (string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+                {
+                    m_CurrentSkip = 0;
+                    matchCommand = Handler.GetLikelyCommand(command, m_CurrentSkip);
+                }
+            }
+
+            bool hasMultiplePossibleCommands = Handler.GetPossibleCommands(command).Skip(1).Any();
+            if (!hasMultiplePossibleCommands)
+            {
                 m_MoveCursorOnNextFrame = true;
+            }
+
+            if (!string.IsNullOrEmpty(matchCommand.Value?.data?.Keyword))
+            {
+                m_InputString = matchCommand.Value.data.Keyword;
             }
         }
 
@@ -389,13 +443,13 @@ namespace SkToolbox.Controllers
             {
                 GUILayout.BeginVertical(m_StyleInput);
 
-                if(SkVersionChecker.NewVersionAvailable)
-                {
-                    if(GUILayout.Button("New version (" + SkVersionChecker.latestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.currentVersion + ") available on " + SkVersionChecker.ApplicationSource + "!", m_StylePanelButtons))
-                    {
-                        Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
-                    }
-                }
+                //if (SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).NewerVersionAvailable)
+                //{
+                //    if (GUILayout.Button("New version (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).LatestVersion + ") of " + Loaders.SkBepInExLoader.MODNAME + " (" + SkVersionChecker.GetCheckRequest(SkToolbox.Loaders.SkBepInExLoader.MODNAME).CurrentVersion + ")!", m_StylePanelButtons))
+                //    {
+                //        Application.OpenURL("https://github.com/derekShaheen/SkToolbox/releases");
+                //    }
+                //}
 
                 m_LinesScrollPosition = GUILayout.BeginScrollView(m_LinesScrollPosition, false, false,
                     new GUILayoutOption[]
@@ -411,7 +465,7 @@ namespace SkToolbox.Controllers
                     GUILayout.Label(line, m_StyleOutput);
                     if (GUILayout.Button(" ", GUI.skin.box, GUILayout.Width(22)))
                     {
-                        
+
                         m_InputString = Util.StripTags(line).Trim();
                         m_MoveCursorOnNextFrame = true;
                     };
@@ -568,29 +622,48 @@ namespace SkToolbox.Controllers
                 GUILayout.MaxHeight(m_MainWindow.height),
             });
 
-            if(bannerTexture != null)
+            if (bannerTexture != null)
             {
                 if (GUILayout.Button(bannerTexture, m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (SkVersionChecker.NewVersionAvailable ? 
-                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
-                                    "\tUp to date!".WithColor(Color.green)));
-                    ScrollToBottom();
+                    if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
+                    {
+                        //SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+
+                        //Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                        //    "\n" + (checkRequest.NewerVersionAvailable ?
+                        //                ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
+                        //                "\tUp to date!".WithColor(Color.green)));
+                        Logger.Submit("SkToolbox " + Loaders.SkBepInExLoader.VERSION + " on " + Application.productName);
+                        foreach (var plugin in Loaders.SkBepInExLoader.Loader.pluginInfo)
+                        {
+                            Logger.Submit($"Plugin: {plugin.Key}, Version: {plugin.Value}");
+                        }
+                        ScrollToBottom();
+                    }
                 }
-            } else
+            }
+            else
             {
                 if (GUILayout.Button("<color=#F0D346>SkToolbox</color>", m_StyleBanner))
                 {
-                    Logger.Submit(SkVersionChecker.currentVersion.ToString() + " on " + Application.productName +
-                        "\n" + (SkVersionChecker.NewVersionAvailable ?
-                                    ("New Version Available: " + SkVersionChecker.latestVersion).WithColor(Color.yellow) :
-                                    "\tUp to date!".WithColor(Color.green)));
+                    //SkVersionChecker.CheckRequest checkRequest = SkVersionChecker.GetCheckRequest(Loaders.SkBepInExLoader.MODNAME);
+
+                    //Logger.Submit(checkRequest.CurrentVersion.ToString() + " on " + Application.productName +
+                    //    "\n" + (checkRequest.NewerVersionAvailable ?
+                    //                ("New Version Available: " + checkRequest.LatestVersion.ToString()).WithColor(Color.yellow) :
+                    //                "\tUp to date!".WithColor(Color.green)));
+                    Logger.Submit("SkToolbox " + Loaders.SkBepInExLoader.VERSION + " on " + Application.productName);
+                    foreach (var plugin in Loaders.SkBepInExLoader.Loader.pluginInfo)
+                    {
+                        Logger.Submit($"Plugin: {plugin.Key}, Version: {plugin.Value}");
+                    }
                     ScrollToBottom();
                 }
             }
 
-            if(Handler.GetAllCommands().Count == 0 && Handler.IsSearching) {
+            if (Handler.GetAllCommands().Count == 0 && Handler.IsSearching)
+            {
                 GUILayout.Label("Searching...", m_StylePanelButtons);
             }
 
@@ -669,13 +742,13 @@ namespace SkToolbox.Controllers
                 }
 
                 m_CurrentString = m_InputString;
-                string[] commands = m_InputString.Split(';');
-                string command = commands[commands.Length - 1].Simplified().Split()[0];
+                string lastCommand = m_InputString.Split(';').Last().Simplified().Split().FirstOrDefault();
 
-                m_currentCommand = Handler.GetCommand(command);
+                m_currentCommand = lastCommand != null ? Handler.GetCommand(lastCommand) : null;
                 return true;
             }
         }
+
 
         public void Submit(string entry, bool prefix = true)
         {
@@ -711,7 +784,12 @@ namespace SkToolbox.Controllers
             }
         }
 
-        private void ScrollToBottom()
+        public void HandleInput()
+        {
+            HandleInput(m_InputString);
+        }
+
+        public void ScrollToBottom()
         {
             m_LinesScrollPosition.y = Mathf.Infinity;
         }
@@ -722,31 +800,54 @@ namespace SkToolbox.Controllers
             {
                 font = Font.CreateDynamicFontFromOSFont("Consolas", Console.FontSize);
             }
+
+            UpdateWindowStyle();
+            UpdateStyleOutput();
+            UpdateStyleHint();
+            UpdateStyleInput();
+            UpdateStyleBanner();
+            UpdateStyleCategoryBanner();
+            UpdateStylePanelButtons();
+        }
+
+        private void UpdateWindowStyle()
+        {
             GUI.color = Console.Theme;
             GUI.skin.window.font = font;
             GUI.skin.window.fontStyle = FontStyle.Bold;
+        }
 
+        private void UpdateStyleOutput()
+        {
             m_StyleOutput.font = font;
             m_StyleOutput.fontSize = font.fontSize;
             m_StyleOutput.richText = true;
             m_StyleOutput.normal.textColor = Color.white;
             m_StyleOutput.wordWrap = true;
             m_StyleOutput.alignment = TextAnchor.UpperLeft;
+        }
 
+        private void UpdateStyleHint()
+        {
             if (m_StyleHint == null)
             {
                 m_StyleHint = new GUIStyle(m_StyleOutput);
                 m_StyleHint.fontSize = 13;
             }
+        }
 
+        private void UpdateStyleInput()
+        {
             if (m_StyleInput == null)
             {
                 m_StyleInput = new GUIStyle(GUI.skin.box);
                 m_StyleInput.alignment = TextAnchor.LowerLeft;
                 m_StyleInput.normal.textColor = Color.white;
-                //m_StyleInput.fontSize = font.fontSize;
             }
+        }
 
+        private void UpdateStyleBanner()
+        {
             if (m_StyleBanner == null)
             {
                 m_StyleBanner = new GUIStyle(m_StyleInput);
@@ -754,7 +855,10 @@ namespace SkToolbox.Controllers
                 m_StyleBanner.fontStyle = FontStyle.BoldAndItalic;
                 m_StyleBanner.alignment = TextAnchor.MiddleCenter;
             }
+        }
 
+        private void UpdateStyleCategoryBanner()
+        {
             if (m_StyleCategoryBanner == null)
             {
                 m_StyleCategoryBanner = new GUIStyle(m_StyleInput);
@@ -762,7 +866,10 @@ namespace SkToolbox.Controllers
                 m_StyleCategoryBanner.alignment = TextAnchor.MiddleCenter;
                 m_StyleCategoryBanner.fontStyle = FontStyle.Bold;
             }
+        }
 
+        private void UpdateStylePanelButtons()
+        {
             if (m_StylePanelButtons == null)
             {
                 m_StylePanelButtons = new GUIStyle(GUI.skin.textArea);
@@ -771,76 +878,65 @@ namespace SkToolbox.Controllers
             m_StylePanelButtons.fontSize = font.fontSize;
         }
 
+
         public void HandlePositioning(int xOverride = -1, bool panelNeedsXAdjustment = false)
         {
             // Setup sizing
-            if (Console.Width == 0) Console.Width = -1;
-            if (Console.Height == 0) Console.Height = -1;
+            int margin = Console.Margin * 2;
+            m_Width = Console.Width >= 0 ? Console.Width - margin : (Screen.width / Mathf.Abs(Console.Width)) - margin;
+            m_Height = Console.Height >= 0 ? Console.Height : (Screen.height / Mathf.Abs(Console.Height) - 125);
 
-            if (Console.Width >= 0)
-            {
-                m_Width = Console.Width - (Console.Margin * 2);
-
-            }
-            else
-            {
-                m_Width = (Screen.width / Mathf.Abs(Console.Width)) - (Console.Margin * 2);
-            }
-
-            if (Console.Height >= 0)
-            {
-                m_Height = Console.Height;
-            }
-            else
-            {
-                m_Height = (Screen.height / Mathf.Abs(Console.Height) - 125);
-            }
             // Set min/max sizing
             m_Width = Mathf.Clamp(m_Width, 320, Screen.width);
             m_Height = Mathf.Clamp(m_Height, 240, Screen.height);
 
             // Setup positioning
+            int centerX = (Screen.width / 2) - (m_Width / 2);
+            int centerY = (Screen.height / 2) - (m_Height / 2);
+            int bottomY = Screen.height - m_Height - Console.Margin - 125;
+
             switch (Console.Position)
             {
                 case Console.ConsolePos.TopCentered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
+                    m_Xpos = centerX;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.LeftCentered:
                     m_Xpos = Console.Margin;
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.RightCentered:
                     m_Xpos = Screen.width - m_Width - Console.Margin;
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.Centered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
-                    m_Ypos = (Screen.height / 2) - (m_Height / 2);
+                    m_Xpos = centerX;
+                    m_Ypos = centerY;
                     break;
                 case Console.ConsolePos.TopLeft:
                     m_Xpos = Console.Margin;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.TopRight:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
+                    m_Xpos = Screen.width - m_Width - Console.Margin;
                     m_Ypos = Console.Margin;
                     break;
                 case Console.ConsolePos.BottomLeft:
                     m_Xpos = Console.Margin;
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Ypos = bottomY;
                     break;
                 case Console.ConsolePos.BottomRight:
                     m_Xpos = Screen.width - m_Width - Console.Margin;
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Ypos = bottomY;
                     break;
                 case Console.ConsolePos.BottomCentered:
-                    m_Xpos = (Screen.width / 2) - (m_Width / 2);
-                    m_Ypos = (Screen.height - m_Height - Console.Margin - 125);
+                    m_Xpos = centerX;
+                    m_Ypos = bottomY;
                     break;
                 default:
                     break;
             }
+
             if (xOverride > 0)
             {
                 m_Width = xOverride;
@@ -856,12 +952,12 @@ namespace SkToolbox.Controllers
             return Handler;
         }
 
-        private void EatInputInRect(Rect eatRect)
-        {
-            var mousePos = Input.mousePosition;
-            if (eatRect.Contains(new Vector2(mousePos.x, Screen.height - mousePos.y)))
-                Input.ResetInputAxes();
-        }
+        //private void EatInputInRect(Rect eatRect)
+        //{
+        //    var mousePos = Input.mousePosition;
+        //    if (eatRect.Contains(new Vector2(mousePos.x, Screen.height - mousePos.y)))
+        //        Input.ResetInputAxes();
+        //}
 
         /// <summary>
         /// A history controller that stores a list of items and allows fetching the previous and next item in the list.
